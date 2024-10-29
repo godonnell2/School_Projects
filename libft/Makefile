@@ -1,8 +1,9 @@
 #VARIABLES
 CC = cc #need to have this because will compile with gcc
 CFLAGS = -Wall -Wextra -Werror -g #need this because wont use flags otherwise
-SRC = src/ft_isalnum.c src/ft_isalpha.c src/ft_isascii.c src/ft_is_digit.c \
-src/ft_strlen.c src/ft_tolower.c src/ft_toupper.c src/ft_strncmp.c src/ft_atoi.c \
+SRC = ft_isalnum.c ft_isalpha.c ft_isascii.c ft_is_digit.c ft_strlen.c\
+ft_tolower.c ft_toupper.c ft_strncmp.c ft_atoi.c ft_memset.c ft_memcpy.c\
+ft_strlcpy.c ft_strlcat.c
 OBJS = $(SRC:.c=.o) #no spaces -spaces pattern rule
 LIB = libft.a
 
