@@ -12,8 +12,11 @@ void	ft_bzero(void *s, size_t n)
 		str[i] = 0;
 		i++;
 	}
+	
+	return ;
 }
 
+/*
 #include <string.h>
 
 int	main(void)
@@ -22,8 +25,9 @@ int	main(void)
 	int		n;
 
 	n = 4;
-	ft_btzero(str, n);
+	ft_bzero(str, n);
 	printf("MINE:%s\n", str);
-	btzero(str, n);
+	bzero(str, n);
 	printf("REAl:%s", str);
 }
+*/
