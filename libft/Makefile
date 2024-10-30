@@ -1,5 +1,5 @@
 #VARIABLES
-CC = cc #need to have this because will compile with gcc
+CC = clang++ #need to have this because will compile with gcc
 CFLAGS = -Wall -Wextra -Werror -g #need this because wont use flags otherwise
 SRC = ft_isalnum.c ft_isalpha.c ft_isascii.c ft_is_digit.c ft_strlen.c\
 ft_tolower.c ft_toupper.c ft_strncmp.c ft_atoi.c ft_memset.c ft_memcpy.c\
