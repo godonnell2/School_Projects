@@ -3,27 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:41:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/29 12:41:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/10/31 21:10:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
 
-# include <bsd/string.h> //this is for memset etc..
+# include <string.h> //this is for memset etc.. bsd is strlcat need to include bsd/
 # include <ctype.h>      //this is for alnum etc.
-# include <stddef.h>
-# include <stdint.h>
+# include <stddef.h>	// this is for size_t
+# include <stdint.h> // this is for SIZE_MAX
+# include <stdlib.h> // this is for malloc
 # include <stdio.h> // this is for printf
 
 int		ft_isalnum(int i);
 int		ft_isalpha(int c);
 int		ft_isascii(int c);
 int		ft_isdigit(int c);
-int		ft_strlen(const char *str);
+size_t	ft_strlen(const char *str);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		ft_toupper(int c);
 void	ft_bzero(void *s, size_t n);
@@ -42,6 +43,7 @@ int		ft_memcmp(const void *s1, const void *s2, size_t n);
 int		ft_isprint(int c);
 int		ft_tolower(int c);
 size_t	ft_strlcat(char *dst, const char *src, size_t size);
+char *ft_substr(char const *s, unsigned int start, size_t len);
 
 #endif // LIBFT_H
 
