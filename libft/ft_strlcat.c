@@ -1,30 +1,27 @@
 #include "libft.h"
 
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
+size_t	ft_strlcat(char *dst, const char *src, size_t dst_size)
 {
 	size_t	i;
 	size_t	j;
-	size_t	length_src;
-	size_t	length_dst;
 
 	i = 0;
 	j = 0;
-	length_src = ft_strlen(src);
-	length_dst = ft_strlen(dst);
-	// size is a buffer to hold the output of hte cat so if its too small the cat
-	// cant work
-	if (size <= length_dst)
+	
+	while(dst[i])
+		i++;
+	
+	while (i + j < size - 1 && src[j])
 	{
-		// ie you return what you would have made if you could have catted
-		return (length_src + size);
+		dst[i + j] = src[j++];
+		j++;
 	}
-	i = length_dst;
-	while (i < size - 1 && src[j])
+
+	if(dst[i] != size)
 	{
-		dst[i++] = src[j++];
+		dst[i] = '\0';
 	}
-	dst[i] = '\0';
-	return (length_dst + length_src);
+	return (i + length_src);
 }
 
 /*
