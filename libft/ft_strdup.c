@@ -9,7 +9,7 @@
    
     size_t i;
     i = 0; 
-   char * ptr = malloc(length +1);
+   char * ptr = (char *)malloc(length +1);
    if (ptr == NULL)
     return NULL;
 
@@ -23,6 +23,11 @@
    return ptr;
  }
 
+/*
+could also do it with 
+return ((char *)ft_memcpy(dup, s, len))
+*/
+/*
  #include <stdio.h>
 
 int main() {
@@ -42,3 +47,4 @@ int main() {
 
     return 0; 
 }
+*/
