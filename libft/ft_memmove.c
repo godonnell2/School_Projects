@@ -36,13 +36,14 @@ void	*ft_memmove(void *dst, const void *src, size_t len)
 			len--;
 		}
 	}
-	return (dest);
+	return (dst);
 }
 
 /*
 NEED TO REMEMBER  LEN == 0
 if dest comes after src theres overlap, will overwrite src
 ie if its bigger!
+NEED TO RETURN ORIGINAL PTR DST NOT DEST
 #include <stdio.h>
 #include <string.h>
 

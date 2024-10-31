@@ -18,7 +18,7 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 	size_t	j;
 
 	i = 0;
-	if (!haystack || len == 0)
+	if (!haystack)
 		return (NULL);
 	if (!needle || needle[0] == '\0')
 		return ((char *)haystack);
@@ -38,7 +38,7 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 
 /*
    while( n[j] && h[i + j] == n[j] && (i +j) < len )
-   really need to review this function
+   NEED TO MAKE SURE I REMEMBER THE VALIDATIONS!!!
 Basic substring found within the limit.
 Substring not found within the limit.
 Limit shorter than the full match.
