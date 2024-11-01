@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-size_t ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
 	int	i;
 
@@ -25,8 +25,8 @@ size_t ft_strlen(const char *str)
 }
 
 /*
-o fix this issue, you should modify the declaration of ft_strlen to 
-accept a const char * instead of char *. This change allows ft_strlen to 
+o fix this issue, you should modify the declaration of ft_strlen to
+accept a const char * instead of char *. This change allows ft_strlen to
 accept string literals]
  and other constant strings without warnings.
 */
