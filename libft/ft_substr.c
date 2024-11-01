@@ -4,9 +4,9 @@ char *ft_substr(char const *s, unsigned int start, size_t len)
 {
     if(s == NULL ||  len == 0)
         return NULL;
-    if( ft_strlen(s) > start )
+    if( ft_strlen(s) < start )
        len = 0;
-    if( ft_strlen(s + start) + len)
+    if( ft_strlen(s + start) < len)
         len = ft_strlen(s + start);
    char * result = (char *)malloc(len * sizeof(char) + 1);
    if( result == NULL )
@@ -15,6 +15,7 @@ char *ft_substr(char const *s, unsigned int start, size_t len)
     return result;
 }
 
+/*
 int main ()
 {
     const char s[] = "tests";
@@ -23,6 +24,7 @@ int main ()
 
     printf("%s",ft_substr(s, start, len));
 }
+*/
 /*
 malloc means not and NULL
 need to remember strlcpy oh wait no i dont can copy manually in exam

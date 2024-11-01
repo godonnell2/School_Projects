@@ -6,19 +6,19 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:41:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/31 21:10:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/01 08:18:09 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
-# define LIBFT_H
+#define LIBFT_H
 
-# include <string.h> //this is for memset etc.. bsd is strlcat need to include bsd/
-# include <ctype.h>      //this is for alnum etc.
-# include <stddef.h>	// this is for size_t
-# include <stdint.h> // this is for SIZE_MAX
-# include <stdlib.h> // this is for malloc
-# include <stdio.h> // this is for printf
+#include <string.h> //this is for memset etc.. bsd is strlcat need to include bsd in terminal lbsd/
+#include <ctype.h>      //this is for alnum etc.
+#include <stddef.h>	// this is for size_t
+#include <stdint.h> // this is for SIZE_MAX
+#include <stdlib.h> // this is for malloc
+#include <stdio.h> // this is for printf
 
 int		ft_isalnum(int i);
 int		ft_isalpha(int c);
@@ -43,7 +43,9 @@ int		ft_memcmp(const void *s1, const void *s2, size_t n);
 int		ft_isprint(int c);
 int		ft_tolower(int c);
 size_t	ft_strlcat(char *dst, const char *src, size_t size);
-char *ft_substr(char const *s, unsigned int start, size_t len);
+char 	*ft_substr(char const *s, unsigned int start, size_t len);
+char 	*ft_strjoin(char const *s1, char const *s2);
+
 
 #endif // LIBFT_H
 
