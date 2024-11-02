@@ -5,7 +5,6 @@ void    ft_putnbr_fd(int n, int fd)
     long nbr;
 
     nbr = (long)n; 
-    int sign = 1; 
     char minus = '-';
 
     if (nbr < 0 )

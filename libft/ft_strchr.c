@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:01:52 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/31 11:01:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/02 17:26:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ char	*ft_strchr(const char *s, int c)
 	char	*str;
 	int		len;
 
+	if (s == NULL) {
+        return NULL; 
+    }
 	str = (char *)s;
 	chr = (char)c;
 	len = ft_strlen(str);

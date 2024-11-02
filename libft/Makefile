@@ -9,8 +9,8 @@ ft_isprint.c ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_putchar_fd.c\
 ft_itoa.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_strmapi.c \
 ft_striteri.c
 
-OBJS = $(SRC:.c=.o) #no spaces pattern rule 
-LIB = libft.a																				
+NAME = libft.a
+OBJS = $(SRC:.c=.o) #no spaces pattern rule 																			
 																														
 #good to learn to use prefix will can remove src / in SRC then
 
@@ -22,12 +22,12 @@ LIB = libft.a
 #no need to even say make all though its fine if i do
 #the bottom line is our shell commands duh !
 
-all: $(LIB)
+all: $(NAME)
 
 #create lib if missing separator error need add colon !!
 #need tab or wont work
-$(LIB): $(OBJS) 
-	ar rcs $(LIB) $^
+$(NAME): $(OBJS) 
+	ar rcs $@ $^
 #$(LIB) = @$(OBJS) all dependencies = caret ^
 
 #cant use $(SRC) because this is a list need the $ < first prequisite /
@@ -43,7 +43,7 @@ clean:
 	rm -f $(OBJS)
 
 fclean : clean
-	rm -f $(LIB)
+	rm -f $(NAME)
 
 re : fclean all
 
