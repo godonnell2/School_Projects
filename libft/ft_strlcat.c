@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:22:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/31 11:22:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/03 18:56:23 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,19 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 int	main(void)
 {
 	char	*src;
-	char	dest[20] = "a ";
-
+	char	dest[20] = "test";
 	src = "Olaaa";
-	printf("My Func : %zu\n", ft_strlcat(dest, src, 21));
+	
+	printf("My Func : %zu\n", ft_strlcat(dest, src, 6));
 		printf("Resulting string: '%s'\n", dest);
-		strcpy(dest, "a ");
-	printf("Original : %zu\n", strlcat(dest, src, 21));
-		printf("Resulting string: '%s'\n", dest);
+	char	test[20] = "test";
+		
+	printf("Original : %zu\n", strlcat(test, src, 6));
+		printf("Resulting string: '%s'\n", test);
 	return(0);
 }
 */
+
 /*
 NEED TO REMMEBER i < dst_size
 dst_size == 0
@@ -68,7 +70,18 @@ Buffer Overflow:
 		or equal to the length of dst. If dst_size is 0, it should return the
 		length of src without modifying dst.
 
+ int main() {
+    char dest[10] = "Hello"; // Length of "Hello" is 5
+    const char *src = "World!"; // Length of "World!" is 6
 
+   
+    size_t result = strlcat(dest, src, sizeof(dest));
+
+    printf("Resulting string: '%s'\n", dest);
+    printf("Total length of the string it tried to create: %zu\n", result);
+    
+    return 0;
+}
 
 */
 /*

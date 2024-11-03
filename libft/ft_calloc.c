@@ -3,25 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/31 11:02:37 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/03 19:24:17 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <stdlib.h>
+#include <stdint.h>
 
 void	*ft_calloc(size_t count, size_t size)
 {
 	size_t	total_mem;
 	void	*ptr;
 
-	if (count == 0 || size == 0)
-	{
-		return (malloc(0));
-	}
 	if (count > SIZE_MAX / size)
 	{
 		return (NULL);

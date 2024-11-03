@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:14:49 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 16:59:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/02 18:59:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 	size_t	j;
 
 	i = 0;
-	if (!needle || needle[0] == '\0')
+	if ( needle[0] == '\0')
 		return ((char *)haystack);
 	while (haystack[i] && i < len)
 	{

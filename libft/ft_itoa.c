@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:41:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 18:10:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/03 19:44:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*ft_itoa(int n)
 	
 	len = find_len(nbr);
 	result = (char *)malloc(sizeof(char) * (len + 1));
-	if (result == NULL)
+	if(result == NULL) 
 		return (NULL);
 	result[len] = '\0';
 	if (nbr == 0)
@@ -53,9 +53,8 @@ char	*ft_itoa(int n)
 		}
 	while(nbr > 0)
 	{
-		result[len-1] = (nbr % 10) + '0';
+		result[--len] = (nbr % 10) + '0';
 		nbr = nbr / 10;
-		len--;
 	}
 	return (result);
 }
@@ -78,7 +77,13 @@ int	main(void)
 	return (0);
 }
 */
-/*needto fill arr from len -1 or will get seg fault*/
+
+/*
+need to add null byte after checking null 
+cos otherwise you len is zero by teh time you add it
+needto fill arr from len -1 or will get seg fault
+becayse arrays are 0indexed 
+*/
 
 /*
 int len;

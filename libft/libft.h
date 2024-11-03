@@ -6,19 +6,19 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:41:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 13:26:47 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/02 18:17:37 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
-# define LIBFT_H
+#define LIBFT_H
 
-# include <ctype.h>  //this is for alnum etc.
-# include <stddef.h> // this is for size_t
-# include <stdint.h> // this is for SIZE_MAX
-# include <stdio.h>  // this is for printf
-# include <stdlib.h> // this is for malloc
-# include <string.h>
+#include <ctype.h>  //this is for alnum etc.
+#include <stddef.h> // this is for size_t
+#include <stdint.h> // this is for SIZE_MAX
+#include <stdio.h>  // this is for printf
+#include <stdlib.h> // this is for malloc
+#include <string.h>
 //this is for memset etc.. bsd is strlcat need to include bsd in terminal lbsd/
 
 int		ft_isalnum(int i);

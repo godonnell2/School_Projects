@@ -6,27 +6,28 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 17:11:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/02 19:01:36 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memmove(void *dst, const void *src, size_t len)
+void *ft_memmove(void *dst, const void *src, size_t len)
 {
-	char		*dest;
-	const char	*s = (const char *)src;
+	char *dest;
+	const char *s = (const char *)src;
+	dest = (char *)dst;
 
-	if (dst == NULL && src == NULL) 
-        return NULL;
+	if (dst == NULL && src == NULL)
+		return NULL;
 	if (len == 0)
 		return (dst);
-	dest = (char *)dst;
+
 	if (dest > s)
 	{
 		while (len > 0)
 		{
-			dest[len - 1] = s[len - 1];
+			dest[len-1] = s[len - 1];
 			len--;
 		}
 	}
@@ -52,21 +53,49 @@ Overlapping memory regions. s+2 s-2
 Cases where len is 0.
 
 */
-/* 
+
+/*
 #include <stdio.h>
 #include <string.h>
 
-int	main(void) {
-	char src[] = "abcdefgh";
-	char dst[] = "01234567";
-	char dst_ft[] = "01234567";
+int main(void)
+{
+	int size = 50;
+	void *buff = malloc(size);
+	memset(buff, ' ', size);
+	char *src = buff + 10;
 
-	ft_memmove(dst_ft + 2, src + 1, 5);
-	memmove(dst + 2, src + 1, 5);
+	for (int i = 10; i < 20; ++i)
+	{
+		((char*)buff)[i] = 'A';
+		((char*)buff)[i+22] = 'B';
+	}
+	
+	char *dst = buff + 32;
 
-	printf("%s\n", dst);
-	printf("%s\n", dst_ft);
+	//ft_memmove(dst, src, 10);
+	// memmove(dst + 2, src + 1, 5);
 
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%02d ", i);
+	}
+	printf("\nBefore\n");
+	for (int i = 0; i < size; ++i)
+	{
+		printf(" %c ", ((char *)buff)[i]);
+	}
+
+	printf("\n");
+	ft_memmove(dst, src, 10);
+
+	printf("After\n");
+	for (int i = 0; i < size; ++i)
+	{
+		printf(" %c ", ((char *)buff)[i]);
+	}
+
+	printf("\n");
 	return (0);
 }
 */
