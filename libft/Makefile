@@ -7,11 +7,13 @@ ft_strlcpy.c ft_strlcat.c ft_bzero.c ft_memmove.c ft_strchr.c ft_strrchr.c\
 ft_strnstr.c ft_memchr.c ft_calloc.c ft_strdup.c ft_memset.c ft_memcmp.c\
 ft_isprint.c ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_putchar_fd.c\
 ft_itoa.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_strmapi.c \
-ft_striteri.c
+ft_striteri.c 
 
+BONUS = ft_lstnew.c ft_lstadd_front
 NAME = libft.a
 OBJS = $(SRC:.c=.o) #no spaces pattern rule 																			
-																														
+BONUS_OBJS = $(BONUS:.c=.o) #no spaces pattern rule
+LIB_SO = libft.so																												
 #good to learn to use prefix will can remove src / in SRC then
 
 #TARGETS / DEPENDENCIES or PREREQUISITES / RULES or SHELL COMMANDS
@@ -39,15 +41,21 @@ $(NAME): $(OBJS)
 #dont need this rule as makefile has this INBUILT but i like making it explicit 
 #-I includes my libft.h
 
+bonus: $(OBJS) $(BONUS_OBJS)
+	ar rcs $(NAME) $(OBJS) $(BONUS_OBJS)
+
+so: $(OBJS) $(BONUS_OBJS)
+	gcc -shared -o $(LIB_SO) $(OBJS) $(BONUS_OBJS) -fPIC
+
 clean: 
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(BONUS_OBJS)
 
 fclean : clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(LIB_SO)
 
 re : fclean all
 
 #test : all
 #$(CC) $(CFLAGS) $(LIB) &&./ a.out
 
-.PHONY : clean fclean all 
+.PHONY : clean fclean all bonus re

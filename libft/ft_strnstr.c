@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:14:49 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 18:59:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/04 11:54:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,17 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 	size_t	j;
 
 	i = 0;
-	if ( needle[0] == '\0')
+	if (!needle[i] || len == 0)
 		return ((char *)haystack);
-	while (haystack[i] && i < len)
+	while (haystack[i] && i <= len)
 	{
 		j = 0;
 		while (needle[j] && haystack[i + j] == needle[j] && (i + j) < len)
 		{
 			j++;
 		}
-		if (needle[j] == '\0')
-			return ((char *)(haystack + i));
+		if (j == ft_strlen(needle))
+			return ((char *)haystack + i);
 		i++;
 	}
 	return (NULL);
@@ -44,7 +44,8 @@ Empty substring (should return the original string).
 Empty main string.
 Full match if n is large enough.
 Limit of zero.
-
+NEED TO ACCOUNT FOR LEN = 0 or we GET AN ERROR WHEN THERE IS A 
+NULL STRING!!!! WE CAUSE A CRAASH BY TRYING TO DEREFERENCE NULL
 
 */
 /*

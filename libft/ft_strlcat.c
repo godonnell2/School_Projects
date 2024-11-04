@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:22:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/03 18:56:23 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/04 11:46:48 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 
 	i = 0;
 	src_len = ft_strlen(src);
+	if (size == 0)
+		return (size + src_len);
 	dst_len = ft_strlen(dst);
 	if (dst_len >= size)
 		return (size + src_len);
@@ -29,23 +31,25 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 		dst[dst_len + i] = src[i];
 		i++;
 	}
-	dst[dst_len + i] = '\0';
+	if (size > 0)
+		dst[dst_len + i] = '\0';
 	return (dst_len + src_len);
 }
 
 /*
+#include <bsd/string.h>
 int	main(void)
 {
 	char	*src;
-	char	dest[20] = "test";
-	src = "Olaaa";
-	
-	printf("My Func : %zu\n", ft_strlcat(dest, src, 6));
-		printf("Resulting string: '%s'\n", dest);
-	char	test[20] = "test";
-		
-	printf("Original : %zu\n", strlcat(test, src, 6));
+	char	*test;
+
+	src = NULL;
+	test = "test";
+	printf("Original : %zu\n", strlcat(test, src, 0));
 		printf("Resulting string: '%s'\n", test);
+	char	*dest= "test";
+		printf("My Func : %zu\n", ft_strlcat(dest, src, 0));
+		printf("Resulting string: '%s'\n", dest);
 	return(0);
 }
 */
@@ -53,6 +57,10 @@ int	main(void)
 /*
 NEED TO REMMEBER i < dst_size
 dst_size == 0
+we had to put the check for size == 0 above dest len
+cos otherwise we dereference dst when its null
+real one seg faults when src is NULL so this is fine
+BUUUT! it does not seg fault when dest is NULL and size is 0
 */
 
 /*
@@ -71,16 +79,16 @@ Buffer Overflow:
 		length of src without modifying dst.
 
  int main() {
-    char dest[10] = "Hello"; // Length of "Hello" is 5
-    const char *src = "World!"; // Length of "World!" is 6
+	char dest[10] = "Hello"; // Length of "Hello" is 5
+	const char *src = "World!"; // Length of "World!" is 6
 
-   
-    size_t result = strlcat(dest, src, sizeof(dest));
 
-    printf("Resulting string: '%s'\n", dest);
-    printf("Total length of the string it tried to create: %zu\n", result);
-    
-    return 0;
+	size_t result = strlcat(dest, src, sizeof(dest));
+
+	printf("Resulting string: '%s'\n", dest);
+	printf("Total length of the string it tried to create: %zu\n", result);
+
+	return (0);
 }
 
 */
@@ -141,7 +149,7 @@ Breakdown of the Condition
    Understanding size:
 		size is the total size of the buffer allocated for dst. This includes
 			space for the existing characters in dst and any additional
-			 characters
+				characters
 			from src,
 			plus one extra byte for the null terminator ('\0').
 

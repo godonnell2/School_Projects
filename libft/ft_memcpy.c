@@ -19,9 +19,8 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	unsigned char	*d;
 
 	i = 0;
-	if (dest == NULL && src == NULL) 
-        return NULL;
-		
+	if (dest == NULL && src == NULL)
+		return (NULL);
 	str = (unsigned char *)src;
 	d = (unsigned char *)dest;
 	while (i < n)
@@ -40,7 +39,7 @@ have to use unsigned char!! otherwise mistakes with ints
  function does not handle the case where both the source and
   destination pointers are NULL correctly, particularly when
    a non-zero size is specified. In C, dereferencing a NULL pointer
-    leads to undefined behavior, which often results in a crash (e.g., 
+	leads to undefined behavior, which often results in a crash (e.g.,
 	segmentation fault).
 
 

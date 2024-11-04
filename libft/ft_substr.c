@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/01 14:37:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/04 13:28:37 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 }
 
 /*
+#include <stdio.h>
 int main ()
 {
 	const char	s[] = "tests";
@@ -36,9 +37,11 @@ int main ()
 
 	start = 3;
 	len = 5;
-	printf("%s",ft_substr(s, start, len));
+	char * result = ft_substr(s, start, len);
+	printf("%s",result);
 }
 */
+
 /*
 malloc means not and NULL
 need to remember strlcpy oh wait no i dont can copy manually in exam
@@ -51,6 +54,15 @@ Explanation:
 
 ft_strlen(s) returns 5.
 Since 5 < 6 is true, the condition executes, and len is set to 0.
+Suppose you have:
 
+    s = "Hello, World!"
+    start = 7 (which points to the character 'W')
+    len = 10
+
+The length of the substring starting from index 7 is 6 (the substring is
+ "World!"). Since 6 is less than 10, the condition will be true, and len 
+ will be updated to 6. This means that the function will safely extract 
+ "World!" instead of trying to extract more characters than are available.
 
 */

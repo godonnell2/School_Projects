@@ -3,23 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:41:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/02 18:17:37 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/04 16:50:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
-#define LIBFT_H
+# define LIBFT_H
 
-#include <ctype.h>  //this is for alnum etc.
-#include <stddef.h> // this is for size_t
-#include <stdint.h> // this is for SIZE_MAX
-#include <stdio.h>  // this is for printf
-#include <stdlib.h> // this is for malloc
-#include <string.h>
+# include <ctype.h>  //this is for alnum etc.
+# include <stddef.h> // this is for size_t
+# include <stdint.h> // this is for SIZE_MAX
+# include <stdio.h>  // this is for printf
+# include <stdlib.h> // this is for malloc
+# include <string.h>
 //this is for memset etc.. bsd is strlcat need to include bsd in terminal lbsd/
+
+typedef struct s_list
+{
+	void			*content;
+	struct s_list	*next;
+}	t_list;
 
 int		ft_isalnum(int i);
 int		ft_isalpha(int c);
@@ -49,12 +55,15 @@ char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strtrim(char const *s1, char const *set);
 char	**ft_split(char const *s, char c);
 char	*ft_itoa(int n);
-void 	ft_putchar_fd(char c, int fd);
+void	ft_putchar_fd(char c, int fd);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
-void    ft_putnbr_fd(int n, int fd);
+void	ft_putnbr_fd(int n, int fd);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 void	ft_striteri(char *s, void (*f)(unsigned int, char*));
+
+t_list	*ft_lstnew(void *content);
+void	ft_lstadd_front(t_list **lst, t_list *new);
 
 #endif // LIBFT_H
 

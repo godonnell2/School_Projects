@@ -12,22 +12,21 @@
 
 #include "libft.h"
 
-void *ft_memmove(void *dst, const void *src, size_t len)
+void	*ft_memmove(void *dst, const void *src, size_t len)
 {
-	char *dest;
-	const char *s = (const char *)src;
-	dest = (char *)dst;
+	char		*dest;
+	const char	*s = (const char *)src;
 
+	dest = (char *)dst;
 	if (dst == NULL && src == NULL)
-		return NULL;
+		return (NULL);
 	if (len == 0)
 		return (dst);
-
 	if (dest > s)
 	{
 		while (len > 0)
 		{
-			dest[len-1] = s[len - 1];
+			dest[len - 1] = s[len - 1];
 			len--;
 		}
 	}
@@ -58,24 +57,25 @@ Cases where len is 0.
 #include <stdio.h>
 #include <string.h>
 
-int main(void)
+int	main(void)
 {
-	int size = 50;
-	void *buff = malloc(size);
-	memset(buff, ' ', size);
-	char *src = buff + 10;
+	int		size;
+	void	*buff;
+	char	*src;
+	char	*dst;
 
+	size = 50;
+	buff = malloc(size);
+	memset(buff, ' ', size);
+	src = buff + 10;
 	for (int i = 10; i < 20; ++i)
 	{
 		((char*)buff)[i] = 'A';
 		((char*)buff)[i+22] = 'B';
 	}
-	
-	char *dst = buff + 32;
-
+	dst = buff + 32;
 	//ft_memmove(dst, src, 10);
 	// memmove(dst + 2, src + 1, 5);
-
 	for (int i = 0; i < size; ++i)
 	{
 		printf("%02d ", i);
@@ -85,16 +85,13 @@ int main(void)
 	{
 		printf(" %c ", ((char *)buff)[i]);
 	}
-
 	printf("\n");
 	ft_memmove(dst, src, 10);
-
 	printf("After\n");
 	for (int i = 0; i < size; ++i)
 	{
 		printf(" %c ", ((char *)buff)[i]);
 	}
-
 	printf("\n");
 	return (0);
 }

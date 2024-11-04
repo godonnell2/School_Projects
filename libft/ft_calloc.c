@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/03 19:24:17 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/04 11:10:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	*ft_calloc(size_t count, size_t size)
 		return (NULL);
 	}
 	total_mem = count * size;
-	ptr = malloc(total_mem);
+	ptr = (void *)malloc(total_mem);
 	if (ptr == NULL)
 		return (NULL);
 	ft_bzero(ptr, total_mem);
