@@ -3,30 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 10:34:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/04 15:02:30 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/05 19:07:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s1, char const *chars_trim)
+char	*ft_strtrim(char const *s1, char const *set)
 {
 	unsigned int	i;
 
-	while (*s1 && ft_strchr(chars_trim, *s1))
+	while (*s1 && ft_strchr(set, *s1))
 	{
 		s1++;
 	}
 	i = ft_strlen(s1);
-	while (i > 0 && ft_strrchr(chars_trim, s1[i]))
+	while (i > 0 && ft_strrchr(set, s1[i]))
 	{
 		i--;
 	}
 	return (ft_substr(s1, 0, i + 1));
 }
+
 
 /*
 i+ 1 because arrays are zero indexed
@@ -43,7 +44,7 @@ int	main(void)
 	char const	*end;
 	char		*trimmed;
 
-	s1 = "grpigracegrpi";
+	s1 = "grpigrpigracegrpi";
 	end = "grpi";
 	trimmed = ft_strtrim(s1, end);
 	printf("%s\n", trimmed);
@@ -75,7 +76,8 @@ char	*ft_strtrim(char const *s1, char const *set)
 }
 
 {
-	unsigned int	i;
+	
+unsigned int	i;
 
 	while (*s1 && ft_strchr(chars_trim, *s1))
 	{
@@ -87,7 +89,5 @@ char	*ft_strtrim(char const *s1, char const *set)
 		i--;
 	}
 	return (ft_substr(s1, 0, i + 1));
-}
-
 
 */

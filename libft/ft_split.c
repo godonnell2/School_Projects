@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/01 14:37:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/05 19:06:04 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,11 @@ char	**ft_split(char const *s, char c)
 	arr[i] = NULL;
 	return (arr);
 }
-
+/*
+The if (*s) statement is used to determine if there's any valid character left 
+to process after skipping delimiters.
+char ** and size of char * (8bytes not one its an address) is diff to char 
+*/
 /*void	free_split(char **arr)
 {
 	for (int i = 0; arr[i] != NULL; i++)
