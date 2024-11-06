@@ -3,26 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/04 11:10:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 14:14:34 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 void	*ft_calloc(size_t count, size_t size)
 {
 	size_t	total_mem;
 	void	*ptr;
 
-	if (count > SIZE_MAX / size)
-	{
-		return (NULL);
-	}
 	total_mem = count * size;
 	ptr = (void *)malloc(total_mem);
 	if (ptr == NULL)
@@ -43,6 +39,9 @@ and need to return a ptr it s just a void ptr !!
 For example, in C, the type size_t has a maximum value defined by SIZE_MAX
 When you multiply count and size, you want to ensure that the result (total_mem
 ) does not exceed SIZE_MAX.
+
+(count > SIZE_MAX / size)
+	//	return (NULL);
 */
 
 /*

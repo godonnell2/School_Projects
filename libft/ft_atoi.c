@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:42:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/29 12:42:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 14:04:43 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,3 +37,10 @@ int	ft_atoi(const char *str)
 	}
 	return (res * neg);
 }
+
+/*
+#include <limits.h>
+int main(void) {
+	printf("%d == %d\n", ft_atoi("-2147483648"), INT32_MIN);
+}
+*/

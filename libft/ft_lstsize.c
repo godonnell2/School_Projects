@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstsize.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/06 13:19:00 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/11/06 13:19:01 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
 /*
@@ -8,37 +20,37 @@ typedef struct s_list
 } t_list
 */
 
-int ft_lstsize(t_list *lst)
+int	ft_lstsize(t_list *lst)
 {
-    int count;
-    count = 0;
-    t_list *ptr;
+	int		count;
+	t_list	*ptr;
 
-    ptr = lst;
-
-    while(ptr!=NULL)
-    {
-      
-        count++;
-        ptr = ptr->next;
-    }
-        return count;
+	count = 0;
+	ptr = lst;
+	while (ptr != NULL)
+	{
+		count++;
+		ptr = ptr->next;
+	}
+	return (count);
 }
 /*
-int main()
+int	main(void)
 {
-    t_list *lst;
+    t_list			*lst;
+	t_list	*node_middle;
+	t_list	*node_first;
+	int		count;
+
     lst = NULL;
     t_list * node_final = ft_lstnew("best");
     ft_lstadd_front(&lst, node_final);
-    t_list *node_middle = ft_lstnew("is the");
+    node_middle = ft_lstnew("is the");
     ft_lstadd_front(&lst, node_middle);
-    t_list *node_first = ft_lstnew("grace");
+    node_first = ft_lstnew("grace");
     ft_lstadd_front(&lst, node_first);
-
-    int count = ft_lstsize(node_first);
+    count = ft_lstsize(node_first);
     printf("%d", count);
-
     return (0);
 }
 */
@@ -53,7 +65,7 @@ EMPTY PTR
 PTR HAS TO BE OF SAME TYPE
 
 should do this in reality good practice
-t_list *current = lst;
+t_list				*current = lst;
     while (current != NULL) {
         t_list *next = current->next;
         free(current);

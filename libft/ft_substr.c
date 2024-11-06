@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/04 13:28:37 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 15:03:30 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,30 @@
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*result;
+	size_t	cap_length;
 
+	cap_length = len;
 	if (ft_strlen(s) < start)
-		len = 0;
+		cap_length = 0;
 	if (ft_strlen(s + start) < len)
-		len = ft_strlen(s + start);
-	result = (char *)malloc(len * sizeof(char) + 1);
+		cap_length = ft_strlen(s + start);
+	result = (char *)malloc(cap_length * sizeof(char) + 1);
 	if (result == NULL)
 		return (NULL);
-	ft_strlcpy(result, s + start, len + 1);
+	ft_strlcpy(result, s + start, cap_length + 1);
 	return (result);
 }
 
 /*
 #include <stdio.h>
+
 int main ()
 {
-	const char	s[] = "tests";
+	const char	s[];
 	int			start;
 	size_t		len;
 
+	s[] = "tests";
 	start = 3;
 	len = 5;
 	char * result = ft_substr(s, start, len);

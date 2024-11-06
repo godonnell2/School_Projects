@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lst_addfront.c                                  :+:      :+:    :+:   */
+/*   ft_lstadd_front.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 16:49:47 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/05 10:55:10 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 14:55:47 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 typedef struct s_list
 {
-	void			*content;
-	struct s_list	*next;
+	void				*content;
+	struct s_list		*next;
 }
 
 Set the next of the new node to the current head
@@ -29,19 +29,21 @@ Finally, the head of the list is updated to point to the new node.
 */
 #include "libft.h"
 
-void ft_lstadd_front(t_list **lst, t_list *new)
+void	ft_lstadd_front(t_list **lst, t_list *new)
 {
-    if(new == NULL)
-        return ;
-  new -> next = *lst;
-  *lst = new;  
+	if (new == NULL)
+		return ;
+	new->next = *lst;
+	*lst = new;
 }
 
 /*
-int main()
+int	main(void)
 {
-    t_list *head;
-    t_list *new = ft_lstnew("Grace is the best");
+    t_list				*head;
+	t_list	*new;
+
+    new = ft_lstnew("Grace is the best");
     
     ft_lstadd_front(&head ,new);
     printf("%s", (char *)head->content);
@@ -52,7 +54,7 @@ int main()
 /*
 we initialize the head of the list
 we make our new node to attach 
-we set the address of head(as its a pointer ) to the new node
+we set the address of	head(as its a pointer ) to the new node
 
 Printing the Content: In your main function, you are printing the content of 
 the new node instead of the head of the list. After calling ft_lstadd_front,
@@ -73,13 +75,13 @@ head -> new_node
 */
 
 /*
-int main() {
+int	main(void) {
     t_list *head = NULL; 
     t_list *new_node = ft_lstnew("Grace is the best"); 
     
     if (new_node == NULL) {
 
-        return 1; 
+        return (1); 
     }
 
     ft_lstadd_front(&head, new_node); 
@@ -89,6 +91,6 @@ int main() {
     }
 
     free(head);
-    return 0;
+    return (0);
 }
 */

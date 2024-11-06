@@ -18,10 +18,10 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 	size_t	j;
 
 	i = 0;
-	if (!needle[i] )
+	if (!needle[i])
 		return ((char *)haystack);
 	if (len == 0)
-        return (NULL);
+		return (NULL);
 	while (haystack[i] && i <= len)
 	{
 		j = 0;
@@ -58,25 +58,40 @@ NULL STRING!!!! WE CAUSE A CRAASH BY TRYING TO DEREFERENCE NULL
 
 void	test_strnstr_functions(void)
 {
-	char	str1[] = "Hello, World!";
-	char	substr1[] = "World";
+	char	str1[];
+	char	substr1[];
 	size_t	len;
 	char	*result_ft;
 	char	*result_std;
-	char	substr2[] = "Mars";
-	char	substr3[] = "";
-	char	str2[] = "";
-	char	substr4[] = "Hello";
-	char	str3[] = "Hello";
-	char	substr5[] = "Hello";
-	char	substr6[] = "Hello, World!";
-	char	substr7[] = "Hello";
-	char	substr8[] = "!";
-	char	str4[] = "abcabcabc";
-	char	substr9[] = "abc";
-	char	str5[] = "Hello, @World!";
-	char	substr10[] = "@World";
+	char	substr2[];
+	char	substr3[];
+	char	str2[];
+	char	substr4[];
+	char	str3[];
+	char	substr5[];
+	char	substr6[];
+	char	substr7[];
+	char	substr8[];
+	char	str4[];
+	char	substr9[];
+	char	str5[];
+	char	substr10[];
 
+	str1[] = "Hello, World!";
+	substr1[] = "World";
+	substr2[] = "Mars";
+	substr3[] = "";
+	str2[] = "";
+	substr4[] = "Hello";
+	str3[] = "Hello";
+	substr5[] = "Hello";
+	substr6[] = "Hello, World!";
+	substr7[] = "Hello";
+	substr8[] = "!";
+	str4[] = "abcabcabc";
+	substr9[] = "abc";
+	str5[] = "Hello, @World!";
+	substr10[] = "@World";
 	len = 12;
 	result_ft = ft_strnstr(str1, substr1, len);
 	result_std = strnstr(str1, substr1, len);

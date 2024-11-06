@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:54 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/10/31 11:02:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 13:40:01 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ void	*ft_memchr(const void *s, int c, size_t n)
 /*
 Needed size_t because you dont have the null byte so that
 is how you set the limit of your loop otherwise impossible
+
+there's an implicit cast to void* because its always allowed to cast something
+to void*
 */
 
 /*

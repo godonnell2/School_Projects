@@ -1,36 +1,48 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstclear.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/06 13:17:59 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/11/06 13:21:42 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
-void ft_lstclear(t_list **lst, void (*del)(void*))
-{
-    t_list *ptr;
 
-  
-    if(*lst == NULL)
-    return;
-    while(*lst!=NULL)
-    {
-   
-  ptr  = *lst;
-     del(ptr->content);
-     *lst = (*lst)->next;
-    free(ptr);
-    }
-    ptr = NULL;
+void	ft_lstclear(t_list **lst, void (*del)(void *))
+{
+	t_list	*ptr;
+
+	if (*lst == NULL)
+		return ;
+	while (*lst != NULL)
+	{
+		ptr = *lst;
+		del(ptr->content);
+		*lst = (*lst)->next;
+		free(ptr);
+	}
+	ptr = NULL;
 }
 
-char g_deleted = 0;
-void del(void *c)
+/*char	g_deleted = 0;
+
+void	del(void *c)
 {
-    g_deleted = 1;
-    free(c);
+	g_deleted = 1;
+	free(c);
 }
+*/
 /*
-int main()
+int	main(void)
 {
       t_list *node_first;
+
     node_first = ft_lstnew(ft_strdup("Grace"));
-
     ft_lstclear(&node_first, del);
-
       if (!g_deleted)
     {
         printf("FAILED: Delete function not called\n");
@@ -39,9 +51,7 @@ int main()
     {
         printf("Success, Grace is the best!\n");
     }
-
-    return 0;
-
+    return (0);
 }
 */
 /*

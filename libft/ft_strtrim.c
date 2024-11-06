@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 10:34:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/05 19:07:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 15:04:44 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,19 @@
 
 char	*ft_strtrim(char const *s1, char const *set)
 {
-	unsigned int	i;
+	unsigned int	len;
 
 	while (*s1 && ft_strchr(set, *s1))
 	{
 		s1++;
 	}
-	i = ft_strlen(s1);
-	while (i > 0 && ft_strrchr(set, s1[i]))
+	len = ft_strlen(s1);
+	while (len > 0 && ft_strrchr(set, s1[len]))
 	{
-		i--;
+		len--;
 	}
-	return (ft_substr(s1, 0, i + 1));
+	return (ft_substr(s1, 0, len + 1));
 }
-
 
 /*
 i+ 1 because arrays are zero indexed

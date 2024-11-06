@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:22:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/04 11:46:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 14:56:46 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 		dst[dst_len + i] = src[i];
 		i++;
 	}
-	if (size > 0)
-		dst[dst_len + i] = '\0';
+	dst[dst_len + i] = '\0';
 	return (dst_len + src_len);
 }
 

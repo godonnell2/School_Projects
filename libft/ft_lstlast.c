@@ -1,29 +1,47 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstlast.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/06 13:18:46 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/11/06 13:18:47 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
-t_list *ft_lstlast(t_list *lst)
+t_list	*ft_lstlast(t_list *lst)
 {
-    if(lst == NULL )
-        return NULL; 
-    t_list *ptr = lst;
-    while(ptr -> next!= NULL)
-    {
-        ptr = ptr -> next; 
-    }
-    return ptr;
+	t_list	*ptr;
+
+	if (lst == NULL)
+		return (NULL);
+	ptr = lst;
+	while (ptr->next != NULL)
+	{
+		ptr = ptr->next;
+	}
+	return (ptr);
 }
 /*
-int main()
+int	main(void)
 {
-    t_list *lst = NULL;
-    t_list *final = ft_lstnew("the best");
-    t_list *middle_node = ft_lstnew("is");
-    t_list *first_node = ft_lstnew("Grace");
+	t_list	*lst;
+	t_list	*final;
+	t_list	*middle_node;
+	t_list	*first_node;
+	t_list	*result;
 
+    lst = NULL;
+    final = ft_lstnew("the best");
+    middle_node = ft_lstnew("is");
+    first_node = ft_lstnew("Grace");
     ft_lstadd_front(&lst, final);
      ft_lstadd_front(&lst, middle_node);
      ft_lstadd_front(&lst, first_node);
-
-    t_list *result = ft_lstlast(lst);
+    result = ft_lstlast(lst);
     printf("%p\n", result);
       printf("Last node content: %s\n", (char *)result->content);
     return(0);
@@ -36,13 +54,12 @@ ALWAYS NEED TO CHECK IF LST WAS NULL liek its a string
 lst: The beginning of the list.
 Return value: Last node of the list
 Description Returns the last node of the list.
-void ft_lstadd_front(t_list **lst, t_list *new)
+void	ft_lstadd_front(t_list **lst, t_list *new)
 {
     if(new == NULL)
         return ;
   new -> next = *lst;
   *lst = new;  
-
 }
 
 For example, consider a linked list with three nodes: A -> B -> C -> NULL.

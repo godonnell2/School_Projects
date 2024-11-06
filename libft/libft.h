@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 12:41:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/05 19:17:04 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/06 13:20:53 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,13 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 #endif // LIBFT_H
 
-/* need to include stddef here to include size_t  Prevent Multiple Definitions:
+/* 
+need to include stddef here to include size_t  Prevent Multiple Definitions:
  If a header file is included multiple times in different source files or even
   within the same source file,
 	without include guards,
-	the compiler would see the same declarations and definitions multiple times,
+	the compiler would see the same declarations and definitions multiple 
+	times,
 	leading to errors like "redefinition of type" or "multiple definitions of
-	functions."*/
+	functions."
+	*/
