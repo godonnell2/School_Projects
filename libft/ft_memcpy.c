@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:21:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 13:34:39 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/07 19:59:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ have to use unsigned char!! otherwise mistakes with ints
 	segmentation fault).
 	SET_EXPLANATION("your memcpy does not behave well with NULL 
 	as both params with size");
-
+	its just a pointer to an address and it will fill ffrom that pt
 	SANDBOX_RAISE(
 			ft_memcpy(NULL, NULL, 3);
 

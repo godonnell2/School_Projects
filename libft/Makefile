@@ -30,7 +30,7 @@ all: $(NAME)
 #create lib if missing separator error need add colon !!
 #r modify libft.a #insert the objs into libft.a s creates an index
 #need tab or wont work
-$(NAME): $(OBJS) 
+$(NAME): $(OBJS) $(BONUS_OBJS)
 	ar rcs $@ $^
 #$(LIB) = @$(OBJS) all dependencies = caret ^
 
@@ -43,8 +43,8 @@ $(NAME): $(OBJS)
 #dont need this rule as makefile has this INBUILT but i like making it explicit 
 #-I includes my libft.h
 
-bonus: $(OBJS) $(BONUS_OBJS)
-	ar rcs $(NAME) $(OBJS) $(BONUS_OBJS)
+bonus: $(NAME)
+	echo yes
 
 so: $(OBJS) $(BONUS_OBJS)
 	gcc -shared -o $(LIB_SO) $(OBJS) $(BONUS_OBJS) -fPIC

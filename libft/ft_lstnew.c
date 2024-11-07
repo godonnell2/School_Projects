@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstnew.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 15:02:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/07 14:02:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/07 21:05:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,10 @@ original variable's value.
 
 n your ft_lstnew function, the content parameter is a pointer (void *content).
 This means that when you create a new node, you are storing a pointer
-		  to some data in the content field of the node.
+			to some data in the content field of the node.
     When you assign new_node->content = content;, you are storing the 
-	address of the data that content points to in the content field of the new node.
+	address of the data that content points to in the content field of the new 
+	node.
 
 Using &test:
 
