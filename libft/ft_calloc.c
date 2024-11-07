@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 14:14:34 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/07 09:46:17 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ void	*ft_calloc(size_t count, size_t size)
 	size_t	total_mem;
 	void	*ptr;
 
+	if (count != 0 && size > SIZE_MAX / count)
+		return (NULL);
 	total_mem = count * size;
 	ptr = (void *)malloc(total_mem);
 	if (ptr == NULL)
@@ -42,6 +44,7 @@ When you multiply count and size, you want to ensure that the result (total_mem
 
 (count > SIZE_MAX / size)
 	//	return (NULL);
+even though this is a little silly more atoms than there are in the universe
 */
 
 /*

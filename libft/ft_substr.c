@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 15:03:30 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/07 10:07:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,17 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*result;
 	size_t	cap_length;
+	size_t	s_len;
 
+	if (!s)
+		return (NULL);
+	s_len = ft_strlen(s);
+	if (start >= s_len)
+		return (ft_strdup(""));
 	cap_length = len;
-	if (ft_strlen(s) < start)
-		cap_length = 0;
-	if (ft_strlen(s + start) < len)
-		cap_length = ft_strlen(s + start);
-	result = (char *)malloc(cap_length * sizeof(char) + 1);
+	if (s_len - start < len)
+		cap_length = s_len - start;
+	result = (char *)malloc((cap_length + 1) * sizeof(char));
 	if (result == NULL)
 		return (NULL);
 	ft_strlcpy(result, s + start, cap_length + 1);
@@ -60,13 +64,13 @@ ft_strlen(s) returns 5.
 Since 5 < 6 is true, the condition executes, and len is set to 0.
 Suppose you have:
 
-    s = "Hello, World!"
-    start = 7 (which points to the character 'W')
-    len = 10
+	s = "Hello, World!"
+	start = 7 (which points to the character 'W')
+	len = 10
 
 The length of the substring starting from index 7 is 6 (the substring is
- "World!"). Since 6 is less than 10, the condition will be true, and len 
- will be updated to 6. This means that the function will safely extract 
+ "World!"). Since 6 is less than 10, the condition will be true, and len
+ will be updated to 6. This means that the function will safely extract
  "World!" instead of trying to extract more characters than are available.
 
 */

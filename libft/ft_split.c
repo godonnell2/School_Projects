@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/05 19:06:04 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/07 14:23:49 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,4 +134,13 @@ int	main(void) {
 	return (0);
 
 }
+*/
+/*
+Encounter 'H': Not a space, !in_word is true 
+→ Increment count to 1, set in_word to 1.
+Encounter 'e', 'l', 'l', ',': 
+All are not spaces, in_word remains 1.
+Encounter ' ': Is a space → Set in_word to 0.
+Encounter 'w': Not a space, !in_word is true \addindex
+ Increment count to 2, set in_word to 1.
 */

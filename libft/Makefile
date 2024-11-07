@@ -28,6 +28,7 @@ LIB_SO = libft.so
 all: $(NAME)
 
 #create lib if missing separator error need add colon !!
+#r modify libft.a #insert the objs into libft.a s creates an index
 #need tab or wont work
 $(NAME): $(OBJS) 
 	ar rcs $@ $^
@@ -51,8 +52,11 @@ so: $(OBJS) $(BONUS_OBJS)
 clean: 
 	rm -f $(OBJS) $(BONUS_OBJS)
 
+#fclean : clean
+#	rm -f $(NAME) 
+
 fclean : clean
-	rm -f $(NAME) $(LIB_SO)
+	rm -f $(NAME) #$(LIB_SO)
 
 re : fclean all
 
