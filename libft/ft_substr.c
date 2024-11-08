@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/07 10:07:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 11:57:26 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	cap_length = len;
 	if (s_len - start < len)
 		cap_length = s_len - start;
-	result = (char *)malloc((cap_length + 1) * sizeof(char));
+	result = (char *)ft_calloc(cap_length + 1, sizeof(char));
 	if (result == NULL)
 		return (NULL);
 	ft_strlcpy(result, s + start, cap_length + 1);

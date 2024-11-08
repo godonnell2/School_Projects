@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/07 09:46:17 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 11:34:36 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void	*ft_calloc(size_t count, size_t size)
 /*
 HAVE TO REMEMEMVER TO BZERO FOR CALLOC
 NEED TO REMEMBER WHEN SET TO ZERO DUH!!!!
+is SPECIFICALLY FOR ARRAYS!!!
 The line return (malloc(0)); allows the function to return a valid pointer that
  can be freed, even if it points to a zero-sized allocation. This is
  consistent with the behavior of calloc in standard C.
