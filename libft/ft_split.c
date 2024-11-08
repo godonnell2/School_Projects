@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 14:37:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/08 13:20:43 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 18:10:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,19 @@ static int	ft_countword(char const *s, char c)
 	return (count);
 }
 
-void *	ft_freearr(char **arr)
+static void	*ft_freearr(char **arr)
 {
 	int	i;
 
 	i = 0;
 	while (arr[i])
 	{
-		free(arr[++i]);
+		free(arr[i]);
+		i++;
 	}
 	free(arr);
 	return (NULL);
 }
-
 
 char	**ft_split(char const *s, char c)
 {
@@ -55,7 +55,8 @@ char	**ft_split(char const *s, char c)
 	char			**arr;
 	unsigned int	word_len;
 
-	if(!(arr = (char **)ft_calloc(sizeof(char *), ft_countword(s, c) + 1)))
+	arr = (char **)ft_calloc(ft_countword(s, c) + 1, sizeof(char *));
+	if (arr == NULL)
 		return (NULL);
 	i = 0;
 	while (*s)
@@ -69,16 +70,14 @@ char	**ft_split(char const *s, char c)
 			else
 				word_len = ft_strchr(s, c) - s;
 			arr[i] = ft_substr(s, 0, word_len);
-			if (arr[i] == NULL)
-				ft_freearr(arr);
+			if (arr[i++] == NULL)
+				return (ft_freearr(arr));
 			s = word_len + s;
-			i++;
 		}
 	}
 	return (arr);
 }
-
-
+/*
 int	main(void)
 {
 	char	**result;
@@ -100,8 +99,7 @@ int	main(void)
 	}
 	free(result);
 }
-
-
+*/
 /*
 The if (*s) statement is used to determine if there's any valid character left 
 to process after skipping delimiters.

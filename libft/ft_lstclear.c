@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 13:17:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 13:21:42 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 18:15:47 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 		*lst = (*lst)->next;
 		free(ptr);
 	}
-	ptr = NULL;
 }
 
 /*char	g_deleted = 0;
