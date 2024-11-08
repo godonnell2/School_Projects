@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 13:17:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 13:17:06 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 09:34:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	main(void)
 }
 */
 /*
+
 lst: The address of a pointer to the first link of
 a list.
 new: The address of a pointer to the node to be

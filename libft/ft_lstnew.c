@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 15:02:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/07 21:05:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/08 09:35:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,9 @@ Using &test:
     If test is a variable (e.g., an integer, a struct, etc.), using &test 
 	gives you the address of that variable. This is important because the 
 	linked list is designed to store pointers to data, not the data itself.
+	Passing &one (a pointer to one) allows ft_lstnew to store a reference
+	 to the int value in one without directly copying or modifying it. 
+	 If you passed one directly (just the integer 1), you would need to cast
+	  it to (void *)1 to store it in a void * pointer, which isn't safe or 
+	  reliable. Using a pointer to the actual value is much more reliable.
 */
