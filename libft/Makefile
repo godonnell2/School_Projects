@@ -32,7 +32,7 @@ all: $(NAME)
 #r modify libft.a c =insert the objs into libft.a s=creates an index
 #need tab or wont work
 $(NAME): $(OBJS)
-	ar rcs $@ $^ 
+	ar -rcs $@ $^ 
 	
 
 #$(LIB) = @$(OBJS) all dependencies = caret ^
