@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libftprintf.h                                      :+:      :+:    :+:   */
+/*   ft_isascii.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/09 17:57:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/09 20:05:01 by gro-donn         ###   ########.fr       */
+/*   Created: 2024/10/28 13:07:20 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/11/06 10:00:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBFTPRINTF_H
-# define LIBFTPRINTF_H
+#include "libft.h"
 
-# include "./libft/libft.h"
-# include <stdarg.h>
-# include <unistd.h>
+int	ft_isascii(int c)
+{
+	if (c >= 0 && c <= 127)
+		return (1);
+	return (0);
+}
 
-int		ft_printf(const char *, ...);
-int		ft_printchar(char c, int fd);
-int		ft_printstring(char *s, int fd);
-size_t	ft_printlong(long nb, int fd);
-size_t	ft_printhex(long nbr, int fd);
-int		ft_printpointer(unsigned long value, int asc);
+/*
+if	((c & 1 << 8) == 0)
 
-#endif //LIBFTPRINTF_H
+
+return (c >= 0 && c <= 127);
+*/

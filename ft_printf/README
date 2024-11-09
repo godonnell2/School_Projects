@@ -1,0 +1,44 @@
+https://42-cursus.gitbook.io/guide/rank-01/ft_printf/variadic-functions
+int	ft_printf(const char *format, ...);
+As you can see, the printf function returns a value of type int. But why ?
+ Checking the return value of printf allows you to detect failure early so you don't waste time attempting to write millions of lines when the first line already failed.
+
+If a positive value is returned (indicating the number of characters written) it means the operation was successful. 
+
+If a negative number is returned there was some error.
+
+The variadic function must have at least one mandatory argument. 
+There is no minimum for the number of variable arguments.
+
+printf("hello my name is %s and i am %d old\n", "laura", 23);
+int	ft_printf(const char *format, char *string, int age);
+
+PARSING is when you interpret!!!
+
+ 
+VA_LIST
+new type of variable it's a holder for info from the macros which are functions
+given below
+cna call it whatever you want but args makes sense
+declaring this will create the list of dynamic arguments
+// access the first argument (type "string")
+va_arg( args,  char * ) // -> "Laura"
+
+macros: 
+va_start
+, 
+va_arg
+ & 
+va_end
+
+VA_START FUNCTION
+function will somehow initialize everything, before we start
+ moving through our variable argument list (va_list).
+ va_start must be called before any use of va_arg - otherwise your va_list
+  variable/table will be empty.
+
+ VA_END()
+   will free the allocated memory.
+
+
+
