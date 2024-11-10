@@ -1,6 +1,6 @@
 #Variables
 
-NAME = libftfprintf.a
+NAME = libftprintf.a
 LIBFTNAME = libft.a
 LIBFTDIR = ./libft
 CC = cc 
@@ -10,19 +10,28 @@ SRC =	\
 		ft_printchar.c \
 		ft_printstring.c \
 		ft_printlong.c \
-		ft_printhex.c 
-#	ft_printpointer.c 
+		ft_printhex.c \
+		ft_printpointer.c 
 		
 OBJS = $(SRC:.c=.o) #map
 
 #Targets
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	ar -rcs $@ $^ 
-	$(MAKE) -C $(LIBFTDIR)  
+$(NAME): $(OBJS) $(LIBFTNAME) 
+	cp $(LIBFTDIR)/$(LIBFTNAME) . 
+	mv $(LIBFTNAME) $@ 
+	ar -rs $@ $(OBJS)
+#one .a file that contains all the libft files and all the printf files
+#mv rename libft.a as libftprintf.a
+# rm c because we're basing it on libft.a r adds
+# we add the .o files printf to libftprintf.a
+
+$(LIBFTNAME): 
+	$(MAKE) -C $(LIBFTDIR) 
 # Ensure libft is built -C option in the make command is used to change the 
 #directory before executing the makefile.
+#compiling our old library
 
 %.o: %.c 
 	$(CC) $(CFLAGS) -c $< -o $@ -I .

@@ -6,11 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/09 17:55:08 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/10 18:02:46 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftprintf.h"
+#include "ft_printf.h"
 
 size_t	ft_printlong(long nbr, int fd)
 {
