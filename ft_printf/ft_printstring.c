@@ -15,7 +15,8 @@
 int	ft_printstring(char *s, int fd)
 {
 	int	length;
-	if(s == NULL)
+
+	if (s == NULL)
 	{
 		s = "(null)";
 	}
@@ -26,5 +27,5 @@ int	ft_printstring(char *s, int fd)
 
 // int main(){
 // printf("%s", (char *)NULL);
-// return 0;
+// return (0);
 // }

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:40 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/10 18:02:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/11 09:38:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 int	ft_printchar(char c, int fd)
 {
-	ft_putchar_fd(c, fd);
-	return (1);
+	return ft_putchar_fd(c, fd);
 }
 
 /*

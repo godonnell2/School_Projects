@@ -6,59 +6,57 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:52:15 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/10 18:02:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/11 09:07:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-// static size_t	ft_printhex_recursive(int big, long nbr, int fd)
-// {
-// 	size_t	count;
-// 	char	digit;
-// 	char	hex_char;
+size_t	ft_printhex(int big, unsigned long nbr, int fd);
 
-// 	count = 0;
-// 	if (nbr > 15)
-// 	{
-// 		count += ft_printhex_recursive(big, nbr / 16, fd);
-// 	}
-// 	digit = nbr % 16;
-// 	if (digit > 9)
-// 	{
-// 		if (big)
-// 			hex_char = ('A' + (digit - 10));
-// 		else
-// 			hex_char = ('a' + (digit - 10));
-// 		ft_putchar_fd(hex_char, fd);
-// 		count++;
-// 	}
-// 	else
-// 	{
-// 		ft_putchar_fd(digit + '0', fd);
-// 		count++;
-// 	}
-// 	return (count);
+size_t ft_printptr(unsigned long ptr_value, int fd)
+{
+
+	ft_putchar_fd('0', fd);
+	ft_putchar_fd('x', fd);
+// 		if (ptr_value == NULL )
+// 	 {
+//     ft_putchar_fd('0', fd);
+//     return 3;
 // }
+	return 2 + (ft_printhex(0, ptr_value, fd));
+}
 
-// size_t	ft_printhex(int big, long nbr, int fd)
-// {
-// 	char	minus;
-// 	size_t	count;
+/*
+int	main(void)
+{
+	 printf("real: %p\n", (void *)3078666666666666666);
+    ft_printptr(3078666666666666666, 1);
+	    printf("\n");
+    printf("real: %p\n", NULL);
+    ft_printptr((unsigned long)NULL, 1);
+	 printf("\n");
+    printf("realptr: %p\n", (void *)-14523);
+    ft_printptr((unsigned long)(-14523), 1);
+    return 0;
+}
+*/
 
-// 	count = 0;
-// 	minus = '-';
-// 	if (nbr < 0)
-// 	{
-// 		ft_putchar_fd(minus, fd);
-// 		count++;
-// 		nbr = -nbr;
-// 	}
-// 	if (nbr == 0)
-// 	{
-// 		ft_putchar_fd('0', fd);
-// 		return (count + 1);
-// 	}
-// 	count += ft_printhex_recursive(big, nbr, fd);
-// 	return (count);
-// }
+// ou need to ensure that the pointer value is treated as an unsigned long and
+//  printed in hexadecimal format prefixed with 0x.
+
+// Handling NULL Pointers: When the pointer is NULL, 
+// it should be represented as 0x0.
+
+// Negative Pointer Values: Pointers should not be negative. 
+// If you are passing a negative value, it should be treated as an unsigned long.
+
+// Hexadecimal Formatting: Ensure that the hexadecimal representation is 
+// correctly formatted, including leading zeros if necessary.
+
+// ointers should be treated as unsigned values when printed in hexadecimal format.
+// This ensures that negative values are not incorrectly represented. By casting 
+// the pointer to unsigned long, we can safely handle the pointer value without
+//  worrying about sign issues.
+// c
+

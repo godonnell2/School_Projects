@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 19:35:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/10 19:04:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/11 09:33:00 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-static size_t	ft_printhex_recursive(int big, long nbr, int fd)
+static size_t	ft_printhex_recursive(int big, unsigned long nbr, int fd)
 {
 	size_t	count;
 	char	digit;
@@ -41,18 +41,11 @@ static size_t	ft_printhex_recursive(int big, long nbr, int fd)
 	return (count);
 }
 
-size_t	ft_printhex(int big, long nbr, int fd)
+size_t	ft_printhex(int big, unsigned long nbr, int fd)
 {
-	char	minus;
+	
 	size_t	count;
 	count = 0;
-	minus = '-';
-	if (nbr < 0)
-	{
-		ft_putchar_fd(minus, fd);
-		count++;
-		nbr = -nbr;
-	}
 	if (nbr == 0)
 	{
 		ft_putchar_fd('0', fd);
@@ -69,6 +62,8 @@ int	main(void)
 
 	count = ft_printhex(0, 10, 1);
 	printf("\ncount:%d\n", count);
+	
+	printf("ptr:%p\n", (void*)10);
 }
 */
 
