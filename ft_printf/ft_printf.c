@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/11 09:31:23 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/11 11:49:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,22 @@
 
 static int	ft_findtype(const char c, va_list *args)
 {
-	int	nbr_c;
 	int	fd;
-	int	big;
 
-	big = 0;
 	fd = 1;
-	nbr_c = 0;
 	if (c == 'c')
-		nbr_c += ft_printchar(va_arg(*args, int), fd);
+		return (ft_printchar(va_arg(*args, int), fd));
 	else if (c == 'd' || c == 'i')
-		nbr_c += ft_printlong(va_arg(*args, int), fd);
+		return (ft_printlong(va_arg(*args, int), fd));
 	else if (c == 's')
-		nbr_c += ft_printstring(va_arg(*args, char *), fd);
+		return (ft_printstring(va_arg(*args, char *), fd));
 	else if (c == 'u')
-		nbr_c += ft_printlong(va_arg(*args, unsigned int), fd);
+		return (ft_printlong(va_arg(*args, unsigned int), fd));
 	else if (c == 'x' || c == 'X')
-	{
-		if (c == 'X')
-			big = 1;
-		nbr_c += ft_printhex(big, va_arg(*args, unsigned int), fd);
-	}
-	else if (c == 'p')
-		 {
-			 nbr_c += ft_printptr((unsigned long)va_arg(*args, void *), fd);
-		 }
-	return (nbr_c);
+		return (ft_printhex(c == 'X', va_arg(*args, unsigned int), fd));
+	else if(c == 'p')
+		return (ft_printptr((unsigned long)va_arg(*args, void *), fd));
+	return (-1);
 }
 
 int	ft_printf(const char *mandatory_string, ...)
@@ -47,9 +37,12 @@ int	ft_printf(const char *mandatory_string, ...)
 	int				fd;
 	va_list			args;
 	unsigned int	i;
-	unsigned int	type;
+	unsigned int	nbr_chars;
+	int printed_chars;
 
-	type = 0;
+	nbr_chars = 0;
+	printed_chars = 0;
+
 	fd = 1;
 	i = 0;
 	va_start(args, mandatory_string);
@@ -57,21 +50,32 @@ int	ft_printf(const char *mandatory_string, ...)
 	{
 		if (mandatory_string[i] == '%')
 		{
-			i = i + 1;
+			i++;
 			if (ft_strchr("cdisupxX", mandatory_string[i]))
-				type = type + ft_findtype(mandatory_string[i], &args);
+			{
+				printed_chars = ft_findtype(mandatory_string[i], &args);
+			}
 			else if (mandatory_string[i] == '%')
-				type = type + ft_printchar('%', fd);
+			{
+				 printed_chars = ft_printchar('%', fd);
+			}
 		}
 		else
-			type = type + ft_printchar(mandatory_string[i], fd);
+			 printed_chars = ft_printchar(mandatory_string[i], fd);
+		
+		                if (printed_chars == -1)
+                {
+                    va_end(args);
+                    return -1; 
+                }
+				nbr_chars += printed_chars;
 		i++;
 	}
 	va_end(args);
-	return (type);
+	return (nbr_chars);
 }
 
-//#include <stdio.h>
+// #include <stdio.h>
 
 // int	main(void)
 // {
@@ -81,6 +85,14 @@ int	ft_printf(const char *mandatory_string, ...)
 // 	nr = 71;
 // 	s = "grace";
 // 	ft_printf("Hello '%x'\n", 0xff);
+// 	ft_printf("mine:%c%c%c\n", 'a', '\t', 'b' );
+// 	printf("real:%c%c%c\n", 'a', '\t', 'b' );
+// 	ft_printf("mine:%cc%cc%c\n", 'a', '\t', 'b');
+// 	printf("real:%cc%cc%c\n", 'a', '\t', 'b');
+
+	
+// 	 ft_printf("mine:%cs%cs%c\n", 'c', 'b', 'a');
+// 	  printf("real:%cs%cs%c\n", 'c', 'b', 'a');
 // 	// ft_printf("Hell %% %co%i%s, unsigned: %u signed: %d", 'g', nr, s,
 // 	// 		(unsigned int)-1, -42);
 // 	// printf("or double: %%");
@@ -89,4 +101,4 @@ int	ft_printf(const char *mandatory_string, ...)
 
 // " expected a statement "
 // You probably have forgotten a closing bracket.
-// u = unsigned int 
+// u = unsigned int
