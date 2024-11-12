@@ -12,7 +12,7 @@ SRC =	\
 		ft_printlong.c \
 		ft_printulong.c \
 		ft_printhex.c \
-		ft_printpointer.c 
+		ft_printptr.c 
 		
 OBJS = $(SRC:.c=.o) #map
 
