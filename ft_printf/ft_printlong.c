@@ -6,17 +6,18 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/11 09:18:07 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/12 13:59:19 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-size_t	ft_printlong(long nbr, int fd)
+int	ft_printlong(long nbr, int fd)
 {
 	char	minus;
 	char	digit;
-	size_t	count;
+	int	count;
+	int error_check = 0;
 
 	count = 1;
 	minus = '-';
@@ -24,14 +25,20 @@ size_t	ft_printlong(long nbr, int fd)
 	{
 		count++;
 		nbr = nbr * -1;
-		ft_putchar_fd(minus, fd);
+		if (ft_putchar_fd(minus, fd) == -1)
+		return -1;
 	}
 	if (nbr > 9)
 	{
-		count += ft_printlong(nbr / 10, fd);
+		error_check = ft_printlong(nbr / 10, fd) ;
+		if(error_check == -1)
+		return -1;
+		count += error_check;
+					
 	}
 	digit = (nbr % 10) + '0';
-	ft_putchar_fd(digit, fd);
+	if( ft_putchar_fd(digit, fd) == -1) 
+		return -1;
 	return (count);
 }
 

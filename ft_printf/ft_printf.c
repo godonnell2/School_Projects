@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/11 11:49:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/12 14:06:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ static int	ft_findtype(const char c, va_list *args)
 	else if (c == 's')
 		return (ft_printstring(va_arg(*args, char *), fd));
 	else if (c == 'u')
-		return (ft_printlong(va_arg(*args, unsigned int), fd));
+		return (ft_printulong(va_arg(*args, unsigned int), fd));
 	else if (c == 'x' || c == 'X')
-		return (ft_printhex(c == 'X', va_arg(*args, unsigned int), fd));
+		return (ft_printhex(c == 'X', va_arg(*args, int), fd));
 	else if(c == 'p')
 		return (ft_printptr((unsigned long)va_arg(*args, void *), fd));
 	return (-1);
