@@ -6,40 +6,50 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/12 13:59:19 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/13 11:17:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_printlong(long nbr, int fd)
+static int	int_handleneg(int fd)
 {
 	char	minus;
-	char	digit;
-	int	count;
-	int error_check = 0;
 
-	count = 1;
 	minus = '-';
+	if (ft_putchar_fd(minus, fd) == -1)
+	{
+		return (-1);
+	}
+	return (1);
+}
+
+int	ft_printlong(long nbr, int fd)
+{
+	char	digit;
+	int		count;
+	int		error_check;
+
+	error_check = 0;
+	count = 0;
 	if (nbr < 0)
 	{
-		count++;
+		count = int_handleneg(fd);
+		 if (count == -1) 
+            return (-1);
 		nbr = nbr * -1;
-		if (ft_putchar_fd(minus, fd) == -1)
-		return -1;
 	}
 	if (nbr > 9)
 	{
-		error_check = ft_printlong(nbr / 10, fd) ;
-		if(error_check == -1)
-		return -1;
+		error_check = ft_printlong(nbr / 10, fd);
+		if (error_check == -1)
+			return (-1);
 		count += error_check;
-					
 	}
 	digit = (nbr % 10) + '0';
-	if( ft_putchar_fd(digit, fd) == -1) 
-		return -1;
-	return (count);
+	if (ft_putchar_fd(digit, fd) == -1)
+		return (-1);
+	return (count + 1);
 }
 
 /*

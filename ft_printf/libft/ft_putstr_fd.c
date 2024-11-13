@@ -15,19 +15,18 @@
 int	ft_putstr_fd(char *s, int fd)
 {
 	size_t	i;
+	int		error_check;
 
 	i = 0;
-	int error_check;
 	error_check = 0;
-	
 	while (s[i])
 	{
 		error_check = ft_putchar_fd(s[i], fd);
-		if(error_check == -1)
-			return -1;
+		if (error_check == -1)
+			return (-1);
 		i++;
 	}
-	return 1;
+	return (1);
 }
 
 /*

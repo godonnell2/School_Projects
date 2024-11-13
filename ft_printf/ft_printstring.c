@@ -15,22 +15,20 @@
 int	ft_printstring(char *s, int fd)
 {
 	int	length;
-	int error_check; 
-	
+	int	error_check;
+
 	error_check = 0;
 	if (s == NULL)
 	{
 		s = "(null)";
 	}
 	length = ft_strlen(s);
-	
 	error_check = ft_putstr_fd(s, fd);
-	if(error_check == -1)
+	if (error_check == -1)
 	{
-		return -1;
+		return (-1);
 	}
-	return length;
-
+	return (length);
 }
 
 // int main(){

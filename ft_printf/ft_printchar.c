@@ -14,7 +14,7 @@
 
 int	ft_printchar(char c, int fd)
 {
-	return ft_putchar_fd(c, fd);
+	return (ft_putchar_fd(c, fd));
 }
 
 /*

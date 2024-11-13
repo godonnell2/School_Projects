@@ -4,7 +4,7 @@ NAME = libftprintf.a
 LIBFTNAME = libft.a
 LIBFTDIR = ./libft
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -g -I ./include  # As
+CFLAGS = -Wall -Wextra -Werror -g -I ./include 
 SRC =	\
 		ft_printf.c \
 		ft_printchar.c \
@@ -14,7 +14,7 @@ SRC =	\
 		ft_printhex.c \
 		ft_printptr.c 
 		
-OBJS = $(SRC:.c=.o) #map
+OBJS = $(SRC:.c=.o) 
 
 #Targets
 all: $(NAME)

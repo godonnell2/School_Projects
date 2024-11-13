@@ -27,7 +27,7 @@ static int	ft_findtype(const char c, va_list *args)
 		return (ft_printulong(va_arg(*args, unsigned int), fd));
 	else if (c == 'x' || c == 'X')
 		return (ft_printhex(c == 'X', va_arg(*args, int), fd));
-	else if(c == 'p')
+	else if (c == 'p')
 		return (ft_printptr((unsigned long)va_arg(*args, void *), fd));
 	return (-1);
 }
@@ -38,11 +38,10 @@ int	ft_printf(const char *mandatory_string, ...)
 	va_list			args;
 	unsigned int	i;
 	unsigned int	nbr_chars;
-	int printed_chars;
+	int				printed_chars;
 
 	nbr_chars = 0;
 	printed_chars = 0;
-
 	fd = 1;
 	i = 0;
 	va_start(args, mandatory_string);
@@ -57,18 +56,17 @@ int	ft_printf(const char *mandatory_string, ...)
 			}
 			else if (mandatory_string[i] == '%')
 			{
-				 printed_chars = ft_printchar('%', fd);
+				printed_chars = ft_printchar('%', fd);
 			}
 		}
 		else
-			 printed_chars = ft_printchar(mandatory_string[i], fd);
-		
-		                if (printed_chars == -1)
-                {
-                    va_end(args);
-                    return -1; 
-                }
-				nbr_chars += printed_chars;
+			printed_chars = ft_printchar(mandatory_string[i], fd);
+		if (printed_chars == -1)
+		{
+			va_end(args);
+			return (-1);
+		}
+		nbr_chars += printed_chars;
 		i++;
 	}
 	va_end(args);
@@ -90,9 +88,8 @@ int	ft_printf(const char *mandatory_string, ...)
 // 	ft_printf("mine:%cc%cc%c\n", 'a', '\t', 'b');
 // 	printf("real:%cc%cc%c\n", 'a', '\t', 'b');
 
-	
-// 	 ft_printf("mine:%cs%cs%c\n", 'c', 'b', 'a');
-// 	  printf("real:%cs%cs%c\n", 'c', 'b', 'a');
+// 		ft_printf("mine:%cs%cs%c\n", 'c', 'b', 'a');
+// 		printf("real:%cs%cs%c\n", 'c', 'b', 'a');
 // 	// ft_printf("Hell %% %co%i%s, unsigned: %u signed: %d", 'g', nr, s,
 // 	// 		(unsigned int)-1, -42);
 // 	// printf("or double: %%");
