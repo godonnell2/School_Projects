@@ -49,7 +49,7 @@ static int	ft_printhex_recursive(unsigned long nbr, int fd)
 	return (count);
 }
 
-int	ft_printptr(unsigned long ptr_value, int fd)
+int	ft_printptr(void *ptr_value, int fd)
 {
 	int	error_check;
 	int	count;
@@ -61,7 +61,7 @@ int	ft_printptr(unsigned long ptr_value, int fd)
 	error_check = ft_putchar_fd('x', fd);
 	if (error_check == -1)
 		return (-1);
-	error_check = ft_printhex_recursive(ptr_value, fd);
+	error_check = ft_printhex_recursive((unsigned long)ptr_value, fd);
 	if (error_check == -1)
 		return (-1);
 	count += error_check + 2;

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/13 11:17:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/13 16:00:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ int	ft_printlong(long nbr, int fd)
 	if (nbr < 0)
 	{
 		count = int_handleneg(fd);
-		 if (count == -1) 
-            return (-1);
+		if (count == -1)
+			return (-1);
 		nbr = nbr * -1;
 	}
 	if (nbr > 9)

@@ -1,9 +1,11 @@
 https://42-cursus.gitbook.io/guide/rank-01/ft_printf/variadic-functions
 int	ft_printf(const char *format, ...);
 As you can see, the printf function returns a value of type int. But why ?
- Checking the return value of printf allows you to detect failure early so you don't waste time attempting to write millions of lines when the first line already failed.
+ Checking the return value of printf allows you to detect failure early so you don't
+  waste time attempting to write millions of lines when the first line already failed.
 
-If a positive value is returned (indicating the number of characters written) it means the operation was successful. 
+If a positive value is returned (indicating the number of characters written)
+ it means the operation was successful. 
 
 If a negative number is returned there was some error.
 
@@ -31,14 +33,18 @@ va_arg
  & 
 va_end
 
-VA_START FUNCTION
+VA_START(args,mandatory_string)FUNCTION
+va_start( va_list var, parameterN );
 function will somehow initialize everything, before we start
  moving through our variable argument list (va_list).
  va_start must be called before any use of va_arg - otherwise your va_list
   variable/table will be empty.
 
- VA_END()
+
+VA_ARG(va_list var, type_of_the_variable )
+This macro allows access to the arguments of the variadic function. 
+Each time va_arg is called, you move to the next argument. 
+
+ VA_END(args) FUNCTION
    will free the allocated memory.
-
-
 

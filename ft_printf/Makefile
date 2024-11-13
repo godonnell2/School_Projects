@@ -10,7 +10,6 @@ SRC =	\
 		ft_printchar.c \
 		ft_printstring.c \
 		ft_printlong.c \
-		ft_printulong.c \
 		ft_printhex.c \
 		ft_printptr.c 
 		

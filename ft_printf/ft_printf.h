@@ -21,8 +21,7 @@ int	ft_printf(const char *mandatory_string, ...);
 int	ft_printchar(char c, int fd);
 int	ft_printstring(char *s, int fd);
 int	ft_printlong(long nb, int fd);
-int	ft_printulong(unsigned long nbr, int fd);
 int	ft_printhex(int big, unsigned int nbr, int fd);
-int	ft_printptr(unsigned long ptr_value, int fd);
+int	ft_printptr(void *ptr_value, int fd);
 
 #endif // FT_PRINTF_H
