@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/14 16:37:15 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/14 20:30:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,10 @@ void	*ft_memmove(void *dst, const void *src, size_t len)
 	}
 	return (dst);
 }
-
+/*
+if it is >=0 it will always be true!!! because its an unsigned value
+so cant use this 
+*/
 /*
 need for it to be len > 0 because size_t is unsigned and will skip to a huge nr
 if it goes to 0 or below
