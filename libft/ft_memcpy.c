@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:21:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/07 19:59:41 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/14 13:44:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,17 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-/*
+
 int main()
 {
-	char *dest = NULL;
-	char *test = NULL;
-	char *src = NULL;
-	size_t n = 3;
-	printf("%d\n", ft_memcpy(dest, src, n));
+	
+	const void *src = NULL;
+	void *dest = NULL;
+	int n = 3;
+	//ft_memcpy(dest, src, n);
+	memcpy(dest, src, n);
 }
-*/
+
 /*
 shouldnt do until end of string for byte wiseoperations duh
 no until str[i]

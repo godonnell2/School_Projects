@@ -53,7 +53,7 @@ bonus: $(NAME) $(BONUS_OBJS)
 
 #hidden file with . in front of it
 
-so: $(OBJS) $(BONUS_OBJS)
+so: clean $(OBJS) $(BONUS_OBJS)
 	gcc -shared -o $(LIB_SO) $(OBJS) $(BONUS_OBJS) -fPIC
 
 clean: 
