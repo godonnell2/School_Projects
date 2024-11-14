@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 11:52:33 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/12 12:32:44 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/13 19:58:27 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ int	ft_putstr_fd(char *s, int fd)
 }
 
 /*
-#include <fcntl.h>
 
+#include <fcntl.h>
 int main ()
 {
 	const char	*temp_filename = "test_output.txt";
