@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/13 16:36:17 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/14 10:56:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static int	handle_format(char format, va_list *args, int fd)
 	return (-1);
 }
 
-static int	print_format(const char *mandatory_string, va_list *args, int fd)
+static int	parse_format(const char *mandatory_string, va_list *args, int fd)
 {
 	unsigned int	i;
 	int				printed_chars;
@@ -77,6 +77,8 @@ int	ft_printf(const char *mandatory_string, ...)
 	return (total_chars);
 }
 
+// here we're convering it to a ptr &args in all the otehrs were
+// dealing with already as a pointer 
 // int	ft_printf(const char *mandatory_string, ...)
 // {
 // 	int				fd;
