@@ -72,7 +72,7 @@ int	ft_printf(const char *mandatory_string, ...)
 
 	fd = 1;
 	va_start(args, mandatory_string);
-	total_chars = print_format(mandatory_string, &args, fd);
+	total_chars = parse_format(mandatory_string, &args, fd);
 	va_end(args);
 	return (total_chars);
 }
