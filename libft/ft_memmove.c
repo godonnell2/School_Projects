@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:02:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/06 13:03:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/14 16:37:15 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ void	*ft_memmove(void *dst, const void *src, size_t len)
 }
 
 /*
+need for it to be len > 0 because size_t is unsigned and will skip to a huge nr
+if it goes to 0 or below
 NEED TO REMEMBER  LEN == 0
 if dest comes after src theres overlap, will overwrite src
 ie if its bigger!
