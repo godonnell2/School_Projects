@@ -55,6 +55,10 @@ int	ft_printptr(void *ptr_value, int fd)
 	int	count;
 
 	count = 0;
+	if (ptr_value == NULL)
+	{
+		return (ft_printstring("nil", fd));
+	}
 	error_check = ft_putchar_fd('0', fd);
 	if (error_check == -1)
 		return (-1);

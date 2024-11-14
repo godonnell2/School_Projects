@@ -6,23 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/13 16:00:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/14 20:20:15 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
-
-static int	int_handleneg(int fd)
-{
-	char	minus;
-
-	minus = '-';
-	if (ft_putchar_fd(minus, fd) == -1)
-	{
-		return (-1);
-	}
-	return (1);
-}
 
 int	ft_printlong(long nbr, int fd)
 {
@@ -34,7 +22,7 @@ int	ft_printlong(long nbr, int fd)
 	count = 0;
 	if (nbr < 0)
 	{
-		count = int_handleneg(fd);
+		count = ft_putchar_fd('-', fd);
 		if (count == -1)
 			return (-1);
 		nbr = nbr * -1;
