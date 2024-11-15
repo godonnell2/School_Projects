@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/15 09:19:08 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 12:24:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,13 @@
 
 char *get_next_line(int fd)
 {	
+	char *store = malloc(1000);
+	//need to add NULL check
+	size_t bytes_read;
 	char *buffer;
-
+	
+	int keep_reading = 1;
+	// NEED A STORE VAR ?? needs to hold a char* of indeterminate size
 	buffer = malloc(BUFFER_SIZE + 1);
 	//  if (!buffer)
     //     return NULL; 
@@ -28,26 +33,41 @@ char *get_next_line(int fd)
     //     return NULL; 
     // }
 	
-	read(fd, buffer, BUFFER_SIZE);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	//NEED TO PUT READ IN THE LOOOP CONDITOON!!!!
+	printf("bytes_read:%zu,", bytes_read);
 	int i = 0;
-	while(buffer[i] != '\n' || buffer[i] == '\0')
+	while(keep_reading && bytes_read > 0)
 	{
+		
+		store[i] =	buffer[i];
 		i++;
+		if (buffer[i] == '\n')
+			{
+			keep_reading = 0;
+			}
+		bytes_read--;
+		store[i]= '\0';
 	}
-	buffer[i]= '\0';
-	///(void) fd;
-	//printf("You entered: %s\n", buffer);
-	return buffer;
+	//(void) fd;
+	printf("You entered: %s\n", store);
+	return store;
 
 }
 //ssize_t read(int, void *, size_t)
 
 int main()
 {
-	char *line = get_next_line(0);
-	 if (line)
-	printf("You entered: %s\n", line); 
-        free(line);
+	const char *temp_file = "test.txt";
+	int fd;
+	fd = open(temp_file, O_RDWR | O_CREAT);
+	
+	printf("%s", get_next_line(fd));
+	
+	//char *line = get_next_line(0);
+	//  if (line)
+	// printf("You entered: %s\n", line); 
+    //     free(line);
 	
 	return 0;
 }
