@@ -1,5 +1,5 @@
 
-NAME = libft_getnextline.a
+NAME = get_next_line.a
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror -g 
 SRC =	\
@@ -11,12 +11,14 @@ OBJS = $(SRC:.c=.o)
 #Targets
 all: $(NAME)
 
+$(NAME): $(OBJS)
+	ar -rcs $(NAME) $(OBJS)
 
 %.o: %.c 
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 clean: 
-rm -f $(OBJS) 
+	rm -f $(OBJS) 
 
 fclean : clean 
 	rm -f $(NAME) 
