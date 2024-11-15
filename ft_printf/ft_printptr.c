@@ -57,7 +57,7 @@ int	ft_printptr(void *ptr_value, int fd)
 	count = 0;
 	if (ptr_value == NULL)
 	{
-		return (ft_printstring("nil", fd));
+		return (ft_printstring("(nil)", fd));
 	}
 	error_check = ft_putchar_fd('0', fd);
 	if (error_check == -1)
@@ -72,6 +72,15 @@ int	ft_printptr(void *ptr_value, int fd)
 	return (count);
 }
 
+/*
+int main ()
+{
+	 printf("REAL:%p\n", (void *)0);
+	 ft_printptr((void *)0,1 );
+
+
+}
+*/
 // int main(void) {
 
 //     printf("real: %p\n", (void *)"");
