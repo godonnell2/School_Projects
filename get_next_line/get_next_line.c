@@ -3,76 +3,81 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/15 12:24:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 17:32:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-char *get_next_line(int fd)
-{	
-	char *store = malloc(1000);
-	//need to add NULL check
-	size_t bytes_read;
-	char *buffer;
-	
-	int keep_reading = 1;
-	// NEED A STORE VAR ?? needs to hold a char* of indeterminate size
-	buffer = malloc(BUFFER_SIZE + 1);
-	//  if (!buffer)
-    //     return NULL; 
-
-	// if (fd <0 || buffer <= 0) 
-    // {
-    //     free(buffer); 
-    //     return NULL; 
-    // }
-	
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	//NEED TO PUT READ IN THE LOOOP CONDITOON!!!!
-	printf("bytes_read:%zu,", bytes_read);
-	int i = 0;
-	while(keep_reading && bytes_read > 0)
-	{
-		
-		store[i] =	buffer[i];
-		i++;
-		if (buffer[i] == '\n')
-			{
-			keep_reading = 0;
-			}
-		bytes_read--;
-		store[i]= '\0';
-	}
-	//(void) fd;
-	printf("You entered: %s\n", store);
-	return store;
-
-}
-//ssize_t read(int, void *, size_t)
-
-int main()
+char	*get_next_line(int fd)
 {
-	const char *temp_file = "test.txt";
-	int fd;
-	fd = open(temp_file, O_RDWR | O_CREAT);
-	
-	printf("%s", get_next_line(fd));
-	
-	//char *line = get_next_line(0);
-	//  if (line)
-	// printf("You entered: %s\n", line); 
-    //     free(line);
-	
-	return 0;
+	char	*store;
+	char	*buffer;
+	int		i;
+	int bytes_read;
+
+	store = malloc(1000);
+	if (store == NULL)
+		return (NULL);
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	if (fd < 0 )
+	{
+		free(buffer);
+		return (NULL);
+	}
+	i = 0;
+	int j = 0;
+	while ((bytes_read =read(fd, buffer, BUFFER_SIZE)) > 0)
+	{
+		while(j < bytes_read)
+		{
+			store[i] = buffer[j];
+			if (buffer[j] == '\n')
+			{
+				store[i] = '\0';
+			}
+			j++;
+		}
+		i++;
+	}
+	return (store);
 }
 
+/*
+char *ft_get_the_whole_line(int fd)
+{
+	char * whole_text = get_next_line(fd);
+	ft_strjoin();
+}
+*/
 
+
+int	main(void)
+{
+	const char	*temp_file = "test.txt";
+	charbuf[256];
+	int			fd;
+	int chars_read;
+
+	fd = open(temp_file, O_RDWR | O_CREAT);
+	while((chars_read = read(fd, buf, BUFFER_SIZE) ))
+	{
+		buf[chars_read] == '\0';
+	printf("%s", get_next_line(fd),buf);
+}
+	return (0);
+}
+
+// char *line = get_next_line(0);
+//  if (line)
+// printf("You entered: %s\n", line);
+//     free(line);
 
 // int main ()
 // {
@@ -99,3 +104,9 @@ check if -1 is kinda like check for null
 void fd will allow you to use this fn without using this parametor
 The read function will fill the buffer with the character read.
 */
+// NEED A STORE VAR ?? needs to hold a char* of indeterminate size
+//(void) fd;
+// printf("You entered: %s\n", store);
+// ssize_t read(int, void *, size_t)
+// NEED TO PUT READ IN THE LOOOP CONDITOON!!!!
+// printf("bytes_read:%zu,", bytes_read);

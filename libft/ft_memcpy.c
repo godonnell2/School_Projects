@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 11:21:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/14 13:44:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 15:28:09 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-
+/*
 int main()
 {
 	
@@ -41,6 +41,7 @@ int main()
 	//ft_memcpy(dest, src, n);
 	memcpy(dest, src, n);
 }
+*/
 
 /*
 shouldnt do until end of string for byte wiseoperations duh

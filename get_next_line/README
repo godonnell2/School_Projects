@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   README                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:00:38 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/15 08:30:07 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 17:12:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,3 +23,21 @@ https://42-cursus.gitbook.io/guide/rank-01/get_next_line/commented-solution
       /* We have to free the buffer variable here since we'll not be using
      * it later in the function, freeing it prevents memory leaks.
      */
+
+    
+        This condition checks if the number of bytes read is greater than 0.
+        The loop will continue as long as there are bytes being read from the file.
+        If bytes_read is 0, it means that the end of the file has been reached, and the loop will terminate.
+        If bytes_read is -1, it indicates an error, and you would typically handle that case
+         (e.g., by breaking out of the loop or logging an error).
+
+Summary:
+
+In summary, this line of code is part of a loop that continuously reads data from a file until either:
+
+    No more data is available (EOF is reached, indicated by bytes_read being 0).
+    An error occurs during the read operation (indicated by bytes_read being -1).
+
+The loop allows you to process the data read from the file in chunks, which is more efficient than 
+reading one byte at a time. Each iteration of the loop will read up to BUFFER_SIZE bytes into buffer, 
+and you can then process that data as needed.
