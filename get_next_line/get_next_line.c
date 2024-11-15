@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/15 07:05:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 09:19:08 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,28 @@
 
 char *get_next_line(int fd)
 {	
+	char *buffer;
 
-	char *buffer = malloc(BUFFER_SIZE + 1);
-	read(0, buffer, 1);
-	 ssize_t bytes_read = read(fd, buffer, BUFFER_SIZE);
+	buffer = malloc(BUFFER_SIZE + 1);
+	//  if (!buffer)
+    //     return NULL; 
 
+	// if (fd <0 || buffer <= 0) 
+    // {
+    //     free(buffer); 
+    //     return NULL; 
+    // }
+	
+	read(fd, buffer, BUFFER_SIZE);
+	int i = 0;
+	while(buffer[i] != '\n' || buffer[i] == '\0')
+	{
+		i++;
+	}
+	buffer[i]= '\0';
 	///(void) fd;
-	buffer[bytes_read] = '\0';
-	printf("You entered: %s\n", buffer);
-	    return buffer;
+	//printf("You entered: %s\n", buffer);
+	return buffer;
 
 }
 //ssize_t read(int, void *, size_t)
@@ -32,12 +45,14 @@ char *get_next_line(int fd)
 int main()
 {
 	char *line = get_next_line(0);
+	 if (line)
 	printf("You entered: %s\n", line); 
         free(line);
 	
+	return 0;
 }
 
-#include <fcntl.h>
+
 
 // int main ()
 // {

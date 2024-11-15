@@ -1,13 +1,25 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    README                                             :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: gro-donn <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/11/14 15:00:38 by gro-donn          #+#    #+#              #
-#    Updated: 2024/11/14 15:00:40 by gro-donn         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   README                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/14 15:00:38 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/11/15 08:30:07 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+https://42-cursus.gitbook.io/guide/rank-01/get_next_line/commented-solution
+  * fd < 0 : this means the file descriptor is invalid
+     * BUFFER_SIZE <= 0 : we'll read BUFFER_SIZE characters at a time,
+     * we can't read 0 or less character
+     * read(fd, 0, 0) < 0 : this check lets us see if the file exists and
+     * that it has some content to read from, or event that the file is 
+     * openable to read, maybe the file descriptor is more than 0, but it
+     * was open in 'modify only', that means we can't read it.
+     */
 
+      /* We have to free the buffer variable here since we'll not be using
+     * it later in the function, freeing it prevents memory leaks.
+     */
