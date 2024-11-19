@@ -1,6 +1,7 @@
 #Variables
 
 NAME = libftprintf.a
+HEADER = ft_printf.h
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror -g
 SRC =	\
@@ -25,7 +26,10 @@ $(NAME): $(OBJS)
 
 
 %.o: %.c 
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -I .
+	
+run:	all 
+	$(CC) $(CFLAGS) $(NAME) && ./a.out
 
 clean: 
 	rm -f $(OBJS) 
