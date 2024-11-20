@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printlong.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:55:07 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/14 20:20:15 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/19 10:36:52 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,21 @@ need to return length
 need to account for zero
 theres always going to be one nr
 dont have to worry about zero if do >9
+
+    Local Scope: Each call to ft_printlong has its own error_check variable,
+     which is initialized to 0 at the start of that call.
+    Value Propagation: When a recursive call returns, the value of error_check
+     in the calling function is updated to the value returned from the 
+     recursive call. This allows the calling function to accumulate the total 
+     count of characters printed.
+    Final Result: The final return value from the original call gives you the 
+    total number of characters printed, which includes all characters
+     printed in all recursive calls.
+
+This mechanism allows the function to effectively count and print each digit of
+ the number while managing recursion cleanly. Each call operates independently,
+  and the values are passed back up the call stack, allowing for a cumulative
+   count without resetting to zero.
  */
 
 // #include <stdio.h>

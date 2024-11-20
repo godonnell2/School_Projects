@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/14 10:56:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/15 21:49:23 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,12 @@ int	ft_printf(const char *mandatory_string, ...)
 	va_end(args);
 	return (total_chars);
 }
-
+#include <stdio.h>
+int main()
+{
+	printf(NULL);
+	//ft_prinft(NULL);
+}
 // here we're convering it to a ptr &args in all the otehrs were
 // dealing with already as a pointer 
 // int	ft_printf(const char *mandatory_string, ...)
