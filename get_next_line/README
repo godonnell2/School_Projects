@@ -3,12 +3,53 @@
 /*                                                        :::      ::::::::   */
 /*   README                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:00:38 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/15 17:12:03 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/20 11:35:00 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
+#include "get_next_line.h"
+#include <stdio.h>
+/*
+ok so we need four functions
+main one to call everything and do protections
+READ , from read to my buffer in a loop buffer could be small after each time you 've 
+read you check to find if you find a newline. if you dont find you continue so 
+they you call the read function again 
+when you do find the newline copy the line from your store into a new string strdup eg
+move everything after your newline into the beginning of the store (moving it back)
+and then you can return the dup string
+
+
+*/
+ /*
+     * read(fd, 0, 0) < 0 : this check lets us see if the file exists and
+     * that it has some content to read from, or event that the file is 
+     * openable to read, maybe the file descriptor is more than 0, but it
+     * was open in 'modify only', that means we can't read it.
+     */
+
+/*
+
+/*
+create if nonexistsent
+truncate if it exists let me overwrite
+
+check if -1 is kinda like check for null
+
+void fd will allow you to use this fn without using this parametor
+The read function will fill the store with the character read.
+*/
+// NEED A STORE VAR ?? needs to hold a char* of indeterminate size
+//(void) fd;
+// printf("You entered: %s\n", existing_content);
+// ssize_t read(int, void *, size_t)
+// NEED TO PUT READ IN THE LOOOP CONDITOON!!!!
+// printf("bytes_read:%zu,", bytes_read);
+
 
 https://42-cursus.gitbook.io/guide/rank-01/get_next_line/commented-solution
   * fd < 0 : this means the file descriptor is invalid
@@ -32,12 +73,3 @@ https://42-cursus.gitbook.io/guide/rank-01/get_next_line/commented-solution
          (e.g., by breaking out of the loop or logging an error).
 
 Summary:
-
-In summary, this line of code is part of a loop that continuously reads data from a file until either:
-
-    No more data is available (EOF is reached, indicated by bytes_read being 0).
-    An error occurs during the read operation (indicated by bytes_read being -1).
-
-The loop allows you to process the data read from the file in chunks, which is more efficient than 
-reading one byte at a time. Each iteration of the loop will read up to BUFFER_SIZE bytes into buffer, 
-and you can then process that data as needed.
