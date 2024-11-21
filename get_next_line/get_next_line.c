@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/21 12:27:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/21 17:44:14 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,44 @@ and already reached EOF
 
 */
 
+char *get_next_line(int fd)
+{
+	char *buffer = NULL;
+	size_t bytes_read;
+	char *newline_pos;
+	char *line;
+	
+	if(buffer == NULL)
+	{
+		buffer = malloc(BUFFER_SIZE);
+		if(!buffer)
+		{
+			return NULL;
+		}
+	}
+	
+	while(1)
+	{
+		
+		newline_pos = strchr(buffer,'\n');
+		if(newline_pos)
+		{
+			size_t line_length = newline_pos - buffer + 1;
+			line = malloc(line_length +1);
+			if(!line)
+			{
+				free(buffer);
+				return NULL;
+			}
+			ft_strlcpy(line, buffer, line_length);
+			line[line_length] = '\0';
+			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1); // +1 for null terminator
+            return line; // Return the line
+		}
+	}
+}
+
+/*
 char	*g_test_str = "\ntest\ngrace this is a second try\n";
 
 int		g_init = 1;
@@ -128,7 +166,7 @@ char	*get_next_line(int fd)
 	
 	return (NULL); // No more lines to read
 }
-
+*/
 #include <fcntl.h>
 #include <stdio.h>
 
