@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:00:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/20 18:07:43 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/21 20:54:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,8 @@ size_t	ft_strlen(const char *str)
 	int	i;
 
 	i = 0;
+    if(!str)
+    return 0;
 	while (str[i])
 	{
 		i++;

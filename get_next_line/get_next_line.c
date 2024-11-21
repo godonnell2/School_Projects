@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/21 17:44:14 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/21 20:56:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ and already reached EOF
 
 char *get_next_line(int fd)
 {
-	char *buffer = NULL;
+	static char *buffer = NULL;
 	size_t bytes_read;
 	char *newline_pos;
 	char *line;
@@ -67,25 +67,51 @@ char *get_next_line(int fd)
 	
 	while(1)
 	{
-		
 		newline_pos = strchr(buffer,'\n');
 		if(newline_pos)
-		{
+			{
 			size_t line_length = newline_pos - buffer + 1;
 			line = malloc(line_length +1);
 			if(!line)
-			{
+				{
 				free(buffer);
 				return NULL;
-			}
+				}
 			ft_strlcpy(line, buffer, line_length);
+			printf("%s", line);
 			line[line_length] = '\0';
-			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1); // +1 for null terminator
-            return line; // Return the line
-		}
-	}
-}
+			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1);
+            return line;
+			}
+		else
+		{
+		size_t current_len = ft_strlen(buffer);
+        bytes_read = read(fd, buffer + current_len, BUFFER_SIZE - current_len);
+        if (bytes_read < 0)
+        	{
+            free(buffer);
+            return NULL;
+        	}
 
+        if (bytes_read == 0)
+        {
+            if (current_len > 0)
+            {
+                line = strdup(buffer);
+                free(buffer);
+                buffer = NULL;
+                return line;
+            }
+            free(buffer);
+            buffer = NULL;
+            return NULL;
+        }
+
+        buffer[current_len + bytes_read] = '\0';
+		}
+    }
+    return NULL;
+}
 /*
 char	*g_test_str = "\ntest\ngrace this is a second try\n";
 
@@ -170,28 +196,32 @@ char	*get_next_line(int fd)
 #include <fcntl.h>
 #include <stdio.h>
 
-int	main(void)
+// int	main(void)
+// {
+// 	char	*line;
+// 	int		max;
+
+// 	 size_t		fd;
+// 	max = 25;
+// 	 fd = open("test.txt", O_RDWR);
+	 
+// 	 while (--max) {
+// 		char buff[5] = {0};
+// 		size_t res = read(fd, buff, 5);
+// 		printf("res= %zu, buff: %c%c%c%c%c\n", res, buff[0],buff[1],buff[2],buff[3],buff[4]);
+// 	 }
+
+
+
+// return 0;
+int main(void)
 {
 	char	*line;
-	int		max;
-
-	 int		fd;
-	max = 25;
-	 fd = open("test.txt", O_RDWR);
-	 
-	 while (--max) {
-		char buff[5] = {0};
-		size_t res = read(fd, buff, 5);
-		printf("res= %d, buff: %c%c%c%c%c\n", res, buff[0],buff[1],buff[2],buff[3],buff[4]);
-	 }
-
-
-
-return 0;
-
+	size_t fd = open("test.txt", O_RDONLY);
+	int		max = 25;
 	while (1)
 	{
-		line = get_next_line(0);
+		line = get_next_line(fd);
 		if (line == NULL)
 		{
 			printf("get line returned null\n");
