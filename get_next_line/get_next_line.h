@@ -6,14 +6,14 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 16:26:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/20 18:12:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/21 10:16:14 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+#  define BUFFER_SIZE 2
 # endif
 # include <fcntl.h>
 # include <stdlib.h>
