@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/22 10:14:00 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/22 11:33:44 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,11 @@ char	*get_next_line(int fd)
 
 if (fd < 0 ||  read(fd, 0, 0) < 0)
 {
+	if(buffer != NULL)
+	{
+		free (buffer);
+		buffer = NULL;
+	}
 	return NULL;
 }
 
@@ -76,7 +81,6 @@ if (buffer == NULL)
 	
 	while (1)
 	{
-	
 		newline_pos = strchr(buffer, '\n');
 		// printf("1sthit buffer: %s newline_pos: \n", buffer, newline_pos);
 		if (newline_pos)
@@ -87,10 +91,10 @@ if (buffer == NULL)
 			if (!line)
 			{
 				free(buffer);
+				buffer = NULL;
 				return (NULL);
 			}
 			ft_strlcpy(line, buffer, line_length+1);
-			
 			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1);
 			//printf("");
 			return (line);
@@ -101,8 +105,6 @@ if (buffer == NULL)
 			current_len = ft_strlen(buffer);
 			bytes_read = read(fd, buffer + current_len, BUFFER_SIZE);
 			   
-
-			
 			if (bytes_read < 0)
 			{
 				free(buffer);
