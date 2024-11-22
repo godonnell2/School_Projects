@@ -6,12 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/21 20:56:42 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/22 09:10:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <string.h>
+#include <stdio.h>
 
 /*
 ok so we need four functions
@@ -55,19 +56,23 @@ char *get_next_line(int fd)
 	size_t bytes_read;
 	char *newline_pos;
 	char *line;
+	char * tmp_store;
 	
 	if(buffer == NULL)
 	{
-		buffer = malloc(BUFFER_SIZE);
+		buffer = ft_calloc(1024,1);
 		if(!buffer)
 		{
 			return NULL;
 		}
+	
 	}
 	
 	while(1)
 	{
+		
 		newline_pos = strchr(buffer,'\n');
+		//printf("1sthit buffer: %s newline_pos: \n", buffer, newline_pos);
 		if(newline_pos)
 			{
 			size_t line_length = newline_pos - buffer + 1;
@@ -78,7 +83,7 @@ char *get_next_line(int fd)
 				return NULL;
 				}
 			ft_strlcpy(line, buffer, line_length);
-			printf("%s", line);
+			//printf("2st copy line%s\n", line);
 			line[line_length] = '\0';
 			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1);
             return line;
@@ -86,7 +91,7 @@ char *get_next_line(int fd)
 		else
 		{
 		size_t current_len = ft_strlen(buffer);
-        bytes_read = read(fd, buffer + current_len, BUFFER_SIZE - current_len);
+        bytes_read = read(fd, buffer + current_len, BUFFER_SIZE);
         if (bytes_read < 0)
         	{
             free(buffer);
@@ -97,7 +102,7 @@ char *get_next_line(int fd)
         {
             if (current_len > 0)
             {
-                line = strdup(buffer);
+                line = ft_strdup(buffer);
                 free(buffer);
                 buffer = NULL;
                 return line;
