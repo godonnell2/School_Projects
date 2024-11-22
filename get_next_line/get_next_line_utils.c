@@ -6,13 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:00:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/22 11:50:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/22 19:51:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <string.h>
-
 
 char	*ft_strchr(char *s, int c)
 {
@@ -42,9 +41,11 @@ char	*ft_strdup(const char *s1)
 	size_t	i;
 	char	*ptr;
 	char	*str;
-  if (s1 == NULL) {
-        return NULL; // Handle NULL input
-    }
+
+	if (s1 == NULL)
+	{
+		return (NULL); // Handle NULL input
+	}
 	length = ft_strlen(s1);
 	i = 0;
 	ptr = (char *)malloc(length + 1);
@@ -62,11 +63,12 @@ char	*ft_strdup(const char *s1)
 
 size_t	ft_strlen(const char *str)
 {
-    if (str == NULL)
-   {return 0;
-   }
 	int	i;
 
+	if (str == NULL)
+	{
+		return (0);
+	}
 	i = 0;
 	if (!str)
 		return (0);
@@ -97,34 +99,19 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (length);
 }
 
-// void	ft_bzero(void *s, size_t n)
-// {
-// 	unsigned char	*str;
-// 	size_t			i;
-
-// 	str = (unsigned char *)s;
-// 	i = 0;
-// 	while (i < n)
-// 	{
-// 		str[i] = 0;
-// 		i++;
-// 	}
-// 	return ;
-// }
-
 void	*ft_calloc(size_t count, size_t size)
 {
-	size_t	total_mem;
-	unsigned char *ptr;
+	size_t			total_mem;
+	unsigned char	*ptr;
+	size_t			i;
 
 	if (count != 0 && size > SIZE_MAX / count)
 		return (NULL);
 	total_mem = count * size;
-	ptr = (unsigned char*)malloc(total_mem);
+	ptr = (unsigned char *)malloc(total_mem);
 	if (ptr == NULL)
 		return (NULL);
-    size_t i;
-    i = 0;
+	i = 0;
 	while (i < total_mem)
 	{
 		ptr[i] = 0;
@@ -135,8 +122,8 @@ void	*ft_calloc(size_t count, size_t size)
 
 void	*ft_memmove(void *dst, const void *src, size_t len)
 {
-	char *dest;
-	const char *s = (const char *)src;
+	char		*dest;
+	const char	*s = (const char *)src;
 
 	dest = (char *)dst;
 	if (dst == NULL && src == NULL)
@@ -160,4 +147,20 @@ void	*ft_memmove(void *dst, const void *src, size_t len)
 		}
 	}
 	return (dst);
+}
+
+void	*grow_buffer(void *ptr, size_t new_size, size_t size_to_copy)
+{
+
+	void *new_ptr = ft_calloc(new_size, 1);
+    if(new_ptr== NULL)
+    {
+        free (ptr);
+        return NULL;
+    }
+
+	ft_memmove(new_ptr, ptr, size_to_copy);
+
+	free(ptr);
+	return (new_ptr);
 }
