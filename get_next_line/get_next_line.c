@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/22 09:10:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/22 10:14:00 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 /*
 ok so we need four functions
@@ -25,97 +25,106 @@ when you do find the newline copy the line from your tmp into a new string strdu
 move everything after your newline into the beginning of the tmp (moving it back)
 and then you can return the dup string
 
-
+DIFFERENT CONDITIONS
 main loop:
 could have newline in buffer  and more charachters
 
-strchr (buffer, '\n') 
+strchr (buffer, '\n')
 	before is line we need to return and remove data from buffer using memmove
-	
-could not have newline in buffer just plain characters 
+
+could not have newline in buffer just plain characters
 if(!strchr(buffer, '\n'))
 	we need to read more data into buffer, append new data from read into buffer
 	if EOF ( read return = 0)
 		return what's in the buffer
-		free buffer. 
-	else 
+		free buffer.
+	else
 		continue from main loop;
 no buffer not initialised
-	if(!buffer) 
+	if(!buffer)
 		malloc a buffer
-		continue from main loop; 
-and already reached EOF 
+		continue from main loop;
+and already reached EOF
 	two iterations first no buffer not initialised
 	second no newline identified
 
 */
 
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-	static char *buffer = NULL;
-	size_t bytes_read;
-	char *newline_pos;
-	char *line;
-	char * tmp_store;
-	
-	if(buffer == NULL)
-	{
-		buffer = ft_calloc(1024,1);
-		if(!buffer)
+	static char	*buffer = NULL;
+	size_t		bytes_read;
+	char		*newline_pos;
+	char		*line;
+	size_t		line_length;
+	size_t		current_len;
+
+if (fd < 0 ||  read(fd, 0, 0) < 0)
+{
+	return NULL;
+}
+
+if (buffer == NULL)
 		{
-			return NULL;
-		}
-	
-	}
-	
-	while(1)
-	{
-		
-		newline_pos = strchr(buffer,'\n');
-		//printf("1sthit buffer: %s newline_pos: \n", buffer, newline_pos);
-		if(newline_pos)
+			buffer = ft_calloc( 1024 * 1024 * 60, 1);
+			if (!buffer)
 			{
-			size_t line_length = newline_pos - buffer + 1;
-			line = malloc(line_length +1);
-			if(!line)
-				{
-				free(buffer);
-				return NULL;
-				}
-			ft_strlcpy(line, buffer, line_length);
-			//printf("2st copy line%s\n", line);
-			line[line_length] = '\0';
-			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1);
-            return line;
+				return (NULL);
 			}
+		}
+	// char * tmp_store;
+	
+	while (1)
+	{
+	
+		newline_pos = strchr(buffer, '\n');
+		// printf("1sthit buffer: %s newline_pos: \n", buffer, newline_pos);
+		if (newline_pos)
+		{
+			line_length = newline_pos - buffer + 1; //newline
+			//printf("line_length:%zu\n", line_length);
+			line = malloc(line_length + 1); // null byte
+			if (!line)
+			{
+				free(buffer);
+				return (NULL);
+			}
+			ft_strlcpy(line, buffer, line_length+1);
+			
+			ft_memmove(buffer, newline_pos + 1, strlen(newline_pos + 1) + 1);
+			//printf("");
+			return (line);
+		}
 		else
 		{
-		size_t current_len = ft_strlen(buffer);
-        bytes_read = read(fd, buffer + current_len, BUFFER_SIZE);
-        if (bytes_read < 0)
-        	{
-            free(buffer);
-            return NULL;
-        	}
+				
+			current_len = ft_strlen(buffer);
+			bytes_read = read(fd, buffer + current_len, BUFFER_SIZE);
+			   
 
-        if (bytes_read == 0)
-        {
-            if (current_len > 0)
-            {
-                line = ft_strdup(buffer);
-                free(buffer);
-                buffer = NULL;
-                return line;
-            }
-            free(buffer);
-            buffer = NULL;
-            return NULL;
-        }
-
-        buffer[current_len + bytes_read] = '\0';
+			
+			if (bytes_read < 0)
+			{
+				free(buffer);
+				return (NULL);
+			}
+			if (bytes_read == 0)
+			{
+				if (current_len > 0)
+				{
+					line = ft_strdup(buffer);
+					free(buffer);
+					buffer = NULL;
+					return (line);
+				}
+				free(buffer);
+				buffer = NULL;
+				return (NULL);
+			}
+			buffer[current_len + bytes_read] = '\0';
 		}
-    }
-    return NULL;
+	}
+	return (NULL);
 }
 /*
 char	*g_test_str = "\ntest\ngrace this is a second try\n";
@@ -145,10 +154,8 @@ char	*get_next_line(int fd)
 	}
 	// we have a buffer size let's say it's one then we cant go down to the bottom instead
 	// we need to call read
-	
 	while (1)
 	{
-		
 			if (buffer[i] == '\n')
 			{
 				line_length = i + 2;
@@ -172,8 +179,6 @@ char	*get_next_line(int fd)
 				return (line);
 			}
 			i++;
-		
-		
 			// hANDLE CASE WHERE NO NEW LINE
 			if (buffer[i] != '\0')
 			{
@@ -190,11 +195,11 @@ char	*get_next_line(int fd)
 			bytes_read = read(fd, buffer, BUFFER_SIZE);
 			if(bytes_read > 0)
 			{
-				printf("bytes_read:%zu, buffer: %s, remaining_length:%zu", bytes_read, buffer, remaining_length);
+				printf("bytes_read:%zu, buffer: %s, remaining_length:%zu",
+					bytes_read, buffer, remaining_length);
 				ft_memmove(buffer, buffer + i + 1, remaining_length);
 			}
 		}
-	
 	return (NULL); // No more lines to read
 }
 */
@@ -206,42 +211,46 @@ char	*get_next_line(int fd)
 // 	char	*line;
 // 	int		max;
 
-// 	 size_t		fd;
+// 		size_t		fd;
 // 	max = 25;
-// 	 fd = open("test.txt", O_RDWR);
-	 
-// 	 while (--max) {
+// 		fd = open("test.txt", O_RDWR);
+
+// 		while (--max) {
 // 		char buff[5] = {0};
 // 		size_t res = read(fd, buff, 5);
-// 		printf("res= %zu, buff: %c%c%c%c%c\n", res, buff[0],buff[1],buff[2],buff[3],buff[4]);
-// 	 }
+// 		printf("res= %zu, buff: %c%c%c%c%c\n", res,
+// buff[0],buff[1],buff[2],buff[3],buff[4]);
+// 		}
 
+// return (0);
+// }
+// REAL MAIN
+// int	main(void)
+// {
+// 	char	*line;
+// 	size_t	fd;
+// 	int		max;
 
-
-// return 0;
-int main(void)
-{
-	char	*line;
-	size_t fd = open("test.txt", O_RDONLY);
-	int		max = 25;
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-		{
-			printf("get line returned null\n");
-			break ;
-		}
-		if (!--max)
-		{
-			printf("max value reached\n");
-			break ;
-		}
-		printf("RESULT RETURNED:'%s'\n", line);
-		free(line);
-	}
-	return (0);
-}
+// 	fd = open("test.txt", O_RDONLY);
+// 	max = 25;
+// 	while (1)
+// 	{
+// 		line = get_next_line(fd);
+// 		if (line == NULL)
+// 		{
+// 			printf("get line returned null\n");
+// 			break ;
+// 		}
+// 		if (!--max)
+// 		{
+// 			printf("max value reached\n");
+// 			break ;
+// 		}
+// 		printf("RESULT RETURNED:'%s'\n", line);
+// 		free(line);
+// 	}
+// 	return (0);
+// }
 // int main(void)
 // {
 //     while (1)
