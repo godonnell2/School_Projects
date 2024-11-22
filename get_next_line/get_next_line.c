@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/22 20:28:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/22 21:05:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,85 +14,80 @@
 #include <stdio.h>
 #include <string.h>
 
-char	*get_next_line(int fd)
+void free_store(char **store)
 {
-	static char	*store = NULL;
-	size_t		bytes_read;
+	free(*store);
+	*store = NULL;
+}
+
+char *get_stored_line(char **store, char *newline_pos)
+{
+	size_t line_length;
+	char *line;
+
+	line_length = newline_pos - (*store) + 1; // newline
+	line = malloc(line_length + 1);		   // null byte
+	if (line == NULL)
+	{
+		free_store(store);
+		return NULL;
+	}
+	ft_strlcpy(line, *store, line_length + 1);
+	ft_memmove(*store, newline_pos + 1, strlen(newline_pos + 1) + 1);
+	return (line);
+}
+
+
+char *get_next_line(int fd)
+{
+	static char *store = NULL;
+	size_t bytes_read;
 	static size_t store_size = 0;
-	char		*newline_pos;
-	char		*line;
-	size_t		line_length;
-	size_t		current_len;
+	char *newline_pos;
+	char *line;
+	size_t current_len;
 
 	if (fd < 0 || read(fd, 0, 0) < 0)
 	{
 		if (store != NULL)
-		{
-			free(store);
-			store = NULL;
-		}
+			free_store(&store);
 		return (NULL);
 	}
+	
 	if (store == NULL)
 	{
 		store = ft_calloc(BUFFER_SIZE, 1);
 		if (!store)
-		{
 			return (NULL);
-		}
 		store_size = BUFFER_SIZE;
 	}
+	
 	while (1)
 	{
 		newline_pos = strchr(store, '\n');
-		// printf("1sthit store: %s newline_pos: \n", store, newline_pos);
+
 		if (newline_pos)
-		{
-			line_length = newline_pos - store + 1; // newline
-			// printf("line_length:%zu\n", line_length);
-			line = malloc(line_length + 1); // null byte
-			if (!line)
-			{
-				free(store);
-				store = NULL;
-				return (NULL);
-			}
-			ft_strlcpy(line, store, line_length + 1);
-			ft_memmove(store, newline_pos + 1, strlen(newline_pos + 1) + 1);
-			// printf("");
-			return (line);
-		}
+			return get_stored_line(&store, newline_pos);
 		else
 		{
 			current_len = ft_strlen(store);
-			  if (current_len + BUFFER_SIZE >= store_size)
-			  {
-               	store = grow_buffer(store, store_size *2, store_size);
-                if (!store) 
-				{
-                    return NULL;
-                }
-                store_size *= 2;
-            }
-			bytes_read = read(fd, store + current_len, BUFFER_SIZE);
-			
-			if (bytes_read < 0)
+			if (current_len + BUFFER_SIZE >= store_size)
 			{
-				free(store);
-				return (NULL);
+				store = grow_store(store, store_size * 2, store_size);
+				if (!store)
+					return NULL;
+				store_size *= 2;
 			}
-			if (bytes_read == 0)
+			bytes_read = read(fd, store + current_len, BUFFER_SIZE);
+
+			if (bytes_read < 1)
 			{
-				if (current_len > 0)
-				{
+				if (bytes_read == 0 && current_len > 0)
 					line = ft_strdup(store);
-					free(store);
-					store = NULL;
-					return (line);
-				}
-				free(store);
-				store = NULL;
-				return (NULL);
+				else
+					line = NULL;
+				free_store(&store);
+				return (line);
 			}
 			store[current_len + bytes_read] = '\0';
 		}
