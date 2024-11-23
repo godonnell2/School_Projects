@@ -50,20 +50,21 @@ static char	*get_stored_line(char **store, char *newline_pos)
 	return (line);
 }
 
-char * handle_finalread(size_t bytes_read, size_t current_len, char **store)
+char	*handle_finalread(size_t bytes_read, size_t current_len, char **store)
 {
-	char			*line;
-				if (bytes_read == 0 && current_len > 0)
-				{
-					line = malloc(current_len + 1);
-					if (!line)
-						return (free_store(store));
-					ft_strlcpy(line, *store, current_len + 1);
-				}
-				else
-					line = NULL;
-				free_store(store);
-				return (line);
+	char	*line;
+
+	if (bytes_read == 0 && current_len > 0)
+	{
+		line = malloc(current_len + 1);
+		if (!line)
+			return (free_store(store));
+		ft_strlcpy(line, *store, current_len + 1);
+	}
+	else
+		line = NULL;
+	free_store(store);
+	return (line);
 }
 
 char	*get_next_line(int fd)
@@ -73,7 +74,7 @@ char	*get_next_line(int fd)
 	static size_t	store_size = 0;
 	char			*newline_pos;
 	size_t			current_len;
-	
+
 	if (fd < 0 || read(fd, 0, 0) < 0)
 	{
 		if (store != NULL)
@@ -104,7 +105,7 @@ char	*get_next_line(int fd)
 			}
 			bytes_read = read(fd, store + current_len, BUFFER_SIZE);
 			if (bytes_read < 1)
-				return handle_finalread(bytes_read, current_len, &store);
+				return (handle_finalread(bytes_read, current_len, &store));
 			store[current_len + bytes_read] = '\0';
 		}
 	}
