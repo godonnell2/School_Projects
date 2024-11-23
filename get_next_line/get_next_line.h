@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 16:26:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/23 10:28:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/23 14:51:27 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,5 @@ size_t	ft_strlen(const char *s);
 char	*ft_strchr(char *s, int c);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 void	*ft_calloc(size_t count, size_t size);
-void	*ft_memmove(void *dst, const void *src, size_t len);
+void	*free_store(char **store);
 #endif

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/23 10:44:49 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/23 14:50:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,28 @@
 #include <stdio.h>
 #include <string.h>
 
-static void	*free_store(char **store)
+static void	*grow_store(char **store, size_t *store_size)
 {
-	free(*store);
-	*store = NULL;
-	return (NULL);
-}
+	char	*new_ptr;
+	char	*ptr;
+	size_t	i;
+	size_t	size_to_copy;
 
-static void	*grow_store(void *ptr, size_t new_size, size_t size_to_copy)
-{
-	void	*new_ptr;
-
-	new_ptr = ft_calloc(new_size, 1);
+	size_to_copy = *store_size;
+	ptr = *store;
+	*store_size *= 2;
+	new_ptr = ft_calloc(*store_size, 1);
 	if (new_ptr == NULL)
 	{
 		free(ptr);
 		return (NULL);
 	}
-	ft_memmove(new_ptr, ptr, size_to_copy);
+	i = 0;
+	while (i < size_to_copy)
+	{
+		new_ptr[i] = ptr[i];
+		i++;
+	}
 	free(ptr);
 	return (new_ptr);
 }
@@ -40,13 +44,21 @@ static char	*get_stored_line(char **store, char *newline_pos)
 {
 	size_t	line_length;
 	char	*line;
+	size_t	i;
 
+	i = 0;
 	line_length = newline_pos - (*store) + 1;
 	line = malloc(line_length + 1);
 	if (line == NULL)
 		return (free_store(store));
 	ft_strlcpy(line, *store, line_length + 1);
-	ft_memmove(*store, newline_pos + 1, strlen(newline_pos + 1) + 1);
+	newline_pos++;
+	while (newline_pos[i])
+	{
+		(*store)[i] = newline_pos[i];
+		i++;
+	}
+	(*store)[i] = '\0';
 	return (line);
 }
 
@@ -67,13 +79,39 @@ char	*handle_finalread(size_t bytes_read, size_t current_len, char **store)
 	return (line);
 }
 
+char	*get_next_line_store(int fd, char **store, size_t *store_size)
+{
+	size_t	bytes_read;
+	char	*newline_pos;
+	size_t	current_len;
+
+	while (1)
+	{
+		newline_pos = strchr(*store, '\n');
+		if (newline_pos)
+			return (get_stored_line(store, newline_pos));
+		else
+		{
+			current_len = ft_strlen(*store);
+			if (current_len + BUFFER_SIZE >= *store_size)
+			{
+				*store = grow_store(store, store_size);
+				if (!(*store))
+					return (NULL);
+			}
+			bytes_read = read(fd, (*store) + current_len, BUFFER_SIZE);
+			if (bytes_read < 1)
+				return (handle_finalread(bytes_read, current_len, store));
+			(*store)[current_len + bytes_read] = '\0';
+		}
+	}
+	return (NULL);
+}
+
 char	*get_next_line(int fd)
 {
 	static char		*store = NULL;
-	size_t			bytes_read;
 	static size_t	store_size = 0;
-	char			*newline_pos;
-	size_t			current_len;
 
 	if (fd < 0 || read(fd, 0, 0) < 0)
 	{
@@ -88,28 +126,7 @@ char	*get_next_line(int fd)
 			return (NULL);
 		store_size = BUFFER_SIZE;
 	}
-	while (1)
-	{
-		newline_pos = strchr(store, '\n');
-		if (newline_pos)
-			return (get_stored_line(&store, newline_pos));
-		else
-		{
-			current_len = ft_strlen(store);
-			if (current_len + BUFFER_SIZE >= store_size)
-			{
-				store = grow_store(store, store_size * 2, store_size);
-				if (!store)
-					return (NULL);
-				store_size *= 2;
-			}
-			bytes_read = read(fd, store + current_len, BUFFER_SIZE);
-			if (bytes_read < 1)
-				return (handle_finalread(bytes_read, current_len, &store));
-			store[current_len + bytes_read] = '\0';
-		}
-	}
-	return (NULL);
+	return (get_next_line_store(fd, &store, &store_size));
 }
 
 /*
