@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 17:54:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/23 07:24:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/23 07:33:32 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -365,12 +365,14 @@ int	main(void)
 }
 */
 
-// #include <stdio.h>
-// int main()
-// {
-// 	printf(NULL);
-// 	//ft_printf(NULL);
-// }
+/*
+#include <stdio.h>
+int main()
+{
+	printf(NULL);
+	ft_printf(NULL);
+}
+*/
 
 // here we're convering it to a ptr &args in all the otehrs were
 // dealing with already as a pointer

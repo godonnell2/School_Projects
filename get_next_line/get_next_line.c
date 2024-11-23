@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/22 21:05:31 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/23 10:44:49 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,46 +14,72 @@
 #include <stdio.h>
 #include <string.h>
 
-void free_store(char **store)
+static void	*free_store(char **store)
 {
 	free(*store);
 	*store = NULL;
+	return (NULL);
 }
 
-char *get_stored_line(char **store, char *newline_pos)
+static void	*grow_store(void *ptr, size_t new_size, size_t size_to_copy)
 {
-	size_t line_length;
-	char *line;
+	void	*new_ptr;
 
-	line_length = newline_pos - (*store) + 1; // newline
-	line = malloc(line_length + 1);		   // null byte
-	if (line == NULL)
+	new_ptr = ft_calloc(new_size, 1);
+	if (new_ptr == NULL)
 	{
-		free_store(store);
-		return NULL;
+		free(ptr);
+		return (NULL);
 	}
+	ft_memmove(new_ptr, ptr, size_to_copy);
+	free(ptr);
+	return (new_ptr);
+}
+
+static char	*get_stored_line(char **store, char *newline_pos)
+{
+	size_t	line_length;
+	char	*line;
+
+	line_length = newline_pos - (*store) + 1;
+	line = malloc(line_length + 1);
+	if (line == NULL)
+		return (free_store(store));
 	ft_strlcpy(line, *store, line_length + 1);
 	ft_memmove(*store, newline_pos + 1, strlen(newline_pos + 1) + 1);
 	return (line);
 }
 
-
-char *get_next_line(int fd)
+char * handle_finalread(size_t bytes_read, size_t current_len, char **store)
 {
-	static char *store = NULL;
-	size_t bytes_read;
-	static size_t store_size = 0;
-	char *newline_pos;
-	char *line;
-	size_t current_len;
+	char			*line;
+				if (bytes_read == 0 && current_len > 0)
+				{
+					line = malloc(current_len + 1);
+					if (!line)
+						return (free_store(store));
+					ft_strlcpy(line, *store, current_len + 1);
+				}
+				else
+					line = NULL;
+				free_store(store);
+				return (line);
+}
 
+char	*get_next_line(int fd)
+{
+	static char		*store = NULL;
+	size_t			bytes_read;
+	static size_t	store_size = 0;
+	char			*newline_pos;
+	size_t			current_len;
+	
 	if (fd < 0 || read(fd, 0, 0) < 0)
 	{
 		if (store != NULL)
 			free_store(&store);
 		return (NULL);
 	}
-	
 	if (store == NULL)
 	{
 		store = ft_calloc(BUFFER_SIZE, 1);
@@ -61,13 +87,11 @@ char *get_next_line(int fd)
 			return (NULL);
 		store_size = BUFFER_SIZE;
 	}
-	
 	while (1)
 	{
 		newline_pos = strchr(store, '\n');
-
 		if (newline_pos)
-			return get_stored_line(&store, newline_pos);
+			return (get_stored_line(&store, newline_pos));
 		else
 		{
 			current_len = ft_strlen(store);
@@ -75,20 +99,12 @@ char *get_next_line(int fd)
 			{
 				store = grow_store(store, store_size * 2, store_size);
 				if (!store)
-					return NULL;
+					return (NULL);
 				store_size *= 2;
 			}
 			bytes_read = read(fd, store + current_len, BUFFER_SIZE);
-
 			if (bytes_read < 1)
-			{
-				if (bytes_read == 0 && current_len > 0)
-					line = ft_strdup(store);
-				else
-					line = NULL;
-				free_store(&store);
-				return (line);
-			}
+				return handle_finalread(bytes_read, current_len, &store);
 			store[current_len + bytes_read] = '\0';
 		}
 	}
@@ -99,11 +115,13 @@ char *get_next_line(int fd)
 ok so we need four functions
 main one to call everything and do protections
 READ ,
-	from read to my store in a loop store could be small after each time you 've
+from read to my store in a loop store could be small after each time you 've
 read you check to find if you find a newline. if you dont find you continue so
 they you call the read function again
-when you do find the newline copy the line from your tmp into a new string strdup eg
-move everything after your newline into the beginning of the tmp (moving it back)
+when you do find the newline copy the line from your tmp into a new string
+strdup eg
+move everything after your newline into the beginning of the tmp
+ (moving it back)
 and then you can return the dup string
 
 DIFFERENT CONDITIONS
