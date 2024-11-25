@@ -6,25 +6,26 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 15:00:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/23 14:54:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/24 15:05:28 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <string.h>
 
-void	*free_store(char **store)
+void *free_store_value(t_store *store)
 {
-	free(*store);
-	*store = NULL;
+	free(store->value);
+	store->value = NULL;
+	store->size = 0;
 	return (NULL);
 }
 
-char	*ft_strchr(char *s, int c)
+char *ft_strchr(char *s, int c)
 {
-	char	chr;
-	char	*str;
-	int		len;
+	char chr;
+	char *str;
+	int len;
 
 	str = (char *)s;
 	chr = (char)c;
@@ -42,9 +43,9 @@ char	*ft_strchr(char *s, int c)
 	return (NULL);
 }
 
-size_t	ft_strlen(const char *str)
+size_t ft_strlen(const char *str)
 {
-	int	i;
+	int i;
 
 	if (str == NULL)
 	{
@@ -60,10 +61,10 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+size_t ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	size_t	i;
-	size_t	length;
+	size_t i;
+	size_t length;
 
 	i = 0;
 	length = ft_strlen(src);
@@ -80,11 +81,11 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (length);
 }
 
-void	*ft_calloc(size_t count, size_t size)
+void *ft_calloc(size_t count, size_t size)
 {
-	size_t			total_mem;
-	unsigned char	*ptr;
-	size_t			i;
+	size_t total_mem;
+	unsigned char *ptr;
+	size_t i;
 
 	if (count != 0 && size > SIZE_MAX / count)
 		return (NULL);

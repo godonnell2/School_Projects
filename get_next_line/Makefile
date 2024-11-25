@@ -2,6 +2,7 @@
 NAME = get_next_line.a
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror -g 
+HDR = get_next_line.h
 SRC =	\
 		get_next_line.c\
 		get_next_line_utils.c  
@@ -14,10 +15,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	ar -rcs $(NAME) $(OBJS)
 
-get_next_line.o: get_next_line.c $(HDR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-get_next_line_utils.o: get_next_line_utils.c $(HDR)
+%.o: %.c $(HDR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean: 
