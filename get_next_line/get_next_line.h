@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 16:26:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/25 07:08:04 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/25 18:22:23 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct t_store
 char *get_next_line(int fd);
 size_t ft_strlen(const char *s);
 char *ft_strchr(char *s, int c);
-size_t ft_strlcpy(char *dst, const char *src, size_t size);
+void ft_strlcpy(char *dst, const char *src, size_t size);
 void *ft_calloc(size_t count, size_t size);
 void *free_store_value(t_store *store);
 #endif
