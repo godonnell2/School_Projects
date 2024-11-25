@@ -6,13 +6,21 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/25 20:43:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/25 21:54:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 #include <string.h>
+
+void	*free_store_value(t_store *store)
+{
+	free(store->value);
+	store->value = NULL;
+	store->size = 0;
+	return (NULL);
+}
 
 static void	grow_store(t_store *store)
 {
@@ -33,13 +41,10 @@ static void	grow_store(t_store *store)
 	}
 	while (i < store->size)
 	{
-		store->value[i] = 0;
-		i++;
-	}
-	i = 0;
-	while (i < size_to_copy)
-	{
-		store->value[i] = ptr[i];
+		if (i < size_to_copy)
+			store->value[i] = ptr[i];
+		else
+			store->value[i] = 0;
 		i++;
 	}
 	free(ptr);
@@ -52,7 +57,6 @@ static char	*get_stored_line(t_store *store)
 	char	*newline_pos;
 	size_t	i;
 
-	i = 0;
 	newline_pos = store->value;
 	while (*newline_pos && *newline_pos != '\n')
 		newline_pos++;
@@ -62,19 +66,18 @@ static char	*get_stored_line(t_store *store)
 	line = malloc(line_length + 1);
 	if (line == NULL)
 		return (free_store_value(store));
-	//ft_strlcpy(line, store->value, line_length + 1);
-
-	while(i < line_length && store->value[i])
+	
+	i = 0;
+	while (i < line_length)
 	{
-		line[i] =store->value[i];
+		line[i] = store->value[i];
 		i++;
 	}
 	line[i] = '\0';
-	i= 0;
-	newline_pos++;
-	while (newline_pos[i])
+	i = 0;
+	while (newline_pos[i+1])
 	{
-		store->value[i] = newline_pos[i];
+		store->value[i] = newline_pos[i+1];
 		i++;
 	}
 	store->value[i] = '\0';
@@ -85,13 +88,20 @@ static char	*handle_finalread(size_t bytes_read, size_t current_len,
 		t_store *store)
 {
 	char	*line;
+	size_t	i;
 
+	i = 0;
 	if (bytes_read == 0 && current_len > 0)
 	{
 		line = malloc(current_len + 1);
 		if (!line)
 			return (free_store_value(store));
-		ft_strlcpy(line, store->value, current_len + 1);
+		while (i < current_len && store->value[i])
+		{
+			line[i] = store->value[i];
+			i++;
+		}
+		line[i] = '\0';
 	}
 	else
 		line = NULL;
@@ -108,29 +118,22 @@ static char	*get_next_line_store(int fd, t_store *store)
 	while (1)
 	{
 		tmp_str = get_stored_line(store);
-		if (tmp_str)
+		if (tmp_str || store->value == NULL)
 			return (tmp_str);
-		else if (store->value == NULL)
-			return (NULL);
-		else
+		tmp_str = store->value;
+		while (*tmp_str)
+			tmp_str++;
+		current_len = tmp_str - store->value;
+		if (current_len + BUFFER_SIZE >= store->size)
 		{
-			tmp_str = store->value;
-			while (*tmp_str)
-			{
-				tmp_str++;
-			}
-			current_len = tmp_str - store->value;
-			if (current_len + BUFFER_SIZE >= store->size)
-			{
-				grow_store(store);
-				if (store->value == NULL)
-					return (NULL);
-			}
-			bytes_read = read(fd, store->value + current_len, BUFFER_SIZE);
-			if (bytes_read < 1)
-				return (handle_finalread(bytes_read, current_len, store));
-			store->value[current_len + bytes_read] = '\0';
+			grow_store(store);
+			if (store->value == NULL)
+				return (NULL);
 		}
+		bytes_read = read(fd, store->value + current_len, BUFFER_SIZE);
+		if (bytes_read < 1)
+			return (handle_finalread(bytes_read, current_len, store));
+		store->value[current_len + bytes_read] = '\0';
 	}
 	return (NULL);
 }
