@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/26 08:09:08 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/26 10:07:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ static char	*handle_finalread(size_t bytes_read, size_t current_len,
 
 static char	*get_next_line_store(int fd, t_store *store)
 {
-	size_t	bytes_read;
+	int	bytes_read;
 	size_t	current_len;
 	char	*tmp_str;
 
@@ -130,10 +130,14 @@ static char	*get_next_line_store(int fd, t_store *store)
 				return (NULL);
 		}
 		bytes_read = read(fd, store->value + current_len, BUFFER_SIZE);
-		if (bytes_read < 1)
+		if (bytes_read == 0)
 			return (handle_finalread(bytes_read, current_len, store));
+		if (bytes_read < 0)
+			break;
 		store->value[current_len + bytes_read] = '\0';
 	}
+	if (bytes_read == -1)
+		return (free_store_value(store), NULL);
 	return (NULL);
 }
 
@@ -143,7 +147,7 @@ char	*get_next_line(int fd)
 	int				i;
 
 	i = 0;
-	if (fd < 0 || (read(fd, 0, 0) < 0))
+	if ((fd < 0))
 	{
 		if (store.value != NULL)
 			free_store_value(&store);
@@ -192,7 +196,6 @@ int	main(void)
 	return (0);
 }
 */
-
 /*
 Hello, World!
 
