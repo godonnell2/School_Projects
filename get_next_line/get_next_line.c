@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/25 21:54:54 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/26 07:49:37 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,8 @@ static char	*get_stored_line(t_store *store)
 		return (NULL);
 	line_length = newline_pos - store->value + 1;
 	line = malloc(line_length + 1);
-	if (line == NULL)
+	if (!line)
 		return (free_store_value(store));
-	
 	i = 0;
 	while (i < line_length)
 	{
@@ -75,9 +74,9 @@ static char	*get_stored_line(t_store *store)
 	}
 	line[i] = '\0';
 	i = 0;
-	while (newline_pos[i+1])
+	while (newline_pos[i + 1])
 	{
-		store->value[i] = newline_pos[i+1];
+		store->value[i] = newline_pos[i + 1];
 		i++;
 	}
 	store->value[i] = '\0';
