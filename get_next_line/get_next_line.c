@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/26 10:07:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/27 13:09:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,19 +67,15 @@ static char	*get_stored_line(t_store *store)
 	if (!line)
 		return (free_store_value(store));
 	i = 0;
-	while (i < line_length)
+	while (store->value[i])
 	{
-		line[i] = store->value[i];
-		i++;
+		if (i++ < line_length)
+			line[i-1] = store->value[i-1];
+		else
+			store->value[i - 1 - line_length] = store->value[i -1];
 	}
-	line[i] = '\0';
-	i = 0;
-	while (newline_pos[i + 1])
-	{
-		store->value[i] = newline_pos[i + 1];
-		i++;
-	}
-	store->value[i] = '\0';
+	store->value[i - line_length] = '\0';
+	line[line_length] = '\0';
 	return (line);
 }
 
@@ -110,19 +106,18 @@ static char	*handle_finalread(size_t bytes_read, size_t current_len,
 
 static char	*get_next_line_store(int fd, t_store *store)
 {
-	int	bytes_read;
+	int		bytes_read;
 	size_t	current_len;
 	char	*tmp_str;
 
+	current_len = 0;
 	while (1)
 	{
 		tmp_str = get_stored_line(store);
 		if (tmp_str || store->value == NULL)
 			return (tmp_str);
-		tmp_str = store->value;
-		while (*tmp_str)
-			tmp_str++;
-		current_len = tmp_str - store->value;
+		while (store->value[current_len] != '\0')
+			current_len++;
 		if (current_len + BUFFER_SIZE >= store->size)
 		{
 			grow_store(store);
@@ -130,14 +125,10 @@ static char	*get_next_line_store(int fd, t_store *store)
 				return (NULL);
 		}
 		bytes_read = read(fd, store->value + current_len, BUFFER_SIZE);
-		if (bytes_read == 0)
+		if (bytes_read <= 0)
 			return (handle_finalread(bytes_read, current_len, store));
-		if (bytes_read < 0)
-			break;
 		store->value[current_len + bytes_read] = '\0';
 	}
-	if (bytes_read == -1)
-		return (free_store_value(store), NULL);
 	return (NULL);
 }
 
@@ -147,7 +138,7 @@ char	*get_next_line(int fd)
 	int				i;
 
 	i = 0;
-	if ((fd < 0))
+	if (fd < 0)
 	{
 		if (store.value != NULL)
 			free_store_value(&store);
