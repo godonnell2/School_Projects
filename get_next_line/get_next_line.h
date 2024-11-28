@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 16:26:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/27 10:18:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/28 09:52:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,12 @@
 
 typedef struct t_store
 {
-    size_t size;
+    size_t capacity;
     char *value;
 } t_store;
 
 char *get_next_line(int fd);
 void *free_store_value(t_store *store);
+char *get_next_line_store(int fd, t_store *store);
+
 #endif

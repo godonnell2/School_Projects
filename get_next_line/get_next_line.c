@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 14:59:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/11/27 13:09:41 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/11/28 10:27:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,128 +14,10 @@
 #include <stdio.h>
 #include <string.h>
 
-void	*free_store_value(t_store *store)
+char *get_next_line(int fd)
 {
-	free(store->value);
-	store->value = NULL;
-	store->size = 0;
-	return (NULL);
-}
-
-static void	grow_store(t_store *store)
-{
-	char	*ptr;
-	size_t	i;
-	size_t	size_to_copy;
-
-	size_to_copy = store->size;
-	ptr = store->value;
-	store->size *= 2;
-	store->value = malloc(store->size);
-	i = 0;
-	if (store->value == NULL)
-	{
-		free(ptr);
-		store->size = 0;
-		return ;
-	}
-	while (i < store->size)
-	{
-		if (i < size_to_copy)
-			store->value[i] = ptr[i];
-		else
-			store->value[i] = 0;
-		i++;
-	}
-	free(ptr);
-}
-
-static char	*get_stored_line(t_store *store)
-{
-	size_t	line_length;
-	char	*line;
-	char	*newline_pos;
-	size_t	i;
-
-	newline_pos = store->value;
-	while (*newline_pos && *newline_pos != '\n')
-		newline_pos++;
-	if (*newline_pos != '\n')
-		return (NULL);
-	line_length = newline_pos - store->value + 1;
-	line = malloc(line_length + 1);
-	if (!line)
-		return (free_store_value(store));
-	i = 0;
-	while (store->value[i])
-	{
-		if (i++ < line_length)
-			line[i-1] = store->value[i-1];
-		else
-			store->value[i - 1 - line_length] = store->value[i -1];
-	}
-	store->value[i - line_length] = '\0';
-	line[line_length] = '\0';
-	return (line);
-}
-
-static char	*handle_finalread(size_t bytes_read, size_t current_len,
-		t_store *store)
-{
-	char	*line;
-	size_t	i;
-
-	i = 0;
-	if (bytes_read == 0 && current_len > 0)
-	{
-		line = malloc(current_len + 1);
-		if (!line)
-			return (free_store_value(store));
-		while (i < current_len && store->value[i])
-		{
-			line[i] = store->value[i];
-			i++;
-		}
-		line[i] = '\0';
-	}
-	else
-		line = NULL;
-	free_store_value(store);
-	return (line);
-}
-
-static char	*get_next_line_store(int fd, t_store *store)
-{
-	int		bytes_read;
-	size_t	current_len;
-	char	*tmp_str;
-
-	current_len = 0;
-	while (1)
-	{
-		tmp_str = get_stored_line(store);
-		if (tmp_str || store->value == NULL)
-			return (tmp_str);
-		while (store->value[current_len] != '\0')
-			current_len++;
-		if (current_len + BUFFER_SIZE >= store->size)
-		{
-			grow_store(store);
-			if (store->value == NULL)
-				return (NULL);
-		}
-		bytes_read = read(fd, store->value + current_len, BUFFER_SIZE);
-		if (bytes_read <= 0)
-			return (handle_finalread(bytes_read, current_len, store));
-		store->value[current_len + bytes_read] = '\0';
-	}
-	return (NULL);
-}
-
-char	*get_next_line(int fd)
-{
-	static t_store	store = {0};
-	int				i;
+	static t_store store = {0};
+	int i;
 
 	i = 0;
 	if (fd < 0)
@@ -149,7 +31,7 @@ char	*get_next_line(int fd)
 		store.value = malloc(BUFFER_SIZE);
 		if (!store.value)
 			return (NULL);
-		store.size = BUFFER_SIZE;
+		store.capacity = BUFFER_SIZE;
 		while (i < BUFFER_SIZE)
 		{
 			store.value[i] = 0;
@@ -197,6 +79,14 @@ End of file without newline
 */
 
 /*
+for newline imagine if there was just one newline
+0-0 = 0 how do we leave space for the newline ??
+
+read returns data beyond our newline! but we still need to 
+be able to return that the next time!! we call our function
+we SHOULD only ever return up untul first newline but there 
+coudl be multiple!!! and we need someway to keep track of this
+data in buffer
 ok so we need four functions
 main one to call everything and do protections
 READ ,
