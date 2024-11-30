@@ -31,13 +31,18 @@ char	*get_next_line(int fd)
 	{
 		if (store.bytes_stored > 0)
 		{
-			newline_pos = ft_strchr(store.value, '\n');
-			if (newline_pos)
+            newline_pos = store.value;
+             while (*newline_pos && *newline_pos != '\n')
+                newline_pos++;
+			if (*newline_pos == '\n') 
 			{
 				line_length = newline_pos - store.value + 1;
 				cpy = ft_strndup(store.value, line_length);
 				if (!cpy)
+                {
+                free(line);
 					return (NULL);
+                }
 				temp = ft_strjoin(line, cpy);
 				free(cpy);
 				free(line);

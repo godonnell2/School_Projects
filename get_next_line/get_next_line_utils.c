@@ -45,27 +45,6 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-char	*ft_strchr(const char *s, int c)
-{
-	char	chr;
-	char	*str;
-	int		len;
-
-	str = (char *)s;
-	chr = (char)c;
-	len = ft_strlen(str);
-	if (chr == '\0')
-		return (str + len);
-	while (*str)
-	{
-		if (chr == *str)
-		{
-			return (str);
-		}
-		str++;
-	}
-	return (NULL);
-}
 
 char	*ft_strjoin(const char *s1, const char *s2)
 {
@@ -77,13 +56,9 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	i = 0;
     j = 0;
 	if (s1 == NULL)
-	{
 		len_total = ft_strlen(s2) + 1;
-	}
 	else
-	{
 		len_total = ft_strlen(s1) + ft_strlen(s2) + 1;
-	}
 	arr = malloc(len_total * sizeof(char));
 	if (!arr)
 		return (NULL);

@@ -12,20 +12,24 @@ int	main(void)
 	fd = open("test.txt", O_RDONLY);
 	// int fd = 0;
 	max = 25;
-	while (1)
-	{
-		if (!--max)
-		{
-			printf("Max iterations reached\n");
-			break ;
-		}
-		line = get_next_line(fd);
-		if (line == NULL)
-		{
-			printf("get_next_line found a NULL\n");
-			break ;
-		}
-		printf("RESULT RETURNED:'%s'\n", line);
+   
+    line = get_next_line(fd);
+     printf("RESULT RETURNED:'%s'\n", line);
 		free(line);
+	//while (line)
+	// {
+	// 	if (!--max)
+	// 	{
+	// 		printf("Max iterations reached\n");
+	// 		break ;
+	// 	}
+		// line = get_next_line(fd);
+		// if (line == NULL)
+		// {
+		// 	printf("get_next_line found a NULL\n");
+		// 	break ;
+		// }
+		// printf("RESULT RETURNED:'%s'\n", line);
+		// free(line);
 	}
-}
+//}
