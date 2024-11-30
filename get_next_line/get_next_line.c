@@ -16,106 +16,29 @@
 // else we read into the store DONE!!!
 
 
-static char *extract_line_from_store(t_store *store, char *line)
-{
-    char*cpy;
-    char *newline_pos;
-     size_t remaining_bytes;
-    newline_pos = store->value;
-    while (*newline_pos && *newline_pos != '\n')
-        newline_pos++;
-    if (*newline_pos == '\n')
-    {
-        size_t line_length = newline_pos - store->value + 1;
-        cpy = malloc(line_length +1);
-        if (!cpy)
-        {
-            free(line);
-            return NULL;
+char *get_next_line(int fd) {
+    static char buffer[BUFFER_SIZE + 1]; // Buffer to hold read data
+    int bytes_read; // Number of bytes read from the file descriptor
+    char *line = NULL; // Pointer to hold the line to be returned
+
+    bytes_read = 1; // Initialize bytes_read to enter the loop
+    while ((fd >= 0 ) && bytes_read > 0) {
+        if (buffer[0]!='\0') { // If there is data in the buffer
+            line = str_join_buff(line, buffer); // Join the current line with the buffer
+            if (!line) {
+                return NULL; // Return NULL if memory allocation fails
+            }
+            // Check if the last character in the line is a newline
+            if (line[ft_strlen_chr(line, '\n') - 1] == '\n') {
+                break; // Exit the loop if a newline is found
+            }
+        } else { // If the buffer is empty, read more data
+            bytes_read = read(fd, buffer, BUFFER_SIZE); // Read from the file descriptor
+            if (bytes_read < 0) {
+                return free(line), NULL; // Return NULL on read error
+            }
+            buffer[bytes_read] = '\0'; // Null-terminate the buffer
         }
-        ft_memmove(cpy, store->value, line_length);
-        cpy[line_length] = '\0';
-        char *temp = ft_strjoin(line, cpy);
-        
-        free(cpy);
-        free(line);
-        if (!temp)
-            return NULL;
-        line = temp;
-        remaining_bytes = store->bytes_stored - line_length;
-        ft_memmove(store->value, store->value + line_length, remaining_bytes);
-        store->bytes_stored = remaining_bytes;
-        store->value[store->bytes_stored] = '\0';
-        return line;
     }
-    return NULL;
-}
-
-static char *append_store_to_line(t_store *store, char *line)
-{
-    char *temp = ft_strjoin(line, store->value);
-    free(line);
-    if (!temp)
-        return NULL;
-    line = temp;
-    store->bytes_stored = 0;
-    store->value[0] = '\0';
-    return line;
-}
-
-static int read_into_store(int fd, t_store *store)
-{
-    int bytes_read = read(fd, store->value + store->bytes_stored, BUFFER_SIZE);
-    if (bytes_read > 0)
-    {
-        store->bytes_stored += bytes_read;
-        store->value[store->bytes_stored] = '\0';
-    }
-    return bytes_read;
-}
-
-static char *handle_end_of_file(t_store *store, char *line, int bytes_read)
-{
-      if (bytes_read == -1) 
-     {
-            free(line);
-            store->bytes_stored = 0; 
-            store->value[0] = '\0'; 
-            return NULL;
-        }
-    if (line)
-    {
-        char *temp = ft_strjoin(line, store->value);
-        free(line);
-        if (!temp)
-            return NULL;
-        line = temp;
-        store->bytes_stored = 0;
-        store->value[0] = '\0';
-    }
-    return line;
-}
-
-char *get_next_line(int fd)
-{
-    static t_store store;
-    char *line = NULL;
-
-    if (fd < 0 )
-        return NULL;
-    while (1)
-    {
-        if (store.bytes_stored > 0)
-        {
-            char *result = extract_line_from_store(&store, line);
-            if (result)
-                return result;
-            line = append_store_to_line(&store, line);
-            if (!line)
-                return NULL;
-        }
-        int bytes_read = read_into_store(fd, &store);
-        if (bytes_read <= 0)
-            return handle_end_of_file(&store, line, bytes_read);
-    }
+    return line; // Return the constructed line
 }

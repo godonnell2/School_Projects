@@ -13,17 +13,8 @@
 #  error BUFFER_SIZE has to be >0
 # endif
 
-size_t		ft_strlen(const char *str);
-char		*ft_strjoin(const char *s1, const char *s2);
-void		*ft_memmove(void *dst, const void *src, size_t len);
-
-
-typedef struct t_store
-{
-	char	value[BUFFER_SIZE];
-	size_t	bytes_stored;
-}			t_store;
-
+size_t ft_strlen_chr(char *str, char c);
+char *str_join_buff(char *existingline, char *new_data);
 char		*get_next_line(int fd);
 
 #endif
