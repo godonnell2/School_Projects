@@ -18,25 +18,31 @@
 
 static char *extract_line_from_store(t_store *store, char *line)
 {
-    char *newline_pos = store->value;
+    char*cpy;
+    char *newline_pos;
+     size_t remaining_bytes;
+    newline_pos = store->value;
     while (*newline_pos && *newline_pos != '\n')
         newline_pos++;
     if (*newline_pos == '\n')
     {
         size_t line_length = newline_pos - store->value + 1;
-        char *cpy = ft_strndup(store->value, line_length);
+        cpy = malloc(line_length +1);
         if (!cpy)
         {
             free(line);
             return NULL;
         }
+        ft_memmove(cpy, store->value, line_length);
+        cpy[line_length] = '\0';
         char *temp = ft_strjoin(line, cpy);
+        
         free(cpy);
         free(line);
         if (!temp)
             return NULL;
         line = temp;
-        size_t remaining_bytes = store->bytes_stored - line_length;
+        remaining_bytes = store->bytes_stored - line_length;
         ft_memmove(store->value, store->value + line_length, remaining_bytes);
         store->bytes_stored = remaining_bytes;
         store->value[store->bytes_stored] = '\0';
@@ -95,7 +101,7 @@ char *get_next_line(int fd)
     static t_store store;
     char *line = NULL;
 
-    if (fd < 0)
+    if (fd < 0 )
         return NULL;
     while (1)
     {

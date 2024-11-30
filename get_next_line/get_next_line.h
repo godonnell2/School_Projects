@@ -14,10 +14,9 @@
 # endif
 
 size_t		ft_strlen(const char *str);
-char		*ft_strchr(const char *s, int c);
 char		*ft_strjoin(const char *s1, const char *s2);
 void		*ft_memmove(void *dst, const void *src, size_t len);
-char		*ft_strndup(const char *s, size_t n);
+
 
 typedef struct t_store
 {
