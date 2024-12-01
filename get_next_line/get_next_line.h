@@ -1,7 +1,14 @@
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/01 16:09:24 by gro-donn          #+#    #+#             */
+/*   Updated: 2024/12/01 16:18:20 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
@@ -13,8 +20,9 @@
 #  error BUFFER_SIZE has to be >0
 # endif
 
-size_t ft_strlen_chr(char *str, char c);
-char *str_join_buff(char *existingline, char *new_data);
-char		*get_next_line(int fd);
+size_t	ft_strlen_chr(char *str, char c);
+char	*str_join_consume(char *current_line, char *new_read,
+			size_t *line_length);
+char	*get_next_line(int fd);
 
 #endif
