@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/01 16:19:43 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/01 17:43:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,31 +29,28 @@
 
 char	*get_next_line(int fd)
 {
-	static char buffer[BUFFER_SIZE + 1];
-	int         bytes_read;
-	char        *line;
-    size_t      line_length;
-    
-    line = NULL;
+	static char	buffer[BUFFER_SIZE + 1];
+	int			bytes_read;
+	char		*line;
+	size_t		line_length;
+
+	line = NULL;
+	line_length = 0;
 	while (fd >= 0)
 	{
 		if (buffer[0] != '\0')
 		{
 			line = str_join_consume(line, buffer, &line_length);
-			if (!line)
-				return (NULL);
-			if (line[line_length - 1] == '\n')
+			if (line == NULL || line[line_length - 1] == '\n')
 				break ;
+			continue ;
 		}
-		else
-		{
-			bytes_read = read(fd, buffer, BUFFER_SIZE);
-			if (bytes_read < 0)
-				return (free(line), NULL);
-			else if (bytes_read == 0)
-				break;
-			buffer[bytes_read] = '\0';
-		}
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read < 0)
+			return (free(line), NULL);
+		else if (bytes_read == 0)
+			break ;
+		buffer[bytes_read] = '\0';
 	}
 	return (line);
 }

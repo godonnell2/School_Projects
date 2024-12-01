@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/01 16:18:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/01 17:29:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # if BUFFER_SIZE < 1
 #  error BUFFER_SIZE has to be >0
 # endif
+
+#include <stdlib.h>
 
 size_t	ft_strlen_chr(char *str, char c);
 char	*str_join_consume(char *current_line, char *new_read,
