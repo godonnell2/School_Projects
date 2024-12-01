@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/01 19:30:53 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/01 19:43:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@
 size_t	ft_strlen_chr(char *str, char c);
 char	*str_join(const char *current_line, const char *new_read,
 			size_t current_len, size_t new_read_len);
-char	*str_join_consume(char *current_line, char *new_read,
+char	*strjoin_consumebuff(char *current_line, char *new_read,
 			size_t *line_length);
-void	consume_new_read(char *new_read, size_t new_read_len);
+void	move_to_front(char *new_read, size_t new_read_len);
 char	*get_next_line(int fd);
 
 #endif

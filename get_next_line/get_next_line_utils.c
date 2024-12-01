@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:29 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/01 19:33:43 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/01 19:43:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ char	*str_join(const char *current_line, const char *new_read,
 	return (join_str);
 }
 
-void	consume_new_read(char *new_read, size_t new_read_len)
+void	move_to_front(char *new_read, size_t new_read_len)
 {
 	size_t	i;
 
@@ -74,14 +74,14 @@ void	consume_new_read(char *new_read, size_t new_read_len)
 	new_read[i] = '\0';
 }
 
-char	*str_join_consume(char *current_line, char *new_read,
+char	*strjoin_consumebuff(char *current_line, char *new_read,
 		size_t *line_length)
 {
 	size_t	current_len;
 	size_t	new_read_len;
 	char	*join_str;
-	
-	current_len = *line_length;
+
+	current_len = (*line_length);
 	new_read_len = ft_strlen_chr(new_read, '\n');
 	join_str = str_join(current_line, new_read, current_len, new_read_len);
 	if (!join_str)
@@ -90,7 +90,7 @@ char	*str_join_consume(char *current_line, char *new_read,
 		return (NULL);
 	}
 	*line_length += new_read_len;
-	consume_new_read(new_read, new_read_len);
+	move_to_front(new_read, new_read_len);
 	free(current_line);
 	return (join_str);
 }

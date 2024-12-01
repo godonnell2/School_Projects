@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/01 19:15:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/01 19:43:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*get_next_line(int fd)
 	{
 		if (buffer[0] != '\0')
 		{
-			line = str_join_consume(line, buffer, &line_length);
+			line = strjoin_consumebuff(line, buffer, &line_length);
 			if (line == NULL || line[line_length - 1] == '\n')
 				break ;
 			continue ;
