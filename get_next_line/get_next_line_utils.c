@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:29 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/02 11:13:10 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/02 11:16:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,17 +61,17 @@ char	*str_join(const char *current_line, const char *new_read,
 	return (join_str);
 }
 
-void	move_to_front(char *new_read, size_t processed_len)
+void	move_to_front(char *buffer, size_t move_len)
 {
 	size_t	i;
 
 	i = 0;
-	while (new_read[processed_len + i])
+	while (buffer[move_len + i])
 	{
-		new_read[i] = new_read[processed_len + i];
+		buffer[i] = buffer[move_len + i];
 		i++;
 	}
-	new_read[i] = '\0';
+	buffer[i] = '\0';
 }
 
 char	*strjoin_consumebuff(char *current_line, char *new_read,
