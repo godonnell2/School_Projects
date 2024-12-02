@@ -6,18 +6,16 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:09:29 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/02 11:16:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/02 11:22:58 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
-size_t	ft_strlen_chr(char *str, char c)
+static size_t	ft_strlen_chr(char *str, char c)
 {
 	size_t	length;
 
@@ -37,7 +35,7 @@ size_t	ft_strlen_chr(char *str, char c)
 	return (length);
 }
 
-char	*str_join(const char *current_line, const char *new_read,
+static char	*str_join(const char *current_line, const char *new_read,
 		size_t current_len, size_t new_read_len)
 {
 	char	*join_str;
@@ -61,7 +59,7 @@ char	*str_join(const char *current_line, const char *new_read,
 	return (join_str);
 }
 
-void	move_to_front(char *buffer, size_t move_len)
+static void	move_to_front(char *buffer, size_t move_len)
 {
 	size_t	i;
 
