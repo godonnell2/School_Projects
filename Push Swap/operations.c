@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:09 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:45:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,19 @@ void	push_to_stack_a(t_stack **stack_b, t_stack **stack_a)
 	write(1, "pa\n", 3);
 }
 
+// or has only one element !(*stack_head)->next)
+// Start from the new head  current_node = *stack_head;
+
 void	rotate_stack(t_stack **stack_head)
 {
 	t_stack	*top_to_bottom_node;
 	t_stack	*current_node;
 
-	if (!(*stack_head) || !(*stack_head)->next) // or has only one element
+	if (!(*stack_head) || !(*stack_head)->next)
 		return ;
 	top_to_bottom_node = *stack_head;
 	*stack_head = top_to_bottom_node->next;
-	current_node = *stack_head; // Start from the new head
+	current_node = *stack_head;
 	while (current_node->next)
 		current_node = current_node->next;
 	current_node->next = top_to_bottom_node;

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:49:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,8 @@ void	add_best_friend(t_stack *a, t_stack **b)
 
 void	add_index(t_stack **node)
 {
-	t_stack *curr;
-	int i;
+	t_stack	*curr;
+	int		i;
 
 	curr = *node;
 	i = 1;

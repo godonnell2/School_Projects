@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:53:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ void	call_functions(t_stack **a, t_stack **b)
 }
 
 /*After processing all elements in stack B, last_rotates(a) is called.*/
+
 void	last_rotates(t_stack **a)
 {
 	while (check_sorting(a))

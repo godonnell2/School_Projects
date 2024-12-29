@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:54:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,22 +78,19 @@ int	check_sorting(t_stack **a)
 
 void	insert_end(t_stack **head, int value)
 {
-	t_stack *new_node;
-	t_stack *curr;
+	t_stack	*new_node;
+	t_stack	*curr;
 
 	new_node = malloc(sizeof(t_stack));
 	if (!new_node)
 		exit(1);
-
 	new_node->next = NULL;
 	new_node->nbr = value;
-
 	if (!*head)
 	{
 		*head = new_node;
 		return ;
 	}
-
 	curr = *head;
 	while (curr->next)
 		curr = curr->next;

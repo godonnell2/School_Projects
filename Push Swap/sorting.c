@@ -6,12 +6,17 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:23 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:28 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:52:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
-
+/*
+	if (check_sorting(a) == 0)
+	{
+		return ;
+	}  If already sorted, do nothing
+*/
 void	sorting(t_stack **a, t_stack **b)
 {
 	t_stack	*curr;
@@ -26,7 +31,7 @@ void	sorting(t_stack **a, t_stack **b)
 	if (check_sorting(a) == 0)
 	{
 		return ;
-	} // If already sorted, do nothing
+	}
 	if (len == 1)
 		return ;
 	else if (len == 2)

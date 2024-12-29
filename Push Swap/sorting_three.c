@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:35 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 00:51:36 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:53:25 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ Assume get_moves returns 1 (it takes 1 move).
 Call	get_moves(*b, 0) to calculate the moves needed to bring the current
 node in stack B
 */
+
 void	add_cost(t_stack **a, t_stack **b)
 {
 	t_stack	*curr;
@@ -70,10 +71,12 @@ void	add_cost(t_stack **a, t_stack **b)
 		curr = curr->next;
 	}
 }
+
 /*
 Purpose: This function moves the node from stack B with the
 minimum cost to the top of stack A.
 */
+
 void	moves_top(t_stack **a, t_stack **b)
 {
 	t_stack	*curr;
@@ -118,14 +121,13 @@ int	cost_win(t_stack *b)
 /*
 Purpose: This function rotates stack A to bring the node at the specified index
  to the top.
-
-
 */
+
 void	rotation_a(t_stack **a, int index)
 {
-	int rotation;
-	int rrotation;
-	int len;
+	int	rotation;
+	int	rrotation;
+	int	len;
 
 	len = struct_len(*a) + 1;
 	rotation = index - 1;

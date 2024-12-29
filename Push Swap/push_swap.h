@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/26 01:09:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 11:02:05 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 
 # define INT_MAX 2147483647
 # define INT_MIN -2147483648
+# define MAX_ARGS 1000
 
 # include <limits.h>
+# include <stddef.h> //size_t
 # include <stdlib.h> // malloc, free, exit
 # include <unistd.h> // write, read, close
 
@@ -35,6 +37,7 @@ char				**ft_split(char *str);
 void				check_int_max(int ac, char **av);
 int					ft_strlen(const char *s);
 long int			ft_atol(const char *str);
+void				*my_memset(void *s, int c, size_t n);
 
 /*stack manipulation */
 t_stack				*add_args_to_stack(int ac, char **av);
@@ -53,7 +56,7 @@ int					ft_split_and_update(int *argc, char ***argv);
 void				err_case(int ac, char **av);
 void				err_case_nofree(void);
 
-/* stack utils NEED REDO*/
+/* stack utils */
 void				insert_end(t_stack **root, int value);
 void				free_stack(t_stack **root);
 void				rotation_a(t_stack **a, int index);
