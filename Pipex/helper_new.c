@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:01:48 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:17:15 by gro-donn         ###   ########.fr       */
+/*   Updated: 2024/12/29 17:56:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ void	init_data(t_data **tmp)
 		exit(EXIT_FAILURE);
 	data->cmd = NULL;
 	data->args_cmds = NULL;
-	data->in_fd = -1;
-	data->out_fd = -1;
+	data->input_fd = -1;
+	data->output_fd = -1;
 	*tmp = data;
 }
 
@@ -42,13 +42,13 @@ void	err_case(const char *msg, t_data *data)
 	perror(msg);
 	if (data)
 	{
-		if (data->in_fd > -1)
+		if (data->input_fd > -1)
 		{
-			close(data->in_fd);
+			close(data->input_fd);
 		}
-		if (data->out_fd > -1)
+		if (data->output_fd > -1)
 		{
-			close(data->out_fd);
+			close(data->output_fd);
 		}
 		free(data);
 	}
