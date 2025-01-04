@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:01:48 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 19:17:01 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 20:41:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	print_usage(void)
 {
 	if (write(2, "Usage ./prog infile cmd1 cmd2 outfile\n", 39) < 0)
-    exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 }
 
 /*

@@ -1,0 +1,7 @@
+finding path
+Allocating memory for full_cmd_path: 0x12c004230
+Allocating memory for full_cmd_path: 0x12c004260
+Allocating memory for full_cmd_path: 0x12c004260
+Allocating memory for full_cmd_path: 0x12c004260
+Allocating memory for full_cmd_path: 0x12c004230
+      12

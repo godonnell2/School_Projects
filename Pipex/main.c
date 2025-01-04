@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 19:20:26 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 20:59:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,19 +52,20 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 		if (data->input_fd < 0)
 			err_case("failure to open input file", data);
 		close(data->pipe_fd[READ_END]);
-		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0)
-			err_case("dup2 stdoutput kid to writeend pipe,dad process", data);
+		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
+			|| dup2(data->input_fd, STDIN_FILENO) < 0)
+			err_case("dup2 failed", data);
 		close(data->pipe_fd[WRITE_END]);
-		if (dup2(data->input_fd, STDIN_FILENO) < 0)
-			err_case("dup2 stdin terminal to file w/ data->in_fd", data);
 		close(data->input_fd);
 		data->args_cmds = ft_split(av[2], ' ');
-			if (!data->args_cmds)
-    			err_case("ft_split failed", data);
+		if (!data->args_cmds)
+			err_case("ft_split failed", data);
 		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd) 
+		if (!data->cmd)
 			err_case("Command not found", data);
 		execve(data->cmd, data->args_cmds, envp);
+		perror("execve failed");
+		exit(EXIT_FAILURE);
 	}
 	return (data->pid1);
 }
@@ -106,10 +107,18 @@ Others can read (4 = read).
 redirect standard input (stdin) of the current process
 (typically a child process)
 to read from the read end of a pipe
+
+The leading 0 in 0644 is a notation in C (and many other programming languages)
+indicating that the number is written in octal (base 8) rather than decimal
+(base 10)
+→ Read and Write permissions for the owner (4 + 2 = 6).
+4 → Read-only permissions for the group.
+4 → Read-only permissions for others.
 */
 
 pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 {
+	close(data->pipe_fd[WRITE_END]);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
@@ -118,19 +127,20 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 		data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 		if (data->output_fd < 0)
 			err_case("failed to open output file", data);
-		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0)
-			err_case("dup2 stdin current child process to readend pipe", data);
+		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0
+			|| dup2(data->output_fd, STDOUT_FILENO) < 0)
+			err_case("dup2 failed", data);
 		close(data->pipe_fd[READ_END]);
-		if (dup2(data->output_fd, STDOUT_FILENO) < 0)
-			err_case("dup2 stdout currkid proc write file instead term", data);
 		close(data->output_fd);
 		data->args_cmds = ft_split(av[3], ' ');
-			if (!data->args_cmds)
-    			err_case("ft_split failed", data);
+		if (!data->args_cmds)
+			err_case("ft_split failed", data);
 		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd) 
+		if (!data->cmd)
 			err_case("Command not found", data);
 		execve(data->cmd, data->args_cmds, envp);
+		perror("execve failed");
+		exit(EXIT_FAILURE);
 	}
 	return (data->pid2);
 }

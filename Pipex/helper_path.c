@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 19:16:31 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 20:44:48 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ char	*find_path(char **envp)
 
 	i = 0;
 	path = NULL;
-	 if (!envp) 
-	 return NULL;
-	 
+	if (!envp)
+		return (NULL);
 	while (envp[i])
 	{
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
 			path = envp[i] + 5;
+			printf("finding path\n");
 			return (path);
 		}
 		i++;
@@ -44,12 +44,12 @@ PATH=/usr/local/bin:/usr/bin:/bin
 This means that the system will look for executables in the directories
 /usr/local/bin, /usr/bin, and /bin, in that order.
 
-char	*envp[] = {
+char		*envp[] = {
 	"PATH=/usr/local/bin:/usr/bin:/bin",
 	NULL // End of environment variables
 };
-char	*cmd = "ls";
-char	*full_path = cmd_path(envp, cmd);
+char		*cmd = "ls";
+char		*full_path = cmd_path(envp, cmd);
 Check Current Directory:
 The function first checks if the command ls exists in the current directory
 using	access(cmd, F_OK).
@@ -75,33 +75,46 @@ It avoids assumptions about the environment, ensuring robustness across systems.
 It adheres to the principle of fail-fast: detecting issues early and
 preventing unpredictable runtime behavior.
  command will only execute once, in the first directory where it is found.
- The process works as follows:
+
+ you free path arr at the end in case no valid command is found for full path
+ // Free the original memory after usage free(path_arr);
 */
+
+static char	*check_command_in_path(char **path_arr, char *cmd)
+{
+	char	*full_cmd_path;
+	size_t	p_len;
+	size_t	c_len;
+	char	**temp;
+
+	temp = path_arr;
+	while (*temp != NULL)
+	{
+		p_len = ft_wordlen(*temp);
+		c_len = ft_wordlen(cmd);
+		full_cmd_path = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
+		if (!full_cmd_path)
+			return (NULL);
+		cat_strs_char(full_cmd_path, *temp, '/', cmd);
+		if (access(full_cmd_path, F_OK) == 0)
+			return (full_cmd_path);
+		free(full_cmd_path);
+		temp++;
+	}
+	return (NULL);
+}
 
 char	*find_fullpath(char **envp, char *cmd)
 {
-	char	*command;
 	char	**path_arr;
-	size_t	p_len;
-	size_t	c_len;
+	char	*full_cmd_path;
 
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
 	path_arr = ft_split(find_path(envp), ':');
 	if (!path_arr)
-    			write(2, "split failed", 13);
-	command = NULL;
-	while (*path_arr != NULL)
-	{
-		p_len = ft_wordlen(*path_arr);
-		c_len = ft_wordlen(cmd);
-		command = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
-		if (!command)
-			return (NULL);
-		if (access(cat_strs_char(command, *path_arr, '/', cmd), F_OK) == 0)
-			return (command);
-		free(command);
-		path_arr++;
-	}
-	return (NULL);
+		return (NULL);
+	full_cmd_path = check_command_in_path(path_arr, cmd);
+	free(path_arr);
+	return (full_cmd_path);
 }
