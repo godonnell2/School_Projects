@@ -6,11 +6,91 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 20:59:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 21:09:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+pid_t	first_child(t_data *data, char **av, char **envp)
+{
+	data->pid1 = fork();
+	if (data->pid1 < 0)
+		err_case("fork for first child failed", data);
+	if (data->pid1 == 0)
+	{
+		data->input_fd = open(av[1], O_RDONLY);
+		if (data->input_fd < 0)
+			err_case("failure to open input file", data);
+		close(data->pipe_fd[READ_END]);
+		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
+			|| dup2(data->input_fd, STDIN_FILENO) < 0)
+			err_case("dup2 failed", data);
+		close(data->pipe_fd[WRITE_END]);
+		close(data->input_fd);
+		data->args_cmds = ft_split(av[2], ' ');
+		if (!data->args_cmds)
+			err_case("ft_split failed", data);
+		data->cmd = find_fullpath(envp, data->args_cmds[0]);
+		if (!data->cmd)
+			err_case("Command not found", data);
+		execve(data->cmd, data->args_cmds, envp);
+		perror("execve failed");
+		exit(EXIT_FAILURE);
+	}
+	return (data->pid1);
+}
+
+pid_t	second_child(t_data *data, int ac, char **av, char **envp)
+{
+	close(data->pipe_fd[WRITE_END]);
+	data->pid2 = fork();
+	if (data->pid2 < 0)
+		err_case("fork for second child failed", data);
+	if (data->pid2 == 0)
+	{
+		data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
+		if (data->output_fd < 0)
+			err_case("failed to open output file", data);
+		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0
+			|| dup2(data->output_fd, STDOUT_FILENO) < 0)
+			err_case("dup2 failed", data);
+		close(data->pipe_fd[READ_END]);
+		close(data->output_fd);
+		data->args_cmds = ft_split(av[3], ' ');
+		if (!data->args_cmds)
+			err_case("ft_split failed", data);
+		data->cmd = find_fullpath(envp, data->args_cmds[0]);
+		if (!data->cmd)
+			err_case("Command not found", data);
+		execve(data->cmd, data->args_cmds, envp);
+		perror("execve failed");
+		exit(EXIT_FAILURE);
+	}
+	return (data->pid2);
+}
+
+
+int	main(int ac, char **av, char **envp)
+{
+	t_data	*data;
+
+	if (ac != 5)
+		print_usage();
+	init_data(&data);
+	if (pipe(data->pipe_fd) < 0)
+		err_case("pipe FAILED", data);
+	if (first_child(data, av, envp) < 0)
+		err_case("fork FAILED for first child", data);
+	if (second_child(data, ac, av, envp) < 0)
+		err_case("fork FAILED for second child", data);
+	close(data->pipe_fd[READ_END]);
+	close(data->pipe_fd[WRITE_END]);
+	waitpid(data->pid1, NULL, 0);
+	waitpid(data->pid2, NULL, 0);
+	free(data);
+	return (0);
+}
 
 /*
 returns a pid_t, which is the process ID of the created child process
@@ -41,34 +121,18 @@ means that any function that reads from standard input (e.g., scanf, getchar,
  Execv is very similar except it doesn't use variable length arguments
 */
 
-pid_t	first_child(t_data *data, char **av, char **envp)
-{
-	data->pid1 = fork();
-	if (data->pid1 < 0)
-		err_case("fork for first child failed", data);
-	if (data->pid1 == 0)
-	{
-		data->input_fd = open(av[1], O_RDONLY);
-		if (data->input_fd < 0)
-			err_case("failure to open input file", data);
-		close(data->pipe_fd[READ_END]);
-		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
-			|| dup2(data->input_fd, STDIN_FILENO) < 0)
-			err_case("dup2 failed", data);
-		close(data->pipe_fd[WRITE_END]);
-		close(data->input_fd);
-		data->args_cmds = ft_split(av[2], ' ');
-		if (!data->args_cmds)
-			err_case("ft_split failed", data);
-		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd)
-			err_case("Command not found", data);
-		execve(data->cmd, data->args_cmds, envp);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	return (data->pid1);
-}
+/*
+The parent process creates the pipe and spawns two child processes
+(first_child and second_child). Each child has a specific
+ responsibility regarding the pipe:
+
+The first child writes data into the pipe.
+The second child reads data from the pipe.
+The parent itself doesn’t perform any read or write operations on the pipe,
+ so it needs to close both ends of the pipe after forking the children.
+we are in the parent right now after we fork
+
+*/
 
 /*
 When a process is created using fork(), it inherits all open file descriptors
@@ -115,65 +179,3 @@ indicating that the number is written in octal (base 8) rather than decimal
 4 → Read-only permissions for the group.
 4 → Read-only permissions for others.
 */
-
-pid_t	second_child(t_data *data, int ac, char **av, char **envp)
-{
-	close(data->pipe_fd[WRITE_END]);
-	data->pid2 = fork();
-	if (data->pid2 < 0)
-		err_case("fork for second child failed", data);
-	if (data->pid2 == 0)
-	{
-		data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
-		if (data->output_fd < 0)
-			err_case("failed to open output file", data);
-		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0
-			|| dup2(data->output_fd, STDOUT_FILENO) < 0)
-			err_case("dup2 failed", data);
-		close(data->pipe_fd[READ_END]);
-		close(data->output_fd);
-		data->args_cmds = ft_split(av[3], ' ');
-		if (!data->args_cmds)
-			err_case("ft_split failed", data);
-		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd)
-			err_case("Command not found", data);
-		execve(data->cmd, data->args_cmds, envp);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	return (data->pid2);
-}
-
-/*
-The parent process creates the pipe and spawns two child processes
-(first_child and second_children). Each child has a specific
- responsibility regarding the pipe:
-
-The first child writes data into the pipe.
-The second child reads data from the pipe.
-The parent itself doesn’t perform any read or write operations on the pipe,
- so it needs to close both ends of the pipe after forking the children.
-we are in the parent right now after we fork
-
-*/
-int	main(int ac, char **av, char **envp)
-{
-	t_data	*data;
-
-	if (ac != 5)
-		print_usage();
-	init_data(&data);
-	if (pipe(data->pipe_fd) < 0)
-		err_case("pipe FAILED", data);
-	if (first_child(data, av, envp) < 0)
-		err_case("fork FAILED for first child", data);
-	if (second_child(data, ac, av, envp) < 0)
-		err_case("fork FAILED for second child", data);
-	close(data->pipe_fd[READ_END]);
-	close(data->pipe_fd[WRITE_END]);
-	waitpid(data->pid1, NULL, 0);
-	waitpid(data->pid2, NULL, 0);
-	free(data);
-	return (0);
-}

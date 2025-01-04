@@ -6,17 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 20:44:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 21:04:44 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/*
-etrieve the value of the PATH environment variable from an array of
-environment variables. The PATH variable contains a list of directories that
-the system searches for executable files.
-*/
 char	*find_path(char **envp)
 {
 	int		i;
@@ -38,7 +33,53 @@ char	*find_path(char **envp)
 	}
 	return (NULL);
 }
+
+static char	*check_command_in_path(char **path_arr, char *cmd)
+{
+	char	*full_cmd_path;
+	size_t	p_len;
+	size_t	c_len;
+	char	**temp;
+
+	temp = path_arr;
+	while (*temp != NULL)
+	{
+		p_len = ft_wordlen(*temp);
+		c_len = ft_wordlen(cmd);
+		full_cmd_path = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
+		if (!full_cmd_path)
+			return (NULL);
+		cat_strs_char(full_cmd_path, *temp, '/', cmd);
+		if (access(full_cmd_path, F_OK) == 0)
+			return (full_cmd_path);
+		free(full_cmd_path);
+		temp++;
+	}
+	return (NULL);
+}
+
+char	*find_fullpath(char **envp, char *cmd)
+{
+	char	**path_arr;
+	char	*full_cmd_path;
+
+	if (access(cmd, F_OK) == 0)
+		return (cmd);
+	path_arr = ft_split(find_path(envp), ':');
+	if (!path_arr)
+		return (NULL);
+	full_cmd_path = check_command_in_path(path_arr, cmd);
+	free(path_arr);
+	return (full_cmd_path);
+}
+
 /*
+etrieve the value of the PATH environment variable from an array of
+environment variables. The PATH variable contains a list of directories that
+the system searches for executable files.
+*/
+
+	/*
 Let's say the PATH environment variable is set as follows:
 PATH=/usr/local/bin:/usr/bin:/bin
 This means that the system will look for executables in the directories
@@ -80,41 +121,3 @@ preventing unpredictable runtime behavior.
  // Free the original memory after usage free(path_arr);
 */
 
-static char	*check_command_in_path(char **path_arr, char *cmd)
-{
-	char	*full_cmd_path;
-	size_t	p_len;
-	size_t	c_len;
-	char	**temp;
-
-	temp = path_arr;
-	while (*temp != NULL)
-	{
-		p_len = ft_wordlen(*temp);
-		c_len = ft_wordlen(cmd);
-		full_cmd_path = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
-		if (!full_cmd_path)
-			return (NULL);
-		cat_strs_char(full_cmd_path, *temp, '/', cmd);
-		if (access(full_cmd_path, F_OK) == 0)
-			return (full_cmd_path);
-		free(full_cmd_path);
-		temp++;
-	}
-	return (NULL);
-}
-
-char	*find_fullpath(char **envp, char *cmd)
-{
-	char	**path_arr;
-	char	*full_cmd_path;
-
-	if (access(cmd, F_OK) == 0)
-		return (cmd);
-	path_arr = ft_split(find_path(envp), ':');
-	if (!path_arr)
-		return (NULL);
-	full_cmd_path = check_command_in_path(path_arr, cmd);
-	free(path_arr);
-	return (full_cmd_path);
-}
