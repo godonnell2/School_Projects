@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 18:27:25 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 19:20:26 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,11 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 			err_case("dup2 stdin terminal to file w/ data->in_fd", data);
 		close(data->input_fd);
 		data->args_cmds = ft_split(av[2], ' ');
+			if (!data->args_cmds)
+    			err_case("ft_split failed", data);
 		data->cmd = find_fullpath(envp, data->args_cmds[0]);
+		if (!data->cmd) 
+			err_case("Command not found", data);
 		execve(data->cmd, data->args_cmds, envp);
 	}
 	return (data->pid1);
@@ -107,7 +111,7 @@ to read from the read end of a pipe
 pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 {
 	data->pid2 = fork();
-	if (data->pid1 < 0)
+	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
 	if (data->pid2 == 0)
 	{
@@ -121,7 +125,11 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 			err_case("dup2 stdout currkid proc write file instead term", data);
 		close(data->output_fd);
 		data->args_cmds = ft_split(av[3], ' ');
-		data->cmd = cmd_path(envp, data->args_cmds[0]);
+			if (!data->args_cmds)
+    			err_case("ft_split failed", data);
+		data->cmd = find_fullpath(envp, data->args_cmds[0]);
+		if (!data->cmd) 
+			err_case("Command not found", data);
 		execve(data->cmd, data->args_cmds, envp);
 	}
 	return (data->pid2);
@@ -150,7 +158,7 @@ int	main(int ac, char **av, char **envp)
 		err_case("pipe FAILED", data);
 	if (first_child(data, av, envp) < 0)
 		err_case("fork FAILED for first child", data);
-	if (second_children(data, ac, av, envp) < 0)
+	if (second_child(data, ac, av, envp) < 0)
 		err_case("fork FAILED for second child", data);
 	close(data->pipe_fd[READ_END]);
 	close(data->pipe_fd[WRITE_END]);

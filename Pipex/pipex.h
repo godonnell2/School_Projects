@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 18:28:19 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 19:05:05 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <stdio.h>    // perror
 # include <stdlib.h>   // exit, malloc, free, execve, wait, waitpid, NULL
 # include <sys/wait.h> // wait, waitpid
-	// This header file provides macros related to process termination.
+						// provides macros related to process termination.
 // It includes declarations for functions like wait and waitpid,
 // which are used to wait for state changes in child processes.
 # include <unistd.h> //access, close, dup2, execve, fork, pipe, read, write
@@ -47,6 +47,7 @@ void		init_data(t_data **tmp);
 void		err_case(const char *msg, t_data *data);
 pid_t		first_child(t_data *data, char **av, char **envp);
 pid_t		second_child(t_data *data, int ac, char **av, char **envp);
+char		*find_fullpath(char **envp, char *cmd);
 int			main(int ac, char **av, char **envp);
 
 #endif

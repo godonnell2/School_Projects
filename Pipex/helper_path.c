@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:19:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 19:16:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@ char	*find_path(char **envp)
 
 	i = 0;
 	path = NULL;
+	 if (!envp) 
+	 return NULL;
+	 
 	while (envp[i])
 	{
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
@@ -85,6 +88,8 @@ char	*find_fullpath(char **envp, char *cmd)
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
 	path_arr = ft_split(find_path(envp), ':');
+	if (!path_arr)
+    			write(2, "split failed", 13);
 	command = NULL;
 	while (*path_arr != NULL)
 	{
