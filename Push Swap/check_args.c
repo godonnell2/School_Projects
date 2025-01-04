@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:41 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 11:03:41 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 14:31:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,6 @@ void	err_case_nofree(void)
 	write(2, "Error\n", 6);
 	exit(1);
 }
-/*
-The err_case function is well-structured, but:
-
-It assumes free_arr will properly handle av even though av
- may not always be dynamically allocated (e.g., in a typical main program,
- argv from int main(int argc, char **argv) isn't dynamically allocated).
- This can cause a double-free or invalid free error.
- free_arr tries to free av as though it were dynamically allocated.
- If av points to argv from main, this will result in undefined behavior.
- Only dynamically allocated memory should be freed.
-
-Fix: Pass a flag indicating whether av is dynamically allocated or ensure
- it’s dynamically allocated before calling free_arr.
- */
 
 void	check_args(int ac, char **av)
 {
@@ -71,6 +57,10 @@ void	check_ints(int ac, char **av)
 	}
 }
 
+/*
+i > ac base case when this us  true all arguments have been processed
+j < count loop has iterated through all unique arguments stored in seen array
+*/
 void	check_duplicates(int ac, char **av, char **seen, int i)
 {
 	int			j;

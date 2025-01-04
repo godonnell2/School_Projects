@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/26 00:52:18 by gro-donn          #+#    #+#              #
-#    Updated: 2024/12/29 08:34:45 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/04 14:30:29 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,6 +23,7 @@ operations_two.c \
 	  sorting_three.c \
 	  sorting_four.c \
 	 check_args.c \
+	 check_args_two.c \
 	  helper_functions.c \
 	  helper_functions_two.c 
 

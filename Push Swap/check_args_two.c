@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 11:00:00 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 14:33:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	init_checkdup(int ac, char **av)
 {
 	char	*seen[MAX_ARGS];
 
-	ft_memset(seen, 0, sizeof(seen));
+	my_memset(seen, 0, sizeof(seen));
 	check_duplicates(ac, av, seen, 1);
 }
 
@@ -68,4 +68,33 @@ int	ft_split_and_update(int *argc, char ***argv)
 		(*argc)++;
 	*argv = split_args;
 	return (0);
+}
+
+void	validate_args(char **av)
+{
+	int	i;
+
+	i = 0;
+	while (av && av[i])
+	{
+		if (av[i][0] == '\0' || av[i][0] <= 32)
+		{
+			write(2, "Error\n", 6);
+			exit(1);
+		}
+		i++;
+	}
+	if (av[1])
+	{
+		i = 0;
+		while (av[1][i])
+		{
+			if ((av[1][i] <= 32 && av[1][i + 1] <= 32))
+			{
+				write(2, "Error\n", 6);
+				exit(1);
+			}
+			i++;
+		}
+	}
 }
