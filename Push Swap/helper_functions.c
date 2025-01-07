@@ -6,11 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:49 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 11:04:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 07:21:53 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
+
+
 
 void	free_arr(int ac, char **av)
 {
@@ -64,4 +66,24 @@ void	*my_memset(void *s, int c, size_t n)
 		i++;
 	}
 	return (s);
+}
+void parse_sign_and_whitespace(const char **str, int *sign)
+{
+    // Initialize sign to 1 (positive)
+    *sign = 1;
+
+    // Skip leading whitespace
+    while (**str == ' ' || **str == '\t' || **str == '\n' || 
+           **str == '\r' || **str == '\v' || **str == '\f') // Check for whitespace characters
+    {
+        (*str)++; // Move to the next character
+    }
+
+    // Check for sign
+    while (**str == '+' || **str == '-') // Check for '+' or '-'
+    {
+        if (**str == '-') // If the character is '-'
+            *sign *= -1; // Flip the sign
+        (*str)++; // Move to the next character
+    }
 }

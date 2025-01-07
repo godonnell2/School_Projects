@@ -6,33 +6,29 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 16:53:12 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 11:30:02 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	init_checkdup(int ac, char **av)
+
+
+int is_in_range(const char *str)
 {
-	char	*seen[MAX_ARGS];
+    long num;
 
-	my_memset(seen, 0, sizeof(seen));
-	check_duplicates(ac, av, seen, 1);
-}
+    num = ft_atol(str);
 
-void	check_fitint(int ac, char **av)
-{
-	int		i;
-	long	num;
+    // Handle overflow cases explicitly
+    if (num == LONG_MAX || num == LONG_MIN)
+        return 0; // Indicate that the number is out of range
 
-	i = 1;
-	while (i < ac)
-	{
-		num = ft_atol(av[i]);
-		if (num > INT_MAX || num < INT_MIN)
-			err_case(ac, av); // NEED CHECK VALGRIND
-		i++;
-	}
+    // Check if the number is within INT_MIN and INT_MAX
+    if (num < INT_MIN || num > INT_MAX)
+        return 0; // Indicate that the number is out of range
+
+    return 1; // Number is within range
 }
 
 // Set the head pointer to NULL to indicate the stack is empty
@@ -54,47 +50,28 @@ void	free_stack(t_stack **head)
 // indicate success return (0);
 // Indicate an error return (-1);
 
-int	ft_split_and_update(int *argc, char ***argv)
-{
-	char	**split_args;
+//Avoid  producing empty strings due to extra spaces.
 
-	split_args = ft_split((*argv)[1]);
-	if (!split_args)
-	{
-		return (-1);
-	}
-	*argc = 0;
-	while (split_args[*argc])
-		(*argc)++;
-	*argv = split_args;
-	return (0);
+int	count_split_args(char **split_args)
+{
+	int	count;
+
+	count = 0;
+	while (split_args[count])
+		count++;
+	return (count);
 }
 
-void	validate_args(char **av)
+int	is_valid_split(char **split_args)
 {
 	int	i;
 
 	i = 0;
-	while (av && av[i])
+	while (split_args[i])
 	{
-		if (av[i][0] == '\0' || av[i][0] <= 32)
-		{
-			write(2, "Error\n", 6);
-			exit(1);
-		}
+		if (split_args[i][0] == '\0' || !is_numeric(split_args[i]))
+			return (0); // Invalid string or non-numeric value
 		i++;
 	}
-	if (av[1])
-	{
-		i = 0;
-		while (av[1][i])
-		{
-			if ((av[1][i] <= 32 && av[1][i + 1] <= 32))
-			{
-				write(2, "Error\n", 6);
-				exit(1);
-			}
-			i++;
-		}
-	}
+	return (1);
 }

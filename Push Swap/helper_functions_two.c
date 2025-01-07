@@ -6,94 +6,88 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 11:03:26 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 11:24:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	parse_sign_and_whitespace(const char **str, int *sign)
+static long convert_to_long(const char *str, int sign)
 {
-	while (**str == ' ' || (**str >= '\t' && **str <= '\r'))
-	{
-		(*str)++;
-	}
-	if (**str == '-')
-	{
-		*sign = -1;
-		(*str)++;
-	}
-	else if (**str == '+')
-	{
-		(*str)++;
-	}
+    long result = 0;
+    int digit;
+
+    while (*str >= '0' && *str <= '9')
+    {
+        digit = *str - '0';
+
+        // Check for overflow
+        if (result > (LONG_MAX - digit) / 10)
+        {
+            return (sign == 1) ? LONG_MAX : LONG_MIN; // Return overflow value
+        }
+
+        result = result * 10 + digit;
+        str++;
+    }
+    return result * sign;
 }
 
-long	convert_to_long(const char *str, int sign)
-{
-	long	result;
-	int		digit;
-
-	result = 0;
-	while (*str >= '0' && *str <= '9')
-	{
-		digit = *str - '0';
-		if (sign == 1)
-			return (LONG_MAX);
-		else
-			return (LONG_MIN);
-		result = result * 10 + digit;
-		str++;
-	}
-	return (result * sign);
-}
 
 long	ft_atol(const char *str)
 {
-	int	sign;
+	int		sign;
+	long	result;
 
 	sign = 1;
 	parse_sign_and_whitespace(&str, &sign);
-	return (convert_to_long(str, sign));
+	result = convert_to_long(str, sign);
+
+	// Check for overflow in `convert_to_long`
+	if (result == LONG_MAX || result == LONG_MIN)
+		return (result);
+
+   return result;
 }
 
-char	*allocate_and_fill_word(char **str)
+
+static char	*allocate_and_fill_word(char **str, char delimiter)
 {
 	char	*word;
 	int		k;
 
-	word = malloc(1000);
+	word = malloc(1000); // Allocate memory for a single word
 	if (!word)
 		return (NULL);
 	k = 0;
-	while (**str > 32)
+	while (**str && **str != delimiter) // Stop at the delimiter or end of the string
 	{
 		word[k++] = **str;
 		(*str)++;
 	}
-	word[k] = '\0';
+	word[k] = '\0'; // Null-terminate the word
 	return (word);
 }
 
-char	**ft_split(char *str)
+char	**ft_split(char *str, char delimiter)
 {
 	char	**arr;
 	int		j;
 
 	j = 0;
-	arr = malloc(1000 * sizeof(char *));
+	arr = malloc(1000 * sizeof(char *)); // Allocate memory for the array of words
 	if (!arr)
 		return (NULL);
 	while (*str)
 	{
-		if (*str > 32)
+		if (*str != delimiter) // Check if current character is not the delimiter
 		{
-			arr[j] = allocate_and_fill_word(&str);
+			arr[j] = allocate_and_fill_word(&str, delimiter); // Extract a word
 			j++;
 		}
 		else
-			str++;
+			str++; // Skip delimiter
 	}
-	arr[j] = NULL;
+	arr[j] = NULL; // Null-terminate the array of words
 	return (arr);
 }

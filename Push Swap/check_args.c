@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:41 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 16:50:49 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 11:55:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,61 +28,89 @@ void	err_case_nofree(void)
 	exit(1);
 }
 
-void	check_args(int ac, char **av)
+void check_args(int ac, char **av)
 {
-	check_ints(av);
-	init_checkdup(ac, av);
-	check_fitint(ac, av);
+    int *nums;
+    int size;
+    int i;
+
+    // Determine size based on input format
+    if (ac == 2) // Single string input (split case)
+        size = count_split_args(av);
+    else // Multiple arguments
+        size = ac - 1;
+
+    nums = malloc(sizeof(int) * size);
+    if (!nums)
+        err_case_nofree(); // Handle memory allocation failure
+
+    for (i = 0; i < size; i++)
+    {
+        const char *current_arg;
+
+        // Handle single string input (split case)
+        if (ac == 2)
+            current_arg = av[i];
+        else
+            current_arg = av[i + 1];
+
+        if (!is_numeric(current_arg)) // Check if argument is numeric
+        {
+            free(nums);
+            err_case_nofree();
+        }
+
+        if (!is_in_range(current_arg)) // Check if argument is in range
+        {
+            free(nums);
+            err_case_nofree();
+        }
+
+        nums[i] = ft_atol(current_arg); // Convert and store in nums array
+    }
+
+    if (has_duplicates(nums, size)) // Check for duplicates
+    {
+        free(nums);
+        err_case_nofree();
+    }
+
+    free(nums); // Free allocated memory
 }
 
-void	check_ints( char **av)
+int	is_numeric(const char *str)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	
-	while (av[i])
+	if (str[0] == '-' || str[0] == '+') // Handle negative or positive signs
+		i++;
+	if (str[i] == '\0') // Ensure there's at least one digit
+		return (0);
+	while (str[i])
 	{
-		j = 0;
-		if ((av[i][j] == '-' || av[i][j] == '+') && av[i][j + 1] != '\0')
-			j++;
-		while (av[i][j])
-		{
-			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
-				err_case(ac, av);
-			j++;
-		}
+		if (str[i] < '0' || str[i] > '9') // Non-numeric character
+			return (0);
 		i++;
 	}
+	return (1);
 }
 
-/*
-i > ac base case when this us  true all arguments have been processed
-j < count loop has iterated through all unique arguments stored in seen array
-*/
-void	check_duplicates(int ac, char **av, char **seen, int i)
+int	has_duplicates(int *arr, int size)
 {
-	int			j;
-	static int	count = 0;
-
-	if (i >= ac)
-	{
-		return ;
-	}
-	j = 0;
-	while (j < count)
-	{
-		if (ft_strcmp(av[i], seen[j]) == 0)
-		{
-			err_case(ac, av); // NEED CHECK VALGRIND
-		}
-		j++;
-	}
-	if (count < MAX_ARGS)
-	{
-		seen[count] = av[i];
-		count++;
-	}
-	check_duplicates(ac, av, seen, i + 1);
+	int i = 0;
+    
+    while (i < size)
+    {
+        int j = i + 1; 
+        while (j < size)
+        {
+            if (arr[i] == arr[j]) 
+                return (1);
+            j++;
+        }
+        i++;
+    }
+    return (0);
 }
+

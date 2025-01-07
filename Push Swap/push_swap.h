@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 16:48:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 06:59:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,12 @@ typedef struct s_stack
 
 /* Utils */
 int					ft_strcmp(char *s1, char *s2);
-char				**ft_split(char *str);
+char	**ft_split(char *str, char delimiter);
 void				check_int_max(int ac, char **av);
 int					ft_strlen(const char *s);
 long int			ft_atol(const char *str);
 void				*my_memset(void *s, int c, size_t n);
+void parse_sign_and_whitespace(const char **str, int *sign);
 
 /*stack manipulation */
 t_stack				*add_args_to_stack(int ac, char **av);
@@ -47,15 +48,14 @@ void				free_stack(t_stack **head);
 void				free_arr(int ac, char **av);
 
 /* Check Arguments */
-void				check_args(int ac, char **av);
-void				check_ints(char **av);
-void				check_duplicates(int ac, char **av, char **seen, int i);
-void				init_checkdup(int ac, char **av);
-void				check_fitint(int ac, char **av);
-int					ft_split_and_update(int *argc, char ***argv);
+int	is_in_range(const char *str);
+int	has_duplicates(int *arr, int size);
+int	is_numeric(const char *str);
+void	check_args(int ac, char **av);
+int	is_valid_split(char **split_args);
 void				err_case(int ac, char **av);
 void				err_case_nofree(void);
-void				validate_args(char **av);
+int	count_split_args(char **split_args);
 
 /* stack utils */
 void				insert_end(t_stack **root, int value);
