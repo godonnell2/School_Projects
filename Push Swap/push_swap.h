@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 14:25:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 16:48:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void				free_arr(int ac, char **av);
 
 /* Check Arguments */
 void				check_args(int ac, char **av);
-void				check_ints(int ac, char **av);
+void				check_ints(char **av);
 void				check_duplicates(int ac, char **av, char **seen, int i);
 void				init_checkdup(int ac, char **av);
 void				check_fitint(int ac, char **av);
@@ -56,8 +56,6 @@ int					ft_split_and_update(int *argc, char ***argv);
 void				err_case(int ac, char **av);
 void				err_case_nofree(void);
 void				validate_args(char **av);
-void				cleanup(int ac, char **av, t_stack *a, t_stack *b);
-void				cleanup_and_exit(int ac, char **av, t_stack *a, t_stack *b);
 
 /* stack utils */
 void				insert_end(t_stack **root, int value);

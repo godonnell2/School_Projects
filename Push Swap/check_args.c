@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:41 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 14:31:10 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 16:50:49 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,18 @@ void	err_case_nofree(void)
 
 void	check_args(int ac, char **av)
 {
-	check_ints(ac, av);
+	check_ints(av);
 	init_checkdup(ac, av);
 	check_fitint(ac, av);
 }
 
-void	check_ints(int ac, char **av)
+void	check_ints( char **av)
 {
 	int	i;
 	int	j;
 
-	i = 1;
-	(void)ac;
+	i = 0;
+	
 	while (av[i])
 	{
 		j = 0;
@@ -50,7 +50,7 @@ void	check_ints(int ac, char **av)
 		while (av[i][j])
 		{
 			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
-				err_case_nofree();
+				err_case(ac, av);
 			j++;
 		}
 		i++;
@@ -75,7 +75,7 @@ void	check_duplicates(int ac, char **av, char **seen, int i)
 	{
 		if (ft_strcmp(av[i], seen[j]) == 0)
 		{
-			err_case_nofree(); // NEED CHECK VALGRIND
+			err_case(ac, av); // NEED CHECK VALGRIND
 		}
 		j++;
 	}

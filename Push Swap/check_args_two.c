@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 14:33:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/04 16:53:12 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	check_fitint(int ac, char **av)
 	{
 		num = ft_atol(av[i]);
 		if (num > INT_MAX || num < INT_MIN)
-			err_case_nofree(); // NEED CHECK VALGRIND
+			err_case(ac, av); // NEED CHECK VALGRIND
 		i++;
 	}
 }
