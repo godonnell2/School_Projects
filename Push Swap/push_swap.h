@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/07 06:59:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:54:43 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 # include <limits.h>
 # include <stddef.h> //size_t
-# include <stdlib.h> // malloc, free, exit
+# include <stdlib.h> // malloc, free, exit, get ENV var
 # include <unistd.h> // write, read, close
 
 typedef struct s_stack
@@ -105,6 +105,9 @@ void				sort_greaterthanfive(t_stack **a, t_stack **b);
 void				call_functions(t_stack **a, t_stack **b);
 void				last_rotates(t_stack **a);
 
+#include <stdio.h>
+
+void print_stack(t_stack *s, char *);
 #endif /* PUSH_SWAP_H */
 
 // Function prototypes

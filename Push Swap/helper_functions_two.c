@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/07 11:24:54 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/08 17:27:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,11 @@ char	**ft_split(char *str, char delimiter)
 	char	**arr;
 	int		j;
 
-	j = 0;
+	j = 1;
 	arr = malloc(1000 * sizeof(char *)); // Allocate memory for the array of words
 	if (!arr)
 		return (NULL);
+	arr[0] = allocate_and_fill_word((char**)&" ", ' ');
 	while (*str)
 	{
 		if (*str != delimiter) // Check if current character is not the delimiter

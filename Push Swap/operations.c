@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:45:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/08 17:15:06 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ void	move_top_element(t_stack **src_stack, t_stack **dst_stack)
 	t_stack	*top_node;
 
 	if (!(*src_stack))
+	{
 		return ;
+	}
 	top_node = *src_stack;
 	*src_stack = (*src_stack)->next;
 	top_node->next = *dst_stack;
@@ -59,4 +61,17 @@ void	ra(t_stack **a)
 {
 	rotate_stack(a);
 	write(1, "ra\n", 3);
+}
+void print_stack(t_stack *s, char * comment) {
+	#ifdef VERBOSE
+	printf("stack:%s\n", comment);
+	while (s) {
+		printf("%d\n", s->nbr);
+		s = s->next;
+	}
+	printf("----\n");
+	#else
+	(void)s;
+	(void)comment;
+	#endif
 }

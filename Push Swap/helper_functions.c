@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:49 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/07 07:21:53 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:32:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 
 void	free_arr(int ac, char **av)
 {
+	if (!av)
+        return;
 	int	i;
 
 	(void)ac;
