@@ -6,13 +6,14 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/08 16:54:43 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/09 07:45:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
+# define EXIT_FAILURE 1
 # define INT_MAX 2147483647
 # define INT_MIN -2147483648
 # define MAX_ARGS 1000
@@ -31,33 +32,32 @@ typedef struct s_stack
 	struct s_stack	*next;
 }					t_stack;
 
-/* Utils */
+/*Helper fns */
 int					ft_strcmp(char *s1, char *s2);
-char	**ft_split(char *str, char delimiter);
+char				**ft_split(char *str, char delimiter);
 void				check_int_max(int ac, char **av);
 int					ft_strlen(const char *s);
 long int			ft_atol(const char *str);
-void				*my_memset(void *s, int c, size_t n);
-void parse_sign_and_whitespace(const char **str, int *sign);
+void				parse_sign_and_whitespace(const char **str, int *sign);
 
-/*stack manipulation */
+/* Check args */
+int					is_in_range(const char *str);
+int					has_duplicates(int *arr, int size);
+int					is_numeric(const char *str);
+void				check_args(int ac, char **av);
+int					is_valid_split(char **split_args);
+void				err_case(int ac, char **av);
+void				err_case_nofree(void);
+int					count_split_args(char **split_args);
+
+/*Stack manipulation */
 t_stack				*add_args_to_stack(int ac, char **av);
 int					struct_len(t_stack *stack);
 int					struct_sum(t_stack *stack);
 void				free_stack(t_stack **head);
 void				free_arr(int ac, char **av);
 
-/* Check Arguments */
-int	is_in_range(const char *str);
-int	has_duplicates(int *arr, int size);
-int	is_numeric(const char *str);
-void	check_args(int ac, char **av);
-int	is_valid_split(char **split_args);
-void				err_case(int ac, char **av);
-void				err_case_nofree(void);
-int	count_split_args(char **split_args);
-
-/* stack utils */
+/* Stack operations */
 void				insert_end(t_stack **root, int value);
 void				free_stack(t_stack **root);
 void				rotation_a(t_stack **a, int index);
@@ -67,6 +67,7 @@ int					check_sorting(t_stack **a);
 int					struct_len(t_stack *root);
 int					struct_sum(t_stack *root);
 t_stack				*add_data(int ac, char **av);
+void				print_stack(t_stack *s, char *str);
 
 /* Actions */
 void				move_top_element(t_stack **src_stack, t_stack **dst_stack);
@@ -105,9 +106,4 @@ void				sort_greaterthanfive(t_stack **a, t_stack **b);
 void				call_functions(t_stack **a, t_stack **b);
 void				last_rotates(t_stack **a);
 
-#include <stdio.h>
-
-void print_stack(t_stack *s, char *);
 #endif /* PUSH_SWAP_H */
-
-// Function prototypes
