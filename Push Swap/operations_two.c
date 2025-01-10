@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 19:54:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/08 17:03:20 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	reverse_rotate_stack(t_stack **stack_head)
 {
 	t_stack	*current_lasttotop_node;
 	t_stack	*second_last_node;
-
+	
 	if (!(*stack_head) || !(*stack_head)->next)
 		return ;
 	current_lasttotop_node = (*stack_head);
@@ -47,24 +47,3 @@ void	reverse_rotate_stack_b(t_stack **stack_b)
 	reverse_rotate_stack(stack_b);
 	write(1, "rrb\n", 4);
 }
-
-#ifdef VERBOSE
-void	print_stack(t_stack *s, char *comment)
-{
-
-	printf("stack:%s\n", comment);
-	while (s)
-	{
-		printf("%d\n", s->nbr);
-		s = s->next;
-	}
-	printf("----\n");
-}
-#else
-void	print_stack(t_stack *s, char *comment)
-{
-	(void)s;
-	(void)comment;
-}
-#endif
-

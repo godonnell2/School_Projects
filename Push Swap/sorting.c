@@ -6,12 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:23 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/09 07:38:29 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/08 17:15:46 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
-
 /*
 	if (check_sorting(a) == 0)
 	{
@@ -27,10 +26,16 @@ void	sorting(t_stack **a, t_stack **b)
 		return ;
 	curr = *a;
 	len = 0;
+	    
+	 print_stack(*a, "inital stack unsorted");
 	while (curr != NULL && ++len)
 		curr = curr->next;
+	//printf("len:%d ", len); // Debugging output
+	
 	if (check_sorting(a) == 0)
+	{
 		return ;
+	}
 	if (len == 1)
 		return ;
 	else if (len == 2)
@@ -68,9 +73,9 @@ to the top of the stack.
 Let's consider the following initial state of Stack A:
 Stack A: 2 -> 3 -> 1 for the second condition
 */
-
 void	sort_3(t_stack **a)
 {
+	print_stack(*a, "sort_3");
 	if ((*a)->nbr > (*a)->next->nbr && (*a)->nbr > (*a)->next->next->nbr)
 		ra(a);
 	if ((*a)->next->nbr > (*a)->next->next->nbr)
@@ -81,6 +86,7 @@ void	sort_3(t_stack **a)
 
 void	sort_4(t_stack **a, t_stack **b)
 {
+	print_stack(*a, "sort_4");
 	push_to_stack_b(a, b);
 	sort_3(a);
 	if (!((*b)->nbr > (*a)->next->nbr && (*b)->nbr < (*a)->next->next->nbr))

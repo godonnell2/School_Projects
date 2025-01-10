@@ -6,15 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 19:25:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 20:29:15 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
-
-/* remember we need to point our tmp value top node to the top number of the
- other stack before we can put the head equal to it! duh!
-*/
 
 void	move_top_element(t_stack **src_stack, t_stack **dst_stack)
 {
@@ -66,3 +62,23 @@ void	ra(t_stack **a)
 	rotate_stack(a);
 	write(1, "ra\n", 3);
 }
+
+#ifdef VERBOSE
+void print_stack(t_stack *s, char * comment) 
+{
+
+	printf("stack:%s\n", comment);
+	while (s) {
+		printf("%d\n", s->nbr);
+		s = s->next;
+	}
+	printf("----\n");
+}
+	#else
+void print_stack(t_stack *s, char * comment)
+{
+	(void)s;
+	(void)comment;
+	
+}
+#endif
