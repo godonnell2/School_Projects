@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:14 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:46:41 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:01:26 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,3 +34,25 @@ void	swap_stack_b(t_stack **stack_b)
 	swap_top_two(stack_b);
 	write(1, "sa\n", 3);
 }
+
+#ifdef VERBOSE
+
+void	print_stack(t_stack *s, char *comment)
+{
+	printf("stack:%s\n", comment);
+	while (s)
+	{
+		printf("%d\n", s->nbr);
+		s = s->next;
+	}
+	printf("----\n");
+}
+
+#else
+
+void	print_stack(t_stack *s, char *comment)
+{
+	(void)s;
+	(void)comment;
+}
+#endif

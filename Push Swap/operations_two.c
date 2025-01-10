@@ -6,11 +6,17 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/08 17:03:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:01:04 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
+
+void	ra(t_stack **a)
+{
+	rotate_stack(a);
+	write(1, "ra\n", 3);
+}
 
 void	rb(t_stack **b)
 {

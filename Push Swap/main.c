@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 20:31:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:01:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,17 @@ void	cleanup(t_stack *a, t_stack *b)
 
 int	main(int ac, char **av)
 {
-	t_stack *stack_a;
-	t_stack *stack_b;
-	char **split_args;
-	int split_used;
+	t_stack	*stack_a;
+	t_stack	*stack_b;
+	char	**split_args;
+	int		split_used;
 
 	stack_a = NULL;
 	stack_b = NULL;
 	split_args = NULL;
 	split_used = 0;
-
 	if (ac < 2)
 		return (0);
-
 	if (ac == 2)
 	{
 		split_args = ft_split(av[1], ' ');
@@ -47,7 +45,6 @@ int	main(int ac, char **av)
 		av = split_args;
 		split_used = 1;
 	}
-
 	check_args(ac, av);
 	printf("ac:%d\n", ac);
 	stack_a = add_args_to_stack(ac, av);
@@ -61,9 +58,7 @@ int	main(int ac, char **av)
 	sorting(&stack_a, &stack_b);
 	print_stack(stack_a, "sorted_stack");
 	cleanup(stack_a, stack_b);
-
 	if (split_used)
 		free_arr(ac, av);
-
 	return (0);
 }
