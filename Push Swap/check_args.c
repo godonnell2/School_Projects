@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:41 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 20:47:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:12:02 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,16 @@
 #define MAX_ARGS 1000
 #include <limits.h>
 
-void	err_case(int ac, char **av)
-{
-	write(2, "Error\n", 6);
-	free_arr(ac, av);
-	exit(1);
-}
-
 void	err_case_nofree(void)
 {
 	write(2, "Error\n", 6);
 	exit(1);
+}
+
+static void	err_case_free(int *nums)
+{
+	free(nums);
+	err_case_nofree();
 }
 
 void	check_args(int ac, char **av)
@@ -43,24 +42,13 @@ void	check_args(int ac, char **av)
 	while (i < size)
 	{
 		current_arg = av[i + 1];
-		if (!is_numeric(current_arg))
-		{
-			free(nums);
-			err_case_nofree();
-		}
-		if (!is_in_range(current_arg))
-		{
-			free(nums);
-			err_case_nofree();
-		}
+		if (!is_numeric(current_arg) || !is_in_range(current_arg))
+			err_case_free(nums);
 		nums[i] = ft_atol(current_arg);
 		i++;
 	}
 	if (has_duplicates(nums, size))
-	{
-		free(nums);
-		err_case_nofree();
-	}
+		err_case_free(nums);
 	free(nums);
 }
 

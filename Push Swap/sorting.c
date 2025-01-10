@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:23 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 21:04:21 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:14:46 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,7 @@ void	sorting(t_stack **a, t_stack **b)
 	print_stack(*a, "inital stack unsorted");
 	while (curr != NULL && ++len)
 		curr = curr->next;
-	if (check_sorting(a) == 0)
-	{
-		return ;
-	}
-	if (len == 1)
+	if ((check_sorting(a) == 0) || (len == 1))
 		return ;
 	else if (len == 2)
 		sort_2(a);

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 21:03:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:09:11 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <stddef.h> //size_t
 # include <stdlib.h> // malloc, free, exit, get ENV var
 # include <unistd.h> // write, read, close
+# include <stdio.h>
 
 typedef struct s_stack
 {
