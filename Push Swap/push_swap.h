@@ -33,12 +33,12 @@ typedef struct s_stack
 
 /* Utils */
 int					ft_strcmp(char *s1, char *s2);
-char	**ft_split(char *str, char delimiter);
+char				**ft_split(char *str, char delimiter);
 void				check_int_max(int ac, char **av);
 int					ft_strlen(const char *s);
 long int			ft_atol(const char *str);
 void				*my_memset(void *s, int c, size_t n);
-void parse_sign_and_whitespace(const char **str, int *sign);
+void				parse_sign_and_whitespace(const char **str, int *sign);
 
 /*stack manipulation */
 t_stack				*add_args_to_stack(int ac, char **av);
@@ -48,14 +48,14 @@ void				free_stack(t_stack **head);
 void				free_arr(int ac, char **av);
 
 /* Check Arguments */
-int	is_in_range(const char *str);
-int	has_duplicates(int *arr, int size);
-int	is_numeric(const char *str);
-void	check_args(int ac, char **av);
-int	is_valid_split(char **split_args);
+int					is_in_range(const char *str);
+int					has_duplicates(int *arr, int size);
+int					is_numeric(const char *str);
+void				check_args(int ac, char **av);
+int					is_valid_split(char **split_args);
 void				err_case(int ac, char **av);
 void				err_case_nofree(void);
-int	count_split_args(char **split_args);
+int					count_split_args(char **split_args);
 
 /* stack utils */
 void				insert_end(t_stack **root, int value);
@@ -105,9 +105,9 @@ void				sort_greaterthanfive(t_stack **a, t_stack **b);
 void				call_functions(t_stack **a, t_stack **b);
 void				last_rotates(t_stack **a);
 
-#include <stdio.h>
+# include <stdio.h>
 
-void print_stack(t_stack *s, char *);
+void				print_stack(t_stack *s, char *);
 #endif /* PUSH_SWAP_H */
 
 // Function prototypes

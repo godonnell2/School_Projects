@@ -64,21 +64,20 @@ void	ra(t_stack **a)
 }
 
 #ifdef VERBOSE
-void print_stack(t_stack *s, char * comment) 
+void	print_stack(t_stack *s, char *comment)
 {
-
 	printf("stack:%s\n", comment);
-	while (s) {
+	while (s)
+	{
 		printf("%d\n", s->nbr);
 		s = s->next;
 	}
 	printf("----\n");
 }
-	#else
-void print_stack(t_stack *s, char * comment)
+#else
+void	print_stack(t_stack *s, char *comment)
 {
 	(void)s;
 	(void)comment;
-	
 }
 #endif

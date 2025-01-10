@@ -6,27 +6,22 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 20:39:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 20:39:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-
-
-int is_in_range(const char *str)
+int	is_in_range(const char *str)
 {
-    long num;
+	long	num;
 
-    num = ft_atol(str);
-    if (num == LONG_MAX || num == LONG_MIN)
-        return 0; // Indicate that the number is out of range
-
-    // Check if the number is within INT_MIN and INT_MAX
-    if (num < INT_MIN || num > INT_MAX)
-        return 0; // Indicate that the number is out of range
-
-    return 1; // Number is within range
+	num = ft_atol(str);
+	if (num == LONG_MAX || num == LONG_MIN)
+		return (0);
+	if (num < INT_MIN || num > INT_MAX)
+		return (0);
+	return (1);
 }
 
 // Set the head pointer to NULL to indicate the stack is empty
@@ -47,7 +42,7 @@ void	free_stack(t_stack **head)
 }
 // indicate success return (0);
 // Indicate an error return (-1);
-//Avoid  producing empty strings due to extra spaces.
+// Avoid  producing empty strings due to extra spaces.
 
 int	count_split_args(char **split_args)
 {
@@ -67,7 +62,7 @@ int	is_valid_split(char **split_args)
 	while (split_args[i])
 	{
 		if (split_args[i][0] == '\0' || !is_numeric(split_args[i]))
-			return (0); 
+			return (0);
 		i++;
 	}
 	return (1);

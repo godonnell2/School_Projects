@@ -6,33 +6,33 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 20:35:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 20:56:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-static long convert_to_long(const char *str, int sign)
+static long	convert_to_long(const char *str, int sign)
 {
-    long result = 0;
-    int digit;
+	long	result;
+	int		digit;
 
-    while (*str >= '0' && *str <= '9')
-    {
-        digit = *str - '0';
-
-        // Check for overflow
-        if (result > (LONG_MAX - digit) / 10)
-        {
-            return (sign == 1) ? LONG_MAX : LONG_MIN; // Return overflow value
-        }
-
-        result = result * 10 + digit;
-        str++;
-    }
-    return result * sign;
+	result = 0;
+	while (*str >= '0' && *str <= '9')
+	{
+		digit = *str - '0';
+		if (result > (LONG_MAX - digit) / 10)
+		{
+			if (sign == 1)
+				return (LONG_MAX);
+			else
+				return (LONG_MIN);
+		}
+		result = result * 10 + digit;
+		str++;
+	}
+	return (result * sign);
 }
-
 
 long	ft_atol(const char *str)
 {
@@ -42,30 +42,26 @@ long	ft_atol(const char *str)
 	sign = 1;
 	parse_sign_and_whitespace(&str, &sign);
 	result = convert_to_long(str, sign);
-
-	// Check for overflow in `convert_to_long`
 	if (result == LONG_MAX || result == LONG_MIN)
 		return (result);
-
-   return result;
+	return (result);
 }
-
 
 static char	*allocate_and_fill_word(char **str, char delimiter)
 {
 	char	*word;
 	int		k;
 
-	word = malloc(1000); // Allocate memory for a single word
+	word = malloc(1000);
 	if (!word)
 		return (NULL);
 	k = 0;
-	while (**str && **str != delimiter) // Stop at the delimiter or end of the string
+	while (**str && **str != delimiter)
 	{
 		word[k++] = **str;
 		(*str)++;
 	}
-	word[k] = '\0'; // Null-terminate the word
+	word[k] = '\0';
 	return (word);
 }
 
@@ -75,20 +71,20 @@ char	**ft_split(char *str, char delimiter)
 	int		j;
 
 	j = 1;
-	arr = malloc(1000 * sizeof(char *)); // Allocate memory for the array of words
+	arr = malloc(1000 * sizeof(char *));
 	if (!arr)
 		return (NULL);
 	arr[0] = malloc(1);
 	arr[0][0] = '\0';
 	while (*str)
 	{
-		if (*str != delimiter) 
+		if (*str != delimiter)
 		{
-			arr[j] = allocate_and_fill_word(&str, delimiter); 
+			arr[j] = allocate_and_fill_word(&str, delimiter);
 			j++;
 		}
 		else
-			str++; 
+			str++;
 	}
 	arr[j] = NULL;
 	return (arr);

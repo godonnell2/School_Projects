@@ -20,13 +20,12 @@ void	cleanup(t_stack *a, t_stack *b)
 	free_stack(&b);
 }
 
-
 int	main(int ac, char **av)
 {
-	t_stack	*stack_a;
-	t_stack	*stack_b;
-	char	**split_args;
-	int		split_used;
+	t_stack *stack_a;
+	t_stack *stack_b;
+	char **split_args;
+	int split_used;
 
 	stack_a = NULL;
 	stack_b = NULL;

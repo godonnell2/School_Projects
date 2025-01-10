@@ -6,20 +6,18 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:49 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/07 15:32:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/10 20:53:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-
-
 void	free_arr(int ac, char **av)
 {
-	if (!av)
-        return;
 	int	i;
 
+	if (!av)
+		return ;
 	(void)ac;
 	i = 0;
 	while (av[i])
@@ -69,23 +67,19 @@ void	*my_memset(void *s, int c, size_t n)
 	}
 	return (s);
 }
-void parse_sign_and_whitespace(const char **str, int *sign)
+
+void	parse_sign_and_whitespace(const char **str, int *sign)
 {
-    // Initialize sign to 1 (positive)
-    *sign = 1;
-
-    // Skip leading whitespace
-    while (**str == ' ' || **str == '\t' || **str == '\n' || 
-           **str == '\r' || **str == '\v' || **str == '\f') // Check for whitespace characters
-    {
-        (*str)++; // Move to the next character
-    }
-
-    // Check for sign
-    while (**str == '+' || **str == '-') // Check for '+' or '-'
-    {
-        if (**str == '-') // If the character is '-'
-            *sign *= -1; // Flip the sign
-        (*str)++; // Move to the next character
-    }
+	*sign = 1;
+	while (**str == ' ' || **str == '\t' || **str == '\n' || **str == '\r'
+		|| **str == '\v' || **str == '\f')
+	{
+		(*str)++;
+	}
+	while (**str == '+' || **str == '-')
+	{
+		if (**str == '-')
+			*sign *= -1;
+		(*str)++;
+	}
 }

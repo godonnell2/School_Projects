@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "push_swap.h"
+
 /*
 	if (check_sorting(a) == 0)
 	{
@@ -26,12 +27,10 @@ void	sorting(t_stack **a, t_stack **b)
 		return ;
 	curr = *a;
 	len = 0;
-	    
-	 print_stack(*a, "inital stack unsorted");
+	print_stack(*a, "inital stack unsorted");
 	while (curr != NULL && ++len)
 		curr = curr->next;
-	//printf("len:%d ", len); // Debugging output
-	
+	// printf("len:%d ", len); // Debugging output
 	if (check_sorting(a) == 0)
 	{
 		return ;

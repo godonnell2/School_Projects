@@ -22,7 +22,7 @@ void	reverse_rotate_stack(t_stack **stack_head)
 {
 	t_stack	*current_lasttotop_node;
 	t_stack	*second_last_node;
-	
+
 	if (!(*stack_head) || !(*stack_head)->next)
 		return ;
 	current_lasttotop_node = (*stack_head);
