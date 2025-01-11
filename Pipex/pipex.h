@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 17:28:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 17:43:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char		*cat_strs_char(char *dest, const char *src1, char c,
 				const char *src2);
 char		**ft_split(char const *s, char c);
 void		print_usage(void);
-t_data*		init_data();
+t_data		init_data();
 void		err_case(const char *msg, t_data *data);
 pid_t		first_child(t_data *data, char **av, char **envp);
 pid_t		second_child(t_data *data, int ac, char **av, char **envp);

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 17:32:10 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 17:44:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,15 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 		char *cmd = find_fullpath(envp, args_cmds[0]);
 		if (!cmd)
 			err_case("Command not found", data);
+	data->input_fd = open(av[1], O_RDONLY);
+		if (data->input_fd < 0)
+			err_case("failure to open input file", data);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case("fork for first child failed", data);
 	if (data->pid1 == 0)
 	{
-		data->input_fd = open(av[1], O_RDONLY);
-		if (data->input_fd < 0)
-			err_case("failure to open input file", data);
+		
 		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
 			|| dup2(data->input_fd, STDIN_FILENO) < 0)
 			err_case("dup2 failed", data);
@@ -50,20 +51,19 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 		char *cmd = find_fullpath(envp, args_cmd[0]);
 		if (!cmd)
 			err_case("Command not found", data);
+	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
+		if (data->output_fd < 0)
+			err_case("failed to open output file", data);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
 	if (data->pid2 == 0)
 	{
-		data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
-		if (data->output_fd < 0)
-			err_case("failed to open output file", data);
 		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0
 			|| dup2(data->output_fd, STDOUT_FILENO) < 0)
 			err_case("dup2 failed", data);
 		close(data->pipe_fd[READ_END]);
 		close(data->output_fd);
-		
 		execve(cmd, args_cmd, envp);
 		perror("execve failed");
 		exit(EXIT_FAILURE);
@@ -74,22 +74,21 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 
 int	main(int ac, char **av, char **envp)
 {
-	t_data	*data;
+	t_data	data;
 
 	if (ac != 5)
 		print_usage();
 	data = init_data();
-	if (pipe(data->pipe_fd) < 0)
-		err_case("pipe FAILED", data);
-	if (first_child(data, av, envp) < 0)
-		err_case("fork FAILED for first child", data);
-	if (second_child(data, ac, av, envp) < 0)
-		err_case("fork FAILED for second child", data);
-	close(data->pipe_fd[READ_END]);
-	close(data->pipe_fd[WRITE_END]);
-	waitpid(data->pid1, NULL, 0);
-	waitpid(data->pid2, NULL, 0);
-	free(data);
+	if (pipe(data.pipe_fd) < 0)
+		err_case("pipe FAILED", &data);
+	if (first_child(&data, av, envp) < 0)
+		err_case("fork FAILED for first child", &data);
+	if (second_child(&data, ac, av, envp) < 0)
+		err_case("fork FAILED for second child", &data);
+	close(data.pipe_fd[READ_END]);
+	close(data.pipe_fd[WRITE_END]);
+	waitpid(data.pid1, NULL, 0);
+	waitpid(data.pid2, NULL, 0);
 	return (0);
 }
 
