@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:01:48 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 21:05:13 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 17:27:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,17 @@ void	print_usage(void)
 		exit(EXIT_FAILURE);
 }
 
-void	init_data(t_data **tmp)
+t_data	*init_data()
 {
 	t_data	*data;
 
 	data = malloc(sizeof(t_data));
 	if (!data)
 		exit(EXIT_FAILURE);
-	data->cmd = NULL;
-	data->args_cmds = NULL;
 	data->input_fd = -1;
 	data->output_fd = -1;
-	*tmp = data;
+
+	return data;
 }
 
 void	err_case(const char *msg, t_data *data)

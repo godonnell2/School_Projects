@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 21:09:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 17:32:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 
 pid_t	first_child(t_data *data, char **av, char **envp)
 {
+	char ** args_cmds = ft_split(av[2], ' ');
+		if (!args_cmds)
+			err_case("ft_split failed", data);
+		char *cmd = find_fullpath(envp, args_cmds[0]);
+		if (!cmd)
+			err_case("Command not found", data);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case("fork for first child failed", data);
@@ -22,19 +28,13 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 		data->input_fd = open(av[1], O_RDONLY);
 		if (data->input_fd < 0)
 			err_case("failure to open input file", data);
-		close(data->pipe_fd[READ_END]);
 		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
 			|| dup2(data->input_fd, STDIN_FILENO) < 0)
 			err_case("dup2 failed", data);
 		close(data->pipe_fd[WRITE_END]);
 		close(data->input_fd);
-		data->args_cmds = ft_split(av[2], ' ');
-		if (!data->args_cmds)
-			err_case("ft_split failed", data);
-		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd)
-			err_case("Command not found", data);
-		execve(data->cmd, data->args_cmds, envp);
+		
+		execve(cmd, args_cmds, envp);
 		perror("execve failed");
 		exit(EXIT_FAILURE);
 	}
@@ -44,6 +44,12 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 {
 	close(data->pipe_fd[WRITE_END]);
+	char **args_cmd = ft_split(av[3], ' ');
+		if (!args_cmd)
+			err_case("ft_split failed", data);
+		char *cmd = find_fullpath(envp, args_cmd[0]);
+		if (!cmd)
+			err_case("Command not found", data);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
@@ -57,13 +63,8 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 			err_case("dup2 failed", data);
 		close(data->pipe_fd[READ_END]);
 		close(data->output_fd);
-		data->args_cmds = ft_split(av[3], ' ');
-		if (!data->args_cmds)
-			err_case("ft_split failed", data);
-		data->cmd = find_fullpath(envp, data->args_cmds[0]);
-		if (!data->cmd)
-			err_case("Command not found", data);
-		execve(data->cmd, data->args_cmds, envp);
+		
+		execve(cmd, args_cmd, envp);
 		perror("execve failed");
 		exit(EXIT_FAILURE);
 	}
@@ -77,7 +78,7 @@ int	main(int ac, char **av, char **envp)
 
 	if (ac != 5)
 		print_usage();
-	init_data(&data);
+	data = init_data();
 	if (pipe(data->pipe_fd) < 0)
 		err_case("pipe FAILED", data);
 	if (first_child(data, av, envp) < 0)

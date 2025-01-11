@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 21:04:44 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 15:57:16 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ char	*find_path(char **envp)
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
 			path = envp[i] + 5;
-			printf("finding path\n");
 			return (path);
 		}
 		i++;
@@ -39,21 +38,21 @@ static char	*check_command_in_path(char **path_arr, char *cmd)
 	char	*full_cmd_path;
 	size_t	p_len;
 	size_t	c_len;
-	char	**temp;
+	char	**temp_patharr;
 
-	temp = path_arr;
-	while (*temp != NULL)
+	temp_patharr = path_arr;
+	while (*temp_patharr != NULL)
 	{
-		p_len = ft_wordlen(*temp);
+		p_len = ft_wordlen(*temp_patharr);
 		c_len = ft_wordlen(cmd);
 		full_cmd_path = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
 		if (!full_cmd_path)
 			return (NULL);
-		cat_strs_char(full_cmd_path, *temp, '/', cmd);
+		cat_strs_char(full_cmd_path, *temp_patharr, '/', cmd);
 		if (access(full_cmd_path, F_OK) == 0)
 			return (full_cmd_path);
 		free(full_cmd_path);
-		temp++;
+		temp_patharr++;
 	}
 	return (NULL);
 }
