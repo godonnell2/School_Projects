@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:53:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:15:54 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 18:41:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,15 @@ char	**ft_split(char const *s, char c)
 	}
 	arr[word] = NULL;
 	return (arr);
+}
+
+void free_split(char **str)
+{
+	int i = 0;
+	while(str[i])
+	{
+		free(str[i]);
+		i++;
+	}
+	free(str);
 }
