@@ -6,13 +6,13 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/26 00:52:18 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/10 21:15:22 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/11 10:16:26 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 CC = gcc 
-CFLAGS = -Wall -Wextra -Werror -g -DVERBOSE=1
+CFLAGS = -Wall -Wextra -Werror -g #-DVERBOSE=1
 SRC = 	main.c \
 		operations.c \
 		operations_two.c \

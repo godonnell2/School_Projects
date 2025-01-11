@@ -6,17 +6,17 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:53:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 09:56:04 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	rotation_b(t_stack **b, int index)
+void rotate_to_top_b(t_stack **b, int index)
 {
-	int	rotation;
-	int	rrotation;
-	int	len;
+	int rotation;
+	int rrotation;
+	int len;
 
 	len = struct_len(*b) + 1;
 	rotation = index - 1;
@@ -39,11 +39,11 @@ void	rotation_b(t_stack **b, int index)
 	}
 }
 
-void	sort_greaterthanfive(t_stack **a, t_stack **b)
+void findmean_below_pushb(t_stack **a, t_stack **b)
 {
-	int	s_len;
-	int	s_sum;
-	int	mean;
+	int s_len;
+	int s_sum;
+	int mean;
 
 	s_len = struct_len(*a);
 	while (s_len > 5)
@@ -56,37 +56,35 @@ void	sort_greaterthanfive(t_stack **a, t_stack **b)
 			ra(a);
 		s_len = struct_len(*a);
 	}
-	call_functions(a, b);
+	sort_greater_than_five(a, b);
 }
 
-/*
-Sort the first five elements in stack A
-While there are elements in stack B
-Assign indices to elements in stack A
-Assign indices to elements in stack B
-Find the best friend index for each node in stack B
-// Calculate the cost for each node in stack B
- // Move the node with the minimum cost to the top of stack A
- / Perform any final rotations to ensure stack A is sorted
-*/
-void	call_functions(t_stack **a, t_stack **b)
+void sort_greater_than_five(t_stack **a, t_stack **b)
 {
 	sort_5(a, b);
 	while ((*b))
 	{
-		add_index(a);
-		add_index(b);
-		add_best_friend(*a, b);
-		add_cost(a, b);
+		set_index(a);
+		set_index(b);
+		set_best_friend(*a, b);
+		set_cost(a, b);
 		moves_top(a, b);
 	}
-	last_rotates(a);
+	rotate_to_finalpos(a);
 }
 
-/*After processing all elements in stack B, last_rotates(a) is called.*/
-
-void	last_rotates(t_stack **a)
+void rotate_to_finalpos(t_stack **a)
 {
 	while (check_sorting(a))
 		ra(a);
 }
+
+/*After processing all elements in stack B, rotate_to_finalpos(a) is called.
+ It calculates the length of stack A and continues processing until
+ there are five or fewer elements left.
+It calculates the sum and mean of the elements in stack A.
+If the top element of stack A is less than the mean, it pushes that element
+to stack B. Otherwise, it rotates stack A.
+After reducing the size of stack A to five or fewer, it calls
+sort_greater_than_five(a, b) to handle the remaining elements.
+*/

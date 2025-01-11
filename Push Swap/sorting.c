@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:23 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 21:14:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 09:56:04 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,20 @@
 		return ;
 	}  If already sorted, do nothing
 */
-void	sorting(t_stack **a, t_stack **b)
+void sorting(t_stack **a, t_stack **b)
 {
-	t_stack	*curr;
-	int		len;
+	t_stack *curr;
+	int len;
 
 	if (a == NULL || *a == NULL)
-		return ;
+		return;
 	curr = *a;
 	len = 0;
 	print_stack(*a, "inital stack unsorted");
 	while (curr != NULL && ++len)
 		curr = curr->next;
 	if ((check_sorting(a) == 0) || (len == 1))
-		return ;
+		return;
 	else if (len == 2)
 		sort_2(a);
 	else if (len == 3)
@@ -41,10 +41,10 @@ void	sorting(t_stack **a, t_stack **b)
 	else if (len == 5)
 		sort_5(a, b);
 	else if (len > 5)
-		sort_greaterthanfive(a, b);
+		findmean_below_pushb(a, b);
 }
 
-void	sort_2(t_stack **a)
+void sort_2(t_stack **a)
 {
 	if ((*a)->nbr > (*a)->next->nbr)
 		swap_stack_a(a);
@@ -67,7 +67,7 @@ to the top of the stack.
 Let's consider the following initial state of Stack A:
 Stack A: 2 -> 3 -> 1 for the second condition
 */
-void	sort_3(t_stack **a)
+void sort_3(t_stack **a)
 {
 	print_stack(*a, "sort_3");
 	if ((*a)->nbr > (*a)->next->nbr && (*a)->nbr > (*a)->next->next->nbr)
@@ -78,7 +78,7 @@ void	sort_3(t_stack **a)
 		swap_stack_a(a);
 }
 
-void	sort_4(t_stack **a, t_stack **b)
+void sort_4(t_stack **a, t_stack **b)
 {
 	print_stack(*a, "sort_4");
 	push_to_stack_b(a, b);
@@ -93,7 +93,7 @@ void	sort_4(t_stack **a, t_stack **b)
 		ra(a);
 }
 
-void	pos_4(t_stack **a, t_stack **b)
+void pos_4(t_stack **a, t_stack **b)
 {
 	reverse_rotate_stack_a(a);
 	push_to_stack_a(b, a);

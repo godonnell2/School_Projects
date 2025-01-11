@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2024/12/29 10:54:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 10:13:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-t_stack	*add_args_to_stack(int ac, char **av)
+t_stack	*add_args_to_stack(char **av)
 {
 	t_stack	*tmphead;
 	int		i;
@@ -20,9 +20,6 @@ t_stack	*add_args_to_stack(int ac, char **av)
 	tmphead = NULL;
 	if (!av)
 		return (NULL);
-	if (ac == 2)
-		i = 0;
-	else
 		i = 1;
 	while (av[i])
 	{
