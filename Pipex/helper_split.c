@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:53:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 18:41:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 19:02:07 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,10 @@ static int	count_words(char const *s, char c)
 
 static char	*copy_word(const char *s, int start, int end, int len)
 {
-	char	*word;
+	char	*word[1000];
 	size_t	i;
 
-	word = (char *)malloc(sizeof(char) * (len + 1));
-	if (!word)
-		return (NULL);
-	i = 0;
+	
 	while (start < end)
 	{
 		word[i] = s[start];
@@ -49,6 +46,33 @@ static char	*copy_word(const char *s, int start, int end, int len)
 	word[i] = '\0';
 	return (word);
 }
+
+/*
+Proposed signature:
+#define SPLIT_BUFF_SIZE 100*1024 //enough?
+char **ft_split_buff(char const *s, char sep, void* buff);
+
+The function uses the buff to:
+- allocate the pointer table
+- cpy strs into the buffer and set the corresponding pointer in the table
+
+The important thing is to keep track of where in the buffer to write next,
+and make sure it doesn't write beyond SPLIT_BUFF_SIZE.
+
+e.g. 
+size_t buff_offset = 0;
+arr = (char**)buff + buff_offset;
+buff_offset += sizeof(char*) * count_words(s, sep) + 1; // Same as in malloc
+arr[word++] = buff + buff_offset
+// copy all bytes until sep
+buff_offset += end - init + 1; // double check +1
+
+return arr; as before
+
+Usage example:
+char split_buff[SPLIT_BUFF_SIZE];
+char ** cmd_args = ft_split_buff(av[2], ' ', split_buff);
+*/
 
 char	**ft_split(char const *s, char c)
 {
