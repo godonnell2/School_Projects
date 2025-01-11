@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/04 20:39:29 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 18:17:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,15 @@ char	*cat_strs_char(char *dest, const char *src1, char c, const char *src2)
 	}
 	dest[i] = '\0';
 	return (dest);
+}
+
+void ft_strcpy(char *src, char *dst)
+{
+	int i = 0;
+	while(src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	dst[i] = '\0';
 }

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 17:44:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 18:18:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,9 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	char ** args_cmds = ft_split(av[2], ' ');
 		if (!args_cmds)
 			err_case("ft_split failed", data);
-		char *cmd = find_fullpath(envp, args_cmds[0]);
-		if (!cmd)
+		char cmd[PATH_MAX]; 
+		find_fullpath(envp, args_cmds[0], cmd);
+		if (cmd[0] == '\0')
 			err_case("Command not found", data);
 	data->input_fd = open(av[1], O_RDONLY);
 		if (data->input_fd < 0)
@@ -48,8 +49,9 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	char **args_cmd = ft_split(av[3], ' ');
 		if (!args_cmd)
 			err_case("ft_split failed", data);
-		char *cmd = find_fullpath(envp, args_cmd[0]);
-		if (!cmd)
+		char cmd[PATH_MAX];
+		find_fullpath(envp, args_cmd[0], cmd);
+		if (cmd[0] == '\0')
 			err_case("Command not found", data);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 		if (data->output_fd < 0)

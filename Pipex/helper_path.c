@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 15:57:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 18:23:14 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ char	*find_path(char **envp)
 	return (NULL);
 }
 
-static char	*check_command_in_path(char **path_arr, char *cmd)
+static void check_command_in_path(char **path_arr, char *cmd, char*full_path)
 {
-	char	*full_cmd_path;
+	
 	size_t	p_len;
 	size_t	c_len;
 	char	**temp_patharr;
@@ -45,31 +45,34 @@ static char	*check_command_in_path(char **path_arr, char *cmd)
 	{
 		p_len = ft_wordlen(*temp_patharr);
 		c_len = ft_wordlen(cmd);
-		full_cmd_path = (char *)malloc(sizeof(char) * (p_len + c_len + 2));
-		if (!full_cmd_path)
-			return (NULL);
-		cat_strs_char(full_cmd_path, *temp_patharr, '/', cmd);
-		if (access(full_cmd_path, F_OK) == 0)
-			return (full_cmd_path);
-		free(full_cmd_path);
+		if((p_len + c_len + 2) > PATH_MAX)
+			return ;
+		cat_strs_char(full_path, *temp_patharr, '/', cmd);
+		if (access(full_path, F_OK) == 0)
+			return ;
 		temp_patharr++;
 	}
-	return (NULL);
+	full_path[0]= '\0';
 }
 
-char	*find_fullpath(char **envp, char *cmd)
+void find_fullpath(char **envp, char *cmd, char* full_path)
 {
 	char	**path_arr;
-	char	*full_cmd_path;
-
+	char *path_env;
+	full_path[0] = '\0';
 	if (access(cmd, F_OK) == 0)
-		return (cmd);
-	path_arr = ft_split(find_path(envp), ':');
+		{
+			ft_strcpy(cmd, full_path);
+			return;
+		}
+	path_env = find_path(envp);
+	if(!path_env)
+		return ;
+	path_arr = ft_split(path_env, ':');
 	if (!path_arr)
-		return (NULL);
-	full_cmd_path = check_command_in_path(path_arr, cmd);
+		return ;
+	check_command_in_path(path_arr, cmd, full_path);
 	free(path_arr);
-	return (full_cmd_path);
 }
 
 /*
