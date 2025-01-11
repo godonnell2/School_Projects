@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 01:09:02 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/10 20:39:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 10:36:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,5 @@ int	is_valid_split(char **split_args)
 			return (0);
 		i++;
 	}
-	return (1);
+	return (i > 1);
 }

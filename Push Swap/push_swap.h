@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:51:43 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 10:14:54 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 10:27:58 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,19 +33,10 @@ typedef struct s_stack
 } t_stack;
 
 /* Utils */
-int ft_strcmp(char *s1, char *s2);
 char **ft_split(char *str, char delimiter);
 void check_int_max(int ac, char **av);
-int ft_strlen(const char *s);
 long int ft_atol(const char *str);
-void *my_memset(void *s, int c, size_t n);
 void parse_sign_and_whitespace(const char **str, int *sign);
-
-/*stack manipulation */
-t_stack *add_args_to_stack(char **av);
-int struct_len(t_stack *stack);
-int struct_sum(t_stack *stack);
-void free_stack(t_stack **head);
 void free_arr(int ac, char **av);
 
 /* Check Arguments */
@@ -59,6 +50,10 @@ void err_case_nofree(void);
 int count_split_args(char **split_args);
 
 /* stack utils */
+t_stack *add_args_to_stack(char **av);
+int struct_len(t_stack *stack);
+int struct_sum(t_stack *stack);
+void free_stack(t_stack **head);
 void insert_end(t_stack **root, int value);
 void free_stack(t_stack **root);
 void rotate_to_top_a(t_stack **a, int index);

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 00:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 10:15:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/11 10:42:23 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ int	handle_args(int ac, char ***av)
 	check_args(ac, *av);
 	return (split_used);
 }
+
+// REMEMBER EMPTY STRING AC IS 2 so not running with no params!!!
+//PRINT IT TO PROVE EM WRONG 
 
 int	main(int ac, char **av)
 {
