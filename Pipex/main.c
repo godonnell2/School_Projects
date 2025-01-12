@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:41:19 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:45:27 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,15 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case("fork for first child failed", data);
-	if (data->pid1 == 0)
-	{
-		if (dup2(data->pipe_fd[WRITE], OUT) < 0
-			|| dup2(data->input_fd, IN) < 0)
-			err_case("dup2 failed", data);
-		close(data->pipe_fd[WRITE]);
-		close(data->input_fd);
-		execve(cmd, args_cmds, envp);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	return (data->pid1);
+	if (data->pid1 != 0)
+		return (data->pid1);
+	if (dup2(data->pipe_fd[WRITE], OUT) < 0 || dup2(data->input_fd, IN) < 0)
+		err_case("dup2 failed", data);
+	close(data->pipe_fd[WRITE]);
+	close(data->input_fd);
+	execve(cmd, args_cmds, envp);
+	perror("execve failed");
+	exit(EXIT_FAILURE);
 }
 
 pid_t	second_child(t_data *data, int ac, char **av, char **envp)
@@ -59,17 +56,15 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
-	if (data->pid2 == 0)
-	{
-		if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
-			err_case("dup2 failed", data);
-		close(data->pipe_fd[READ]);
-		close(data->output_fd);
-		execve(cmd, args_cmd, envp);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	return (data->pid2);
+	if (data->pid2 != 0)
+		return (data->pid2);
+	if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
+		err_case("dup2 failed", data);
+	close(data->pipe_fd[READ]);
+	close(data->output_fd);
+	execve(cmd, args_cmd, envp);
+	perror("execve failed");
+	exit(EXIT_FAILURE);
 }
 
 int	main(int ac, char **av, char **envp)
