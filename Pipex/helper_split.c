@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:53:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:02:47 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:49:43 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ and make sure it doesn't write beyond SPLIT_BUFF_SIZE.
 e.g.
 size_t			buff_offset = 0;
 arr = (char**)buff + buff_offset;
-buff_offset += sizeof(char*) * count_words(s, sep) + 1; // Same as in malloc
+buff_offset += sizeof(char*) * count_words(s, sep) + 1;
 arr[word++] = buff + buff_offset
 // copy all bytes until sep
 buff_offset += end - init + 1; // double check +1
@@ -141,49 +141,4 @@ buff_offset += end - init + 1; // double check +1
 Usage example:
 char			split_buff[SPLIT_BUFF_SIZE];
 char ** cmd_args = ft_split_buff(av[2], ' ', split_buff);
-*/
-
-/*
-char	**ft_split(char const *s, char c)
-{
-	char	**arr;
-	size_t	init;
-	size_t	end;
-	size_t	word;
-
-	arr = (char **)malloc(sizeof(char *) * (count_words((char *)s, c) + 1));
-	if (!(arr) || !(s))
-		return (NULL);
-	init = 0;
-	word = 0;
-	while (s[init])
-	{
-		if (s[init] != c && s[init] != '\0')
-		{
-			end = init;
-			while (s[end] && s[end] != c)
-				end++;
-			arr[word++] = copy_word(s, init, end, (end - init));
-			init = end;
-		}
-		else
-			init++;
-	}
-	arr[word] = NULL;
-	return (arr);
-}
-
-
-void	free_split(char **str)
-{
-	int	i;
-
-	i = 0;
-	while(str[i])
-	{
-		free(str[i]);
-		i++;
-	}
-	free(str);
-}
 */

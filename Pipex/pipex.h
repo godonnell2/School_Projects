@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:40:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:49:35 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <fcntl.h>    // open
 # include <limits.h>   //PATH_MAX
 # include <stdio.h>    // perror
-# include <stdlib.h>   // exit, malloc, free, execve, wait, waitpid, NULL
+# include <stdlib.h>   // exit, execve, wait, waitpid, NULL
 # include <sys/wait.h> // wait, waitpid
 						// provides macros related to process termination.
 // It includes declarations for functions like wait and waitpid,
