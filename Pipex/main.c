@@ -6,36 +6,35 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 19:12:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:41:19 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-/*
+
 pid_t	first_child(t_data *data, char **av, char **envp)
 {
-	char ** args_cmds = ft_split(av[2], ' ');
-		if (!args_cmds)
-			err_case("ft_split failed", data);
-		char cmd[PATH_MAX]; 
-		find_fullpath(envp, args_cmds[0], cmd);
-		if (cmd[0] == '\0')
-			err_case("Command not found", data);
+	char	buff[SPLIT_BUFF_SIZE];
+	char	**args_cmds;
+	char	cmd[PATH_MAX];
+
+	args_cmds = ft_split_buff(av[2], ' ', buff);
+	find_fullpath(envp, args_cmds[0], cmd);
+	if (cmd[0] == '\0')
+		err_case("Command not found", data);
 	data->input_fd = open(av[1], O_RDONLY);
-		if (data->input_fd < 0)
-			err_case("failure to open input file", data);
+	if (data->input_fd < 0)
+		err_case("failure to open input file", data);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case("fork for first child failed", data);
 	if (data->pid1 == 0)
 	{
-		
-		if (dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) < 0
-			|| dup2(data->input_fd, STDIN_FILENO) < 0)
+		if (dup2(data->pipe_fd[WRITE], OUT) < 0
+			|| dup2(data->input_fd, IN) < 0)
 			err_case("dup2 failed", data);
-		close(data->pipe_fd[WRITE_END]);
+		close(data->pipe_fd[WRITE]);
 		close(data->input_fd);
-		
 		execve(cmd, args_cmds, envp);
 		perror("execve failed");
 		exit(EXIT_FAILURE);
@@ -45,26 +44,26 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 
 pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 {
-	close(data->pipe_fd[WRITE_END]);
-	char **args_cmd = ft_split(av[3], ' ');
-		if (!args_cmd)
-			err_case("ft_split failed", data);
-		char cmd[PATH_MAX];
-		find_fullpath(envp, args_cmd[0], cmd);
-		if (cmd[0] == '\0')
-			err_case("Command not found", data);
+	char	buff[SPLIT_BUFF_SIZE];
+	char	**args_cmd;
+	char	cmd[PATH_MAX];
+
+	close(data->pipe_fd[WRITE]);
+	args_cmd = ft_split_buff(av[3], ' ', buff);
+	find_fullpath(envp, args_cmd[0], cmd);
+	if (cmd[0] == '\0')
+		err_case("Command not found", data);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
-		if (data->output_fd < 0)
-			err_case("failed to open output file", data);
+	if (data->output_fd < 0)
+		err_case("failed to open output file", data);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case("fork for second child failed", data);
 	if (data->pid2 == 0)
 	{
-		if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0
-			|| dup2(data->output_fd, STDOUT_FILENO) < 0)
+		if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
 			err_case("dup2 failed", data);
-		close(data->pipe_fd[READ_END]);
+		close(data->pipe_fd[READ]);
 		close(data->output_fd);
 		execve(cmd, args_cmd, envp);
 		perror("execve failed");
@@ -72,22 +71,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	}
 	return (data->pid2);
 }
-*/
-int main()
-{
-	int i = 0;
-	char buff[SPLIT_BUFF_SIZE];
-	char **arr = ft_split_buff(" test this is   ", ' ' , buff);
-	
-	while(arr[i])
-	{
-		printf("%s\n", arr[i]);
-		i++;
-	}
 
-	return 0;
-}
-/*
 int	main(int ac, char **av, char **envp)
 {
 	t_data	data;
@@ -101,13 +85,13 @@ int	main(int ac, char **av, char **envp)
 		err_case("fork FAILED for first child", &data);
 	if (second_child(&data, ac, av, envp) < 0)
 		err_case("fork FAILED for second child", &data);
-	close(data.pipe_fd[READ_END]);
-	close(data.pipe_fd[WRITE_END]);
+	close(data.pipe_fd[READ]);
+	close(data.pipe_fd[WRITE]);
 	waitpid(data.pid1, NULL, 0);
 	waitpid(data.pid2, NULL, 0);
 	return (0);
 }
-*/
+
 /*
 returns a pid_t, which is the process ID of the created child process
 3 params:
@@ -115,18 +99,18 @@ t_data *data: pntr to a struct that holds process IDs and file descriptors.
 char *argv[]: An array of command-line arguments.
 char *envp[]: An array of environment variables.
 The first child writes data to the pipe (via pipe_fd[WRITE_END]).
-It doesn't need to read from the pipe (pipe_fd[READ_END]).
+It doesn't need to read from the pipe (pipe_fd[READ]).
 In the child process (where data->pid1 == 0),
 the child will be writing data to the pipe (via STDOUT_FILENO),
 and it does not need to read from the pipe.
 Closing the read end of the pipe
 
-dup2(data->pipe_fd[WRITE_END], STDOUT_FILENO) effectively redirects the
+dup2(data->pipe_fd[WRITE], STDOUT_FILENO) effectively redirects the
 standard output of the child process to the write end of the pipe.
 This allows the child to send its output to the parent process through the
  pipe.
 
-dup2(data->in_fd, STDIN_FILENO)
+dup2(data->in_fd, STDIN)
 after this call, any input that would normally come from the terminal (standard
 input) will instead be read from the file associated with data->in_fd. This
 means that any function that reads from standard input (e.g., scanf, getchar,
@@ -160,17 +144,17 @@ second child process.
 The second child process is responsible for reading from the pipe and writing
  the output to the specified file.
 The second child does not write to the pipe; it only reads from it using
-data->pipe_fd[READ_END].
- Why Close WRITE_END?
+data->pipe_fd[READ].
+ Why Close WRITE?
 a) Avoid Resource Waste:
-The second child does not need the WRITE_END of the pipe.
+The second child does not need the WRITE of the pipe.
 Keeping it open unnecessarily consumes system resources, as the operating
  system maintains open file descriptors.
 b) Allow Proper EOF Detection:
-When the first child process writes to the pipe and closes its WRITE_END,
+When the first child process writes to the pipe and closes its WRITE,
  the second child detects the end-of-file (EOF) on the pipe when it finishes
   reading.
-If the WRITE_END is left open in the second child:
+If the WRITE is left open in the second child:
 The pipe remains open for writing, even though the second child isn’t using it.
 This prevents the second child from detecting EOF, as the operating system
  assumes the pipe is still active for writing.
@@ -183,7 +167,7 @@ The owner of the file can read and write (6 = read + write).
 The group can read (4 = read).
 Others can read (4 = read).
 
- if (dup2(data->pipe_fd[READ_END], STDIN_FILENO) < 0)
+ if (dup2(data->pipe_fd[READ], STDIN) < 0)
 redirect standard input (stdin) of the current process
 (typically a child process)
 to read from the read end of a pipe

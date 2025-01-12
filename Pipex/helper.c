@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 17:49:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:32:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,46 +49,25 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
-
-void *ft_memcpy(void *dest, const void *src, size_t n)
+void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
-    unsigned char *d = (unsigned char *)dest; 
-    const unsigned char *s = (const unsigned char *)src; 
+	unsigned char		*d;
+	const unsigned char	*s = (const unsigned char *)src;
 
-    while (n--)
-    {
-        *d++ = *s++; 
-    }
-
-    return dest; 
-}
-
-char	*cat_strs_char(char *dest, const char *src1, char c, const char *src2)
-{
-	size_t	i;
-
-	i = 0;
-	if (!src1 || !src2)
+	d = (unsigned char *)dest;
+	while (n--)
 	{
-		return (NULL);
+		*d++ = *s++;
 	}
-	while (*src1)
-	{
-		dest[i++] = *src1++;
-	}
-	dest[i++] = c;
-	while (*src2)
-	{
-		dest[i++] = *src2++;
-	}
-	dest[i] = '\0';
 	return (dest);
 }
 
-void ft_strcpy(char *src, char *dst)
+void	ft_strcpy(char *src, char *dst)
 {
-	int i = 0;
-	while(src[i])
+	int	i;
+
+	i = 0;
+	while (src[i])
 	{
 		dst[i] = src[i];
 		i++;
