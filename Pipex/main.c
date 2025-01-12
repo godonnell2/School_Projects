@@ -6,12 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 18:18:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 19:12:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
+/*
 pid_t	first_child(t_data *data, char **av, char **envp)
 {
 	char ** args_cmds = ft_split(av[2], ' ');
@@ -72,8 +72,22 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	}
 	return (data->pid2);
 }
+*/
+int main()
+{
+	int i = 0;
+	char buff[SPLIT_BUFF_SIZE];
+	char **arr = ft_split_buff(" test this is   ", ' ' , buff);
+	
+	while(arr[i])
+	{
+		printf("%s\n", arr[i]);
+		i++;
+	}
 
-
+	return 0;
+}
+/*
 int	main(int ac, char **av, char **envp)
 {
 	t_data	data;
@@ -93,7 +107,7 @@ int	main(int ac, char **av, char **envp)
 	waitpid(data.pid2, NULL, 0);
 	return (0);
 }
-
+*/
 /*
 returns a pid_t, which is the process ID of the created child process
 3 params:

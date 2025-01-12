@@ -6,12 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 18:42:27 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 18:01:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
+/*
 char	*find_path(char **envp)
 {
 	int		i;
@@ -74,7 +74,7 @@ void find_fullpath(char **envp, char *cmd, char* full_path)
 	check_command_in_path(path_arr, cmd, full_path);
 	free_split(path_arr);
 }
-
+*/
 /*
 etrieve the value of the PATH environment variable from an array of
 environment variables. The PATH variable contains a list of directories that

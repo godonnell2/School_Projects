@@ -6,12 +6,12 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 07:36:00 by gro-donn          #+#    #+#              #
-#    Updated: 2024/12/29 08:34:14 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/12 18:14:02 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 SRC = main.c \
 	helper.c \
 	helper_split.c \

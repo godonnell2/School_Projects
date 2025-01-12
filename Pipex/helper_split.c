@@ -6,51 +6,122 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:53:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 19:02:07 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:02:47 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	count_words(char const *s, char c)
+static size_t	count_words(char const *s, char c)
 {
 	size_t	i;
-	size_t	nbr_words;
+	size_t	word_count;
 
-	nbr_words = 0;
+	word_count = 0;
 	i = 0;
 	while (s[i])
 	{
 		while (s[i] == c)
 			i++;
 		if (s[i])
-			nbr_words++;
+			word_count++;
 		while (s[i] != c && s[i])
 			i++;
 	}
-	return (nbr_words);
+	return (word_count);
 }
 
-static char	*copy_word(const char *s, int start, int end, int len)
+static void	skip_separators(const char **s, char sep)
 {
-	char	*word[1000];
-	size_t	i;
-
-	
-	while (start < end)
+	while (**s == sep)
 	{
-		word[i] = s[start];
-		i++;
-		start++;
+		(*s)++;
 	}
-	word[i] = '\0';
-	return (word);
+}
+
+char	**ft_split_buff(char const *s, char sep, void *buff)
+{
+	const char		*start;
+	t_split_state	curr;
+
+	curr.buff_offset = 0;
+	curr.word_count = count_words(s, sep);
+	curr.arr = (char **)(buff + curr.buff_offset);
+	curr.buff_offset += sizeof(char *) * (curr.word_count + 1);
+	curr.word = 0;
+	while (*s)
+	{
+		skip_separators(&s, sep);
+		start = s;
+		while (*s && *s != sep)
+			s++;
+		curr.word_len = s - start;
+		if (curr.buff_offset + curr.word_len + 1 > SPLIT_BUFF_SIZE)
+			return (NULL);
+		curr.arr[curr.word] = (char *)buff + curr.buff_offset;
+		ft_memcpy(curr.arr[curr.word], start, curr.word_len);
+		curr.arr[curr.word++][curr.word_len] = '\0';
+		curr.buff_offset += curr.word_len + 1;
+		skip_separators(&s, sep);
+	}
+	curr.arr[curr.word] = NULL;
+	return (curr.arr);
 }
 
 /*
+
+char	**ft_split_buff(char const *s, char sep, void *buff)
+{
+	size_t		buff_offset;
+	size_t		word_count;
+	char		**arr;
+	size_t		word;
+	size_t		word_len;
+	const char	*start;
+
+	buff_offset = 0;
+	word_count = count_words(s, sep);
+	arr = (char **)(buff + buff_offset);
+	buff_offset += sizeof(char *) * (word_count + 1);
+	if (buff_offset > SPLIT_BUFF_SIZE)
+	{
+		return (NULL);
+	}
+	word = 0;
+	while (*s == sep)
+	{
+		s++;
+	}
+	while (*s)
+	{
+		start = s;
+		while (*s && *s != sep)
+		{
+			s++;
+		}
+		word_len = s - start;
+		if (buff_offset + word_len + 1 > SPLIT_BUFF_SIZE)
+		{
+			return (NULL);
+		}
+		arr[word] = (char *)buff + buff_offset;
+		ft_memcpy(arr[word], start, word_len);
+		arr[word][word_len] = '\0';
+		buff_offset += word_len + 1;
+		word++;
+		while (*s == sep)
+		{
+			s++;
+		}
+	}
+	arr[word] = NULL;
+	return (arr);
+}
+
+*/
+
+/*
 Proposed signature:
-#define SPLIT_BUFF_SIZE 100*1024 //enough?
-char **ft_split_buff(char const *s, char sep, void* buff);
 
 The function uses the buff to:
 - allocate the pointer table
@@ -59,21 +130,20 @@ The function uses the buff to:
 The important thing is to keep track of where in the buffer to write next,
 and make sure it doesn't write beyond SPLIT_BUFF_SIZE.
 
-e.g. 
-size_t buff_offset = 0;
+e.g.
+size_t			buff_offset = 0;
 arr = (char**)buff + buff_offset;
 buff_offset += sizeof(char*) * count_words(s, sep) + 1; // Same as in malloc
 arr[word++] = buff + buff_offset
 // copy all bytes until sep
 buff_offset += end - init + 1; // double check +1
 
-return arr; as before
-
 Usage example:
-char split_buff[SPLIT_BUFF_SIZE];
+char			split_buff[SPLIT_BUFF_SIZE];
 char ** cmd_args = ft_split_buff(av[2], ' ', split_buff);
 */
 
+/*
 char	**ft_split(char const *s, char c)
 {
 	char	**arr;
@@ -103,9 +173,12 @@ char	**ft_split(char const *s, char c)
 	return (arr);
 }
 
-void free_split(char **str)
+
+void	free_split(char **str)
 {
-	int i = 0;
+	int	i;
+
+	i = 0;
 	while(str[i])
 	{
 		free(str[i]);
@@ -113,3 +186,4 @@ void free_split(char **str)
 	}
 	free(str);
 }
+*/

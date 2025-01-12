@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/11 18:17:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/12 17:49:16 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,20 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 		i++;
 	}
 	return (0);
+}
+
+
+void *ft_memcpy(void *dest, const void *src, size_t n)
+{
+    unsigned char *d = (unsigned char *)dest; 
+    const unsigned char *s = (const unsigned char *)src; 
+
+    while (n--)
+    {
+        *d++ = *s++; 
+    }
+
+    return dest; 
 }
 
 char	*cat_strs_char(char *dest, const char *src1, char c, const char *src2)
