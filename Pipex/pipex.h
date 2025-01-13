@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:49:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/13 07:57:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ t_data		init_data(void);
 void		err_case(const char *msg, t_data *data);
 pid_t		first_child(t_data *data, char **av, char **envp);
 pid_t		second_child(t_data *data, int ac, char **av, char **envp);
-void		find_fullpath(char **envp, char *cmd, char *full_path);
+void		resolve_command_full_path(char **envp, char *cmd, char *full_path);
 int			main(int ac, char **av, char **envp);
 
 #endif

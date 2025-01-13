@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:45:27 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/13 07:57:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	char	cmd[PATH_MAX];
 
 	args_cmds = ft_split_buff(av[2], ' ', buff);
-	find_fullpath(envp, args_cmds[0], cmd);
+	resolve_command_full_path(envp, args_cmds[0], cmd);
 	if (cmd[0] == '\0')
 		err_case("Command not found", data);
 	data->input_fd = open(av[1], O_RDONLY);
@@ -47,7 +47,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 
 	close(data->pipe_fd[WRITE]);
 	args_cmd = ft_split_buff(av[3], ' ', buff);
-	find_fullpath(envp, args_cmd[0], cmd);
+	resolve_command_full_path(envp, args_cmd[0], cmd);
 	if (cmd[0] == '\0')
 		err_case("Command not found", data);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);

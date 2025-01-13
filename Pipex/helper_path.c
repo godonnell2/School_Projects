@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:09:17 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/13 08:46:28 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*find_path(char **envp)
+char	*get_env_path_variable(char **envp)
 {
 	int		i;
 	char	*path;
@@ -32,6 +32,8 @@ char	*find_path(char **envp)
 	}
 	return (NULL);
 }
+
+// F_OK check if file(cmd) exists regardless of permissions
 
 static void	check_command_in_path(char **path_arr, char *cmd, char *full_path)
 {
@@ -54,7 +56,7 @@ static void	check_command_in_path(char **path_arr, char *cmd, char *full_path)
 	full_path[0] = '\0';
 }
 
-void	find_fullpath(char **envp, char *cmd, char *full_path)
+void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 {
 	char	buff[SPLIT_BUFF_SIZE];
 	char	**path_arr;
@@ -66,12 +68,19 @@ void	find_fullpath(char **envp, char *cmd, char *full_path)
 		ft_strcpy(cmd, full_path);
 		return ;
 	}
-	path_env = find_path(envp);
+	path_env = get_env_path_variable(envp);
 	if (!path_env)
 		return ;
 	path_arr = ft_split_buff(path_env, ':', buff);
 	check_command_in_path(path_arr, cmd, full_path);
 }
+
+// if ls exists in current folder you copy it to full path and return
+//  otherwise PATH=/usr/local/bin:/usr/bin:/bin
+//  path_arr[0] = "/usr/local/bin"
+// path_arr[1] = "/usr/bin"
+// path_arr[2] = "/bin"
+// path_arr[3] = NULL // Null-terminated
 
 /*
 etrieve the value of the PATH environment variable from an array of
@@ -117,6 +126,5 @@ It adheres to the principle of fail-fast: detecting issues early and
 preventing unpredictable runtime behavior.
 command will only execute once, in the first directory where it is found.
 
-you free path arr at the end in case no valid command is found for full path
-// Free the original memory after usage free(path_arr);
+
 */

@@ -1,1 +1,18 @@
-      10
+Makefile
+a.out
+helper.c
+helper.o
+helper_new.c
+helper_new.o
+helper_path.c
+helper_path.o
+helper_split.c
+helper_split.o
+input.txt
+main.c
+main.o
+outdir
+outfile
+output.txt
+pipex
+pipex.h
