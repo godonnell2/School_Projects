@@ -10,7 +10,7 @@ typedef struct s_map
 {
     int width;        // Number of columns in the map
     int height;       // Number of rows in the map
-    char *array;     // 3D array to hold the map data (z values)
+    int ***array;     // 3D array to hold the map data (z values)
     int z_min;        
     int z_max;       
 } t_map;
@@ -34,5 +34,6 @@ int handle_exit(void *param);
 
 char *read_file_to_buffer(const char *filename);
 void determine_dimensions(const char *buffer, t_map *map);
-
+void allocate_map_array(t_map *map);
+void print_map_array(t_map *map);
 #endif

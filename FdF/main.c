@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/15 10:44:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/15 11:23:19 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,15 @@ int	main(void)
 	
 	char * buffer = read_file_to_buffer("test_maps/basictest.fdf");
 
-
-	 t_map map;
+	t_map map;
 	determine_dimensions(buffer, &map);
-		printf("height=%d\n", map.height);
-		printf("width=%d\n", map.width);
-		
-		exit(1);
-
-
+	allocate_map_array(&map);
+	exit(1);
+	print_map_array(&map);
 	
+	
+	
+
 	ctx.mlx = mlx_init();
 	ctx.mlx_win = mlx_new_window(ctx.mlx, 500, 350, "Hello world!");
 	img.img = mlx_new_image(ctx.mlx, 500, 350);

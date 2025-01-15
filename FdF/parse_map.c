@@ -133,83 +133,8 @@ void determine_dimensions(const char *buffer, t_map *map)
     map->width = width;
 }
 
-/*
-static void allocate_map_array(t_map *map)
-{
-    int ***array;
-    int **rows;
-    int *cells;
-    size_t total_cells = map->height * map->width * 2; // Each cell holds 2 integers
 
-    // Allocate memory for rows and cells in a single block
-    cells = malloc(total_cells * sizeof(int));
-    rows = malloc(map->height * sizeof(int *));
-    array = malloc(map->height * sizeof(int **));
 
-    if (!array || !rows || !cells)
-        handle_error("Memory allocation error for map");
 
-    // Link rows to the cells
-    for (int row = 0; row < map->height; row++)
-    {
-        rows[row] = &cells[row * map->width * 2];
-        array[row] = malloc(map->width * sizeof(int *));
-        if (!array[row])
-            handle_error("Memory allocation error for map row");
 
-        for (int col = 0; col < map->width; col++)
-        {
-            array[row][col] = &rows[row][col * 2];
-        }
-    }
 
-    map->array = array; // Assign the array to the map structure
-}
-
- void free_map(t_map *map)
-{
-    if (map->array)
-    {
-        free(map->array[0][0]); // Free the cells
-        free(map->array[0]);    // Free the row pointers
-        free(map->array);       // Free the array of pointers
-    }
-}
-
-static void find_min_max(t_map *map, int i, int j, int *z_max)
-{
-    static int z_min; // Static variable to hold the minimum value
-
-    if (i == 0 && j == 0) // Initialize z_min on the first call
-        z_min = map->array[0][0][0];
-
-    if (i >= map->height) // Base case: if we have processed all rows
-        return;
-
-    if (j >= map->width) // Move to the next row
-    {
-        find_min_max(map, i + 1, 0, z_max);
-        return;
-    }
-
-    if (map->array[i][j][0] < z_min)
-        z_min = map->array[i][j][0];
-    if (map->array[i][j][0] > *z_max)
-        *z_max = map->array[i][j][0];
-
-    find_min_max(map, i, j + 1, z_max); // Move to the next column
-
-    if (i == map->height - 1 && j == map->width - 1) // On the last call, set the final min value
-    {
-        map->z_min = z_min;
-    }
-}
-
-static void ft_get_z_min_max(t_map *map)
-{
-    int z_max = map->array[0][0][0]; // Initialize z_max to the first element
-    find_min_max(map, 0, 0, &z_max);
-    map->z_max = z_max; // Set the maximum value in the map structure
-}
-
-*/
