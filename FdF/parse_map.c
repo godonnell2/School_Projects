@@ -1,10 +1,13 @@
 #include "fdf.h"
-
+#include <string.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #define BUFFER_SIZE 1024 
 
 void handle_error(const char *message)
 {
-    ft_printf("%s\n", message);
+    printf("%s\n", message);
 	exit (1);
 }
 
@@ -18,21 +21,21 @@ void handle_error(const char *message)
 //FILL WIDTH 
 //FILL HEIGHT 
 ////store MIN MAX 
-static char *read_file_to_buffer(const char *filename)
+char *read_file_to_buffer(const char *filename)
 {
     int fd = open(filename, O_RDONLY);
     if (fd == -1)
-        handle_error("Failed to open file", 1);
+        handle_error("Failed to open file");
 
-    char *buffer = malloc(BUFFER_SIZE + 1);
+    char *buffer = malloc(BUFFER_SIZE +1);
     if (!buffer)
     {
         close(fd);
-        handle_error("Memory allocation error", 1);
+        handle_error("Memory allocation error");
     }
 
-    size_t total_bytes_read = 0;
-    size_t bytes_read;
+    int total_bytes_read = 0;
+    int bytes_read;
 
     while ((bytes_read = read(fd, buffer + total_bytes_read, BUFFER_SIZE)) > 0)
     {
@@ -45,7 +48,7 @@ static char *read_file_to_buffer(const char *filename)
             {
                 free(buffer);
                 close(fd);
-                handle_error("Memory allocation error", 1);
+                handle_error("Memory allocation error");
             }
             memcpy(new_buffer, buffer, total_bytes_read);
             free(buffer);
@@ -57,7 +60,7 @@ static char *read_file_to_buffer(const char *filename)
     {
         free(buffer);
         close(fd);
-        handle_error("Error reading file", 1);
+        handle_error("Error reading file");
     }
 
     buffer[total_bytes_read] = '\0';
@@ -65,12 +68,13 @@ static char *read_file_to_buffer(const char *filename)
     return buffer;
 }
 
+
 static int count_words(const char *line)
 {
     int count = 0;
     int in_word = 0;
 
-    while (*line)
+    while (*line && *line != '\n')
     {
         if (*line != ' ' && !in_word)
         {
@@ -87,7 +91,7 @@ static int count_words(const char *line)
     return count;
 }
 
-static void determine_dimensions(const char *buffer, t_map *map)
+void determine_dimensions(const char *buffer, t_map *map)
 {
     int height = 0;
     int width = 0;
@@ -108,6 +112,7 @@ static void determine_dimensions(const char *buffer, t_map *map)
 
             if (first_line)
             {
+                
                 width = current_width;
                 first_line = 0;
             }
@@ -115,19 +120,20 @@ static void determine_dimensions(const char *buffer, t_map *map)
             {
                 handle_error("Error: inconsistent width in map data");
             }
-
-            height++;
+            
         }
 
         if (*buffer == '\n')
         {
             buffer++;
+            height++;
         }
     }
     map->height = height;
     map->width = width;
 }
 
+/*
 static void allocate_map_array(t_map *map)
 {
     int ***array;
@@ -205,3 +211,5 @@ static void ft_get_z_min_max(t_map *map)
     find_min_max(map, 0, 0, &z_max);
     map->z_max = z_max; // Set the maximum value in the map structure
 }
+
+*/

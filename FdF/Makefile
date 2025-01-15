@@ -6,16 +6,17 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/13 09:25:24 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/15 10:30:16 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Iminilibx_macos 
+CFLAGS = -Wall -Wextra -Werror -g -Iminilibx_macos 
 #linker flags
 LDFLAGS = -L ./minilibx_macos \
     -l mlx -framework OpenGL -framework Appkit
-SRC = main.c 
+SRC = main.c parse_map.c keymouse_controls.c 
+		
 	
 
 OBJ = $(SRC:.c=.o)

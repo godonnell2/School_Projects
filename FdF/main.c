@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/14 13:27:14 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/15 10:44:35 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,37 +54,24 @@ void    draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
 	}
 }
 
-int handle_exit(void *param)
-{
-	printf("exiting\n");
-    t_mlx_context *ctx = (t_mlx_context *)param;
 
-    if (ctx->mlx_win)
-        mlx_destroy_window(ctx->mlx, ctx->mlx_win);
-
-    // Perform additional cleanup here if needed
-
-    exit(0);
-}
-// 65307 is the keycode for ESC in MLX on Linux (X11)
-int handle_keypress(int keycode, void *param)
-{
-	printf("keycode=%d\n", keycode);
-	//53 mac
-    if (keycode == 65307 || keycode == 53) 
-    {
-        handle_exit(param);
-    }
-    return (0);
-}
-
-
+//Specialised event handlers
 int	main(void)
 {
-	//void	*mlx;
-	//void	*mlx_win;
 	t_data	img;
 	t_mlx_context ctx;
+	
+	char * buffer = read_file_to_buffer("test_maps/basictest.fdf");
+
+
+	 t_map map;
+	determine_dimensions(buffer, &map);
+		printf("height=%d\n", map.height);
+		printf("width=%d\n", map.width);
+		
+		exit(1);
+
+
 	
 	ctx.mlx = mlx_init();
 	ctx.mlx_win = mlx_new_window(ctx.mlx, 500, 350, "Hello world!");
@@ -99,13 +86,15 @@ int	main(void)
 	mlx_put_image_to_window(ctx.mlx, ctx.mlx_win, img.img, 0, 0);
 	
 	
-
-	 // Hook event handlers
-    mlx_hook(ctx.mlx_win, 17, 0, handle_exit, &ctx);      // Close button
-    mlx_key_hook(ctx.mlx_win, handle_keypress, &ctx);     // Key press
-
+    mlx_hook(ctx.mlx_win, 17, 0, handle_exit, &ctx);      
+    mlx_key_hook(ctx.mlx_win, handle_keypress, &ctx);   
+	
 	// NEED TO BE AT END!!!
 	mlx_loop(ctx.mlx);
 }
+//17 = DestroyNotify    NAME OF LIB used by minilibx for linux = x11 x.h    
+//OS has told x that the window close button has been pressed  
+// 0 is the mask it says no mask! look at ALL bits
+// (otherwise can bit shift for more specficity)
 //a triangle is a shape where three lines connect  
 //2 lines meet at each point 
