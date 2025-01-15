@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/13 07:57:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/15 20:05:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 		err_case("Command not found", data);
 	data->input_fd = open(av[1], O_RDONLY);
 	if (data->input_fd < 0)
-		err_case("failure to open input file", data);
+		err_case("pipex: : No such file or directory", data);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case("fork for first child failed", data);
