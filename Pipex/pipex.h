@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 12:23:05 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/17 13:10:36 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ void		resolve_command_full_path(char **envp, char *cmd, char *full_path);
 void		ft_printf(const char *mandatory_string, ...);
 void		err_case_printf(char **av, t_data *data);
 void	err_case_cmd(t_data *data, char **av);
+void	err_case_file_one(t_data *data, char **av);
+void	err_case_cmd_two(t_data *data, char **av);
 int			main(int ac, char **av, char **envp);
 
 #endif

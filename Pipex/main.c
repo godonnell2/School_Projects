@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 12:10:41 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/17 13:11:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 		err_case_cmd(data, av);
 	data->input_fd = open(av[1], O_RDONLY);
 	if(data->input_fd < 0)
-		err_case(data, av);
+		err_case_file_one(data, av);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case(data, av);
@@ -35,7 +35,7 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	close(data->pipe_fd[WRITE]);
 	close(data->input_fd);
 	execve(cmd, args_cmds, envp);
-	perror("\033[31mError");
+	perror("");
 	exit(EXIT_FAILURE);
 }
 
@@ -49,7 +49,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	args_cmd = ft_split_buff(av[3], ' ', buff);
 	resolve_command_full_path(envp, args_cmd[0], cmd);
 	if (cmd[0] == '\0')
-		err_case_cmd(data, av);
+		err_case_cmd_two(data, av);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (data->output_fd < 0)
 		err_case(data, av);
@@ -63,7 +63,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	close(data->pipe_fd[READ]);
 	close(data->output_fd);
 	execve(cmd, args_cmd, envp);
-	perror("\033[31mError");
+	perror("");
 	exit(EXIT_FAILURE);
 }
 
