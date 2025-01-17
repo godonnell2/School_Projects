@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:01:48 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:31:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/17 12:24:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,31 @@ t_data	init_data(void)
 	return (data);
 }
 
-void	err_case(const char *msg, t_data *data)
+void	err_case_cmd(t_data *data, char **av)
 {
-	perror(msg);
+        ft_printf("\033[31m%s: Error: Command not found\n", av[0]);
+  
+	if (data)
+	{
+		if (data->input_fd > -1)
+		{
+			close(data->input_fd);
+		}
+		if (data->output_fd > -1)
+		{
+			close(data->output_fd);
+		}
+	}
+	exit(1);
+}
+
+// perror prints the most recent system error 
+void	err_case(t_data *data, char **av)
+{
+	
+     ft_printf("\033[31m%s: Error: ", av[0]);
+  
+    perror("");
 	if (data)
 	{
 		if (data->input_fd > -1)

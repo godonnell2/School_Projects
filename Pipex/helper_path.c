@@ -75,10 +75,6 @@ void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 	check_command_in_path(path_arr, cmd, full_path);
 }
 
-
-
-
-
 // if ls exists in current folder you copy it to full path and return
 //  otherwise PATH=/usr/local/bin:/usr/bin:/bin
 //  path_arr[0] = "/usr/local/bin"

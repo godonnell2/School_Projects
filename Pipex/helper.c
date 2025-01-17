@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/12 20:32:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/16 09:10:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	ft_putstr_fd(char *s, int fd)
+void	ft_putstring_fd(char *s, int fd)
 {
 	write(fd, s, ft_wordlen(s));
 }
