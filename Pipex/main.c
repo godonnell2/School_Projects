@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/18 09:52:01 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/18 19:41:02 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,16 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	args_cmds = ft_split_buff(av[2], ' ', buff);
 	resolve_command_full_path(envp, args_cmds[0], cmd);
 	if (cmd[0] == '\0')
-		err_case_extra(data, av, 3);
+		err_case_cmd(data, av, 2);
 	data->input_fd = open(av[1], O_RDONLY);
 	if (data->input_fd < 0)
-		err_case_extra(data, av, 1);
+		err_case_perror(data, av, 1);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case(data, av);
 	if (data->pid1 != 0)
-		return (data->pid1);
-	if (dup2(data->pipe_fd[WRITE], OUT) < 0 || dup2(data->input_fd, IN) < 0)
+			return (data->pid1);
+	if (dup2(data->input_fd, IN) < 0 || dup2(data->pipe_fd[WRITE], OUT) < 0)
 		err_case(data, av);
 	close(data->pipe_fd[WRITE]);
 	close(data->input_fd);
@@ -49,10 +49,10 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	args_cmd = ft_split_buff(av[3], ' ', buff);
 	resolve_command_full_path(envp, args_cmd[0], cmd);
 	if (cmd[0] == '\0')
-		err_case_extra(data, av, 2);
+		err_case_cmd(data, av, 3);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (data->output_fd < 0)
-		err_case(data, av);
+		err_case_perror(data, av, ac-1);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case(data, av);
@@ -86,6 +86,7 @@ int	main(int ac, char **av, char **envp)
 	close(data.pipe_fd[WRITE]);
 	waitpid(data.pid1, NULL, 0);
 	waitpid(data.pid2, &exit_code, 0);
+	close(data.input_fd);
 	return (exit_code);
 }
 

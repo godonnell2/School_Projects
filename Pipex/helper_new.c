@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:01:48 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/18 10:02:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/18 19:39:11 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,9 @@ t_data	init_data(void)
 	return (data);
 }
 
-void	err_case_extra(t_data *data, char **av, int i)
+static void close_exit(t_data *data)
 {
-	ft_printf("%s: %s: command not found\n", av[0], av[i]);
-	if (data)
+if (data)
 	{
 		if (data->input_fd > -1)
 		{
@@ -40,28 +39,45 @@ void	err_case_extra(t_data *data, char **av, int i)
 		{
 			close(data->output_fd);
 		}
+		if(data->pipe_fd[READ] > -1)
+		{
+			
+			close(data->pipe_fd[READ]);
+		
+		}
+		if(data->pipe_fd[WRITE] > -1)
+		{
+		close(data->pipe_fd[WRITE]);
+		}
 	}
 	exit(1);
 }
+
+void	err_case_cmd(t_data *data, char **av, int i)
+{
+	ft_printf("%s: %s: command not found\n", av[0], av[i]);
+	close_exit(data);
+	
+}
+
+void	err_case_perror(t_data *data, char **av, int i)
+{
+	ft_printf("%s: %s: ", av[0], av[i]);
+	perror("");
+	close_exit(data);
+	
+}
+
 
 // perror prints the most recent system error
 void	err_case(t_data *data, char **av)
 {
 	ft_printf("%s: ", av[0]);
 	perror("");
-	if (data)
-	{
-		if (data->input_fd > -1)
-		{
-			close(data->input_fd);
-		}
-		if (data->output_fd > -1)
-		{
-			close(data->output_fd);
-		}
-	}
-	exit(1);
+	close_exit(data);
+	
 }
+
 
 char	*cat_strs_char(char *dest, const char *src1, char c, const char *src2)
 {
