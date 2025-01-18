@@ -29,7 +29,7 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	if (data->pid1 < 0)
 		err_case(data, av);
 	if (data->pid1 != 0)
-			return (data->pid1);
+		return (data->pid1);
 	if (dup2(data->input_fd, IN) < 0 || dup2(data->pipe_fd[WRITE], OUT) < 0)
 		err_case(data, av);
 	close(data->pipe_fd[WRITE]);
@@ -52,7 +52,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 		err_case_cmd(data, av, 3);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (data->output_fd < 0)
-		err_case_perror(data, av, ac-1);
+		err_case_perror(data, av, ac - 1);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case(data, av);

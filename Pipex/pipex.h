@@ -60,7 +60,7 @@ t_data		init_data(void);
 
 void		err_case(t_data *data, char **av);
 void		err_case_cmd(t_data *data, char **av, int i);
-void	err_case_perror(t_data *data, char **av, int i);
+void		err_case_perror(t_data *data, char **av, int i);
 
 pid_t		first_child(t_data *data, char **av, char **envp);
 pid_t		second_child(t_data *data, int ac, char **av, char **envp);
