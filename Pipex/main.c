@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 13:11:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/18 09:52:01 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	args_cmds = ft_split_buff(av[2], ' ', buff);
 	resolve_command_full_path(envp, args_cmds[0], cmd);
 	if (cmd[0] == '\0')
-		err_case_cmd(data, av);
+		err_case_extra(data, av, 3);
 	data->input_fd = open(av[1], O_RDONLY);
-	if(data->input_fd < 0)
-		err_case_file_one(data, av);
+	if (data->input_fd < 0)
+		err_case_extra(data, av, 1);
 	data->pid1 = fork();
 	if (data->pid1 < 0)
 		err_case(data, av);
@@ -49,7 +49,7 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 	args_cmd = ft_split_buff(av[3], ' ', buff);
 	resolve_command_full_path(envp, args_cmd[0], cmd);
 	if (cmd[0] == '\0')
-		err_case_cmd_two(data, av);
+		err_case_extra(data, av, 2);
 	data->output_fd = open(av[ac - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (data->output_fd < 0)
 		err_case(data, av);
@@ -70,17 +70,18 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 int	main(int ac, char **av, char **envp)
 {
 	t_data	data;
-	int exit_code = 0;
-	
+	int		exit_code;
+
+	exit_code = 0;
 	if (ac != 5)
 		print_usage();
 	data = init_data();
 	if (pipe(data.pipe_fd) < 0)
-		err_case( &data, av);
+		err_case(&data, av);
 	if (first_child(&data, av, envp) < 0)
-		err_case( &data, av);
+		err_case(&data, av);
 	if (second_child(&data, ac, av, envp) < 0)
-		err_case( &data, av);
+		err_case(&data, av);
 	close(data.pipe_fd[READ]);
 	close(data.pipe_fd[WRITE]);
 	waitpid(data.pid1, NULL, 0);

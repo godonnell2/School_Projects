@@ -6,5 +6,3 @@ lines
 we need
 to do a bit
 more but we are very
-close 
-close

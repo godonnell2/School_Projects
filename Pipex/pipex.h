@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 13:10:36 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/18 09:53:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,15 +57,16 @@ void		*ft_memcpy(void *dest, const void *src, size_t n);
 char		**ft_split_buff(char const *s, char sep, void *buff);
 void		print_usage(void);
 t_data		init_data(void);
-void		err_case(t_data *data, char**av);
+void		err_case(t_data *data, char **av);
 pid_t		first_child(t_data *data, char **av, char **envp);
 pid_t		second_child(t_data *data, int ac, char **av, char **envp);
 void		resolve_command_full_path(char **envp, char *cmd, char *full_path);
 void		ft_printf(const char *mandatory_string, ...);
-void		err_case_printf(char **av, t_data *data);
-void	err_case_cmd(t_data *data, char **av);
-void	err_case_file_one(t_data *data, char **av);
-void	err_case_cmd_two(t_data *data, char **av);
+void		err_case_extra(t_data *data, char **av, int i);
 int			main(int ac, char **av, char **envp);
+
+void		ft_printchar(char c, int fd);
+char		*ft_strchr(const char *s, int c);
+void		ft_putstr_fd(char *s, int fd);
 
 #endif
