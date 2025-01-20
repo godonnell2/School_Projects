@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/18 19:41:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 14:37:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ pid_t	first_child(t_data *data, char **av, char **envp)
 	char	cmd[PATH_MAX];
 
 	args_cmds = ft_split_buff(av[2], ' ', buff);
+	if (args_cmds[0] == NULL)
+		err_case_cmd(data, av, 2);
 	resolve_command_full_path(envp, args_cmds[0], cmd);
 	if (cmd[0] == '\0')
 		err_case_cmd(data, av, 2);
@@ -47,6 +49,8 @@ pid_t	second_child(t_data *data, int ac, char **av, char **envp)
 
 	close(data->pipe_fd[WRITE]);
 	args_cmd = ft_split_buff(av[3], ' ', buff);
+	if (args_cmd[0] == NULL)
+		err_case_cmd(data, av, 2);
 	resolve_command_full_path(envp, args_cmd[0], cmd);
 	if (cmd[0] == '\0')
 		err_case_cmd(data, av, 3);
@@ -89,7 +93,22 @@ int	main(int ac, char **av, char **envp)
 	close(data.input_fd);
 	return (exit_code);
 }
+/*
+ERROR ONE!!
+valgrind --trace-children=yes --track-fds=yes ./pipex infile "" "" FIXED 
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cat" "" out BROKEN!!!
+maybe this is an issue with if data->pid != 0 return data->pid
 
+ERROR TWO!!
+valgrind --trace-children=yes --track-fds=yes input.txt "cd" "wc -l" pwd
+one extra open fd NOT SURE ABOUT THIS ONE 
+
+ERROR THREE
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "sleep 1" "sleep 4" out
+
+Need to protect against no ENV
+  
+*/
 /*
 returns a pid_t, which is the process ID of the created child process
 3 params:

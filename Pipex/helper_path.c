@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 15:56:06 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 14:49:11 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,16 @@ void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 	char	*path_env;
 
 	full_path[0] = '\0';
+
 	if (access(cmd, F_OK) == 0)
 	{
 		ft_strcpy(cmd, full_path);
 		return ;
 	}
+	if (full_path)
+    printf("PATH: %s\n", full_path);
+else
+    printf("PATH variable not set.\n");
 	path_env = get_env_path_variable(envp);
 	if (!path_env)
 		return ;
