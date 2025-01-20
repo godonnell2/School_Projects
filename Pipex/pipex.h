@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/18 19:35:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 21:14:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,12 @@ typedef struct s_data
 	int		output_fd;
 	pid_t	pid1;
 	pid_t	pid2;
+	 char buff[SPLIT_BUFF_SIZE];
+	char buff_two[SPLIT_BUFF_SIZE];
+	char **cmd1_args;
+    char **cmd2_args;
+	char cmd1_fullpath[PATH_MAX];
+	char cmd2_fullpath[PATH_MAX];
 }			t_data;
 
 typedef struct s_split_state
@@ -57,6 +63,7 @@ void		*ft_memcpy(void *dest, const void *src, size_t n);
 char		**ft_split_buff(char const *s, char sep, void *buff);
 void		print_usage(void);
 t_data		init_data(void);
+void	close_data(t_data *data);
 
 void		err_case(t_data *data, char **av);
 void		err_case_cmd(t_data *data, char **av, int i);

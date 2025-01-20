@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 14:49:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 21:05:58 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void	check_command_in_path(char **path_arr, char *cmd, char *full_path)
 		if ((p_len + c_len + 2) > PATH_MAX)
 			return ;
 		cat_strs_char(full_path, *temp_patharr, '/', cmd);
-		if (access(full_path, F_OK) == 0)
+		if (access(full_path, X_OK) == 0)
 			return ;
 		temp_patharr++;
 	}
@@ -64,15 +64,12 @@ void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 
 	full_path[0] = '\0';
 
-	if (access(cmd, F_OK) == 0)
+	if (access(cmd, X_OK) == 0)
 	{
 		ft_strcpy(cmd, full_path);
 		return ;
 	}
-	if (full_path)
-    printf("PATH: %s\n", full_path);
-else
-    printf("PATH variable not set.\n");
+	
 	path_env = get_env_path_variable(envp);
 	if (!path_env)
 		return ;
