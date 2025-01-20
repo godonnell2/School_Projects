@@ -63,13 +63,11 @@ void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 	char	*path_env;
 
 	full_path[0] = '\0';
-
 	if (access(cmd, X_OK) == 0)
 	{
 		ft_strcpy(cmd, full_path);
 		return ;
 	}
-	
 	path_env = get_env_path_variable(envp);
 	if (!path_env)
 		return ;

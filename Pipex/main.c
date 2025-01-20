@@ -6,126 +6,113 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 21:49:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 21:54:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int validate_input_and_commands(t_data *data, char **av, char **envp)
+int	validate_input_and_commands(t_data *data, char **av, char **envp)
 {
-
-    data->input_fd = open(av[1], O_RDONLY);
-    if (data->input_fd < 0) {
-        err_case_perror(data, av, 1);
-    }
-    data->cmd1_args = ft_split_buff(av[2], ' ', data->buff);
-    if (data->cmd1_args[0] == NULL) 
+	data->input_fd = open(av[1], O_RDONLY);
+	if (data->input_fd < 0)
+		err_case_perror(data, av, 1);
+	data->cmd1_args = ft_split_buff(av[2], ' ', data->buff);
+	if (data->cmd1_args[0] == NULL)
+		err_case_cmd(data, av, 2);
+	resolve_command_full_path(envp, data->cmd1_args[0], data->cmd1_fullpath);
+	if (data->cmd1_fullpath[0] == '\0')
 	{
-        err_case_cmd(data, av, 2);
-    }
-    resolve_command_full_path(envp, data->cmd1_args[0], data->cmd1_fullpath);
-    if (data->cmd1_fullpath[0] == '\0') 
+		err_case_cmd(data, av, 2);
+	}
+	data->cmd2_args = ft_split_buff(av[3], ' ', data->buff_two);
+	if (data->cmd2_args[0] == NULL)
 	{
-        err_case_cmd(data, av, 2);
-    }
-
-    data->cmd2_args = ft_split_buff(av[3], ' ', data->buff_two);
-    if (data->cmd2_args[0] == NULL) 
+		err_case_cmd(data, av, 3);
+	}
+	resolve_command_full_path(envp, data->cmd2_args[0], data->cmd2_fullpath);
+	if (data->cmd2_fullpath[0] == '\0')
 	{
-        err_case_cmd(data, av, 3);
-    }
-    resolve_command_full_path(envp, data->cmd2_args[0], data->cmd2_fullpath);
-    if (data->cmd2_fullpath[0] == '\0') {
-        err_case_cmd(data, av, 3);
-    }
-   
-    return 1;
+		err_case_cmd(data, av, 3);
+	}
+	return (1);
 }
 
-int main(int ac, char **av, char **envp)
+int	main(int ac, char **av, char **envp)
 {
-    t_data data;
-    int exit_code;
+	t_data	data;
+	int		exit_code;
 
-    exit_code = 0;
-    if (ac != 5)
-        print_usage();
-
-    data = init_data();
-
-    if (!validate_input_and_commands(&data, av, envp) )
-	 {
-        return 1;
-    }
-	
-    if (pipe(data.pipe_fd) < 0)
-        err_case(&data, av);
-		
-printf("fds input=%d pipe[0]=%d pipe[1]=%d\n", data.input_fd, data.pipe_fd[0], data.pipe_fd[1]);
-    data.pid1 = fork();
-	
-    if (data.pid1 < 0)
-        err_case(&data, av);
-    if (data.pid1 == 0) 
+	exit_code = 0;
+	if (ac != 5)
+		print_usage();
+	data = init_data();
+	if (!validate_input_and_commands(&data, av, envp))
 	{
+		return (1);
+	}
+	if (pipe(data.pipe_fd) < 0)
+		err_case(&data, av);
 	
-        if (dup2(data.input_fd, IN) < 0 || dup2(data.pipe_fd[WRITE], OUT) < 0)
-            err_case(&data, av);
+	data.pid1 = fork();
+	if (data.pid1 < 0)
+		err_case(&data, av);
+	if (data.pid1 == 0)
+	{
+		if (dup2(data.input_fd, IN) < 0 || dup2(data.pipe_fd[WRITE], OUT) < 0)
+			err_case(&data, av);
 		close(data.pipe_fd[READ]);
-        close(data.pipe_fd[WRITE]);
-        close(data.input_fd);	
-        execve(data.cmd1_fullpath, data.cmd1_args, envp);
-        perror("TEST"); 
-        exit(EXIT_FAILURE);
-    }
+		close(data.pipe_fd[WRITE]);
+		close(data.input_fd);
+		execve(data.cmd1_fullpath, data.cmd1_args, envp);
+		perror("TEST");
+		exit(EXIT_FAILURE);
+	}
 	close(data.pipe_fd[WRITE]);
-    close(data.input_fd);
-		
+	close(data.input_fd);
 	data.output_fd = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (data.output_fd < 0)
-    	err_case_perror(&data, av, ac-1);
-		
-    data.pid2 = fork();
-    if (data.pid2 < 0)
-        err_case(&data, av);
-    if(data.pid2 == 0)
+		err_case_perror(&data, av, ac - 1);
+	data.pid2 = fork();
+	if (data.pid2 < 0)
+		err_case(&data, av);
+	if (data.pid2 == 0)
 	{
-    	if (dup2(data.pipe_fd[READ], IN) < 0 || dup2(data.output_fd, OUT) < 0)
-            err_case(&data, av);
-        close(data.pipe_fd[READ]);
-        close(data.output_fd);
-        execve(data.cmd2_fullpath, data.cmd2_args , envp);
-        perror("");
-        exit(EXIT_FAILURE);
-    
+		if (dup2(data.pipe_fd[READ], IN) < 0 || dup2(data.output_fd, OUT) < 0)
+			err_case(&data, av);
+		close(data.pipe_fd[READ]);
+		close(data.output_fd);
+		execve(data.cmd2_fullpath, data.cmd2_args, envp);
+		perror("");
+		exit(EXIT_FAILURE);
 	}
-    
-    close(data.pipe_fd[READ]);
-    close(data.output_fd);
-    waitpid(data.pid1, NULL, 0);
-    waitpid(data.pid2, &exit_code, 0);
-    close_data(&data);
-    return exit_code;
+	close(data.pipe_fd[READ]);
+	close(data.output_fd);
+	waitpid(data.pid1, NULL, 0);
+	waitpid(data.pid2, &exit_code, 0);
+	close_data(&data);
+	return (exit_code);
 }
-
 
 /*
 ERROR ONE!!
-valgrind --trace-children=yes --track-fds=yes ./pipex infile "" "" FIXED 
-valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cat" "" out FIXED I THINK??!!!
+valgrind --trace-children=yes --track-fds=yes ./pipex infile "" "" FIXED
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cat" "" out 
+FIXED I THINK??!!!
 maybe this is an issue with if data->pid != 0 return data->pid
 
 ERROR TWO!!
 valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cd" "wc -l" pwd
-one extra open fd NOT SURE ABOUT THIS ONE 
+one extra open fd NOT SURE ABOUT THIS ONE
 
 ERROR THREE
-valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "sleep 1" "sleep 10" out
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "sleep 1" 
+"sleep 10" out
 time ./pipex input.txt "sleep 2" "sleep 2" out
-
+printf("fds input=%d pipe[0]=%d pipe[1]=%d\n", data.input_fd,
+		data.pipe_fd[0], data.pipe_fd[1]);
 Need to protect against no ENV
-  
+
 */
 /*
 returns a pid_t, which is the process ID of the created child process
