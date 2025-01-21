@@ -134,7 +134,18 @@ void determine_dimensions(const char *buffer, t_map *map)
 }
 
 
-
+char* read_map_into_array(t_map *map)
+{
+    int array_size = (map->height -'0')* (map->width -'0');
+    char* map_array = malloc(array_size * sizeof(char));
+    int height = map->height -'0'; 
+    while(height > 0)
+    {
+        map_array = read_file_to_buffer("basic_test");
+        height--;
+    }
+    return map_array;
+}
 
 
 

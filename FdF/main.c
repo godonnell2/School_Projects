@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/15 11:23:19 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/21 13:04:11 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,12 @@ int	main(void)
 
 	t_map map;
 	determine_dimensions(buffer, &map);
-	allocate_map_array(&map);
+	//allocate_map_array(&map);
+	char *map_array = read_map_into_array(&map);
+	
+	printf("map_array=\n%s\n", map_array); 
+	
 	exit(1);
-	print_map_array(&map);
-	
-	
 	
 
 	ctx.mlx = mlx_init();
@@ -94,6 +95,6 @@ int	main(void)
 //17 = DestroyNotify    NAME OF LIB used by minilibx for linux = x11 x.h    
 //OS has told x that the window close button has been pressed  
 // 0 is the mask it says no mask! look at ALL bits
-// (otherwise can bit shift for more specficity)
+// (otherwise can bit shift for more specificity)
 //a triangle is a shape where three lines connect  
 //2 lines meet at each point 

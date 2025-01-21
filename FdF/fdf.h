@@ -34,6 +34,7 @@ int handle_exit(void *param);
 
 char *read_file_to_buffer(const char *filename);
 void determine_dimensions(const char *buffer, t_map *map);
-void allocate_map_array(t_map *map);
+//void allocate_map_array(t_map *map);
+char *read_map_into_array(t_map *map);
 void print_map_array(t_map *map);
 #endif
