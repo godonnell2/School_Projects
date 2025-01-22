@@ -11,8 +11,8 @@ typedef struct s_map
     int width;        // Number of columns in the map
     int height;       // Number of rows in the map
     int ***array;     // 3D array to hold the map data (z values)
-    int z_min;        
-    int z_max;       
+    long z_min;        
+    long z_max;       
 } t_map;
 
 typedef struct s_mlx_context 
@@ -34,7 +34,8 @@ int handle_exit(void *param);
 
 char *read_file_to_buffer(const char *filename);
 void determine_dimensions(const char *buffer, t_map *map);
-//void allocate_map_array(t_map *map);
-char *read_map_into_array(t_map *map);
+
+void find_min_max(long *array, int array_size, t_map *map);
+long *read_map_into_array(t_map *map, char *buffer);
 void print_map_array(t_map *map);
 #endif

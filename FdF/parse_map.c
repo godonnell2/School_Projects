@@ -134,18 +134,65 @@ void determine_dimensions(const char *buffer, t_map *map)
 }
 
 
-char* read_map_into_array(t_map *map)
+long * read_map_into_array(t_map *map, char *buffer)
 {
-    int array_size = (map->height -'0')* (map->width -'0');
-    char* map_array = malloc(array_size * sizeof(char));
-    int height = map->height -'0'; 
-    while(height > 0)
+    int array_size = map->height * map->width;
+   long * map_array = malloc(array_size * sizeof(long));
+    int i = 0;
+    char *tmp_buff = buffer;
+    while(i < array_size)
     {
-        map_array = read_file_to_buffer("basic_test");
-        height--;
+        map_array[i] =  atol(tmp_buff);
+        
+        while (*tmp_buff != '\n' && *tmp_buff != ' ')
+        {
+            tmp_buff++;
+        }
+        tmp_buff++;
+        i++;
+   
     }
+       if (i < array_size) 
+       {
+        fprintf(stderr, "Warning: Expected %d elements, but read %d elements.\n", array_size, i);
+     }
     return map_array;
+    
 }
 
+
+#include <limits.h>
+
+void find_min_max(long *array, int array_size, t_map *map) {
+    if (array_size <= 0)
+     {
+     
+        map->z_min = 0; 
+        map->z_max = 0; 
+        return;
+    }
+
+  
+   map->z_min = array[0];
+   map->z_max = array[0];
+
+   int i = 1; 
+   while (i < array_size)
+    {
+        if (array[i] < map->z_min) {
+            map->z_min = array[i];
+        }
+        if (array[i] > map->z_max) {
+            map->z_max = array[i];
+        }
+        i++;
+    }
+}
+
+// read ints and skip newlines and spaces until EOF or all
+//  (then check how many elements you were expecting)
+//Convert 3d pts to 2dpts
+// find the edges and the vertices
+//find min and max FINISHED
 
 

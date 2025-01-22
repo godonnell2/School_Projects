@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/21 13:04:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/22 16:44:12 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,28 @@ int	main(void)
 	t_data	img;
 	t_mlx_context ctx;
 	
-	char * buffer = read_file_to_buffer("test_maps/basictest.fdf");
+	char * buffer = read_file_to_buffer("test_maps/100-6.fdf");
 
 	t_map map;
 	determine_dimensions(buffer, &map);
-	//allocate_map_array(&map);
-	char *map_array = read_map_into_array(&map);
+
+	 long *map_array = read_map_into_array(&map, buffer);
+	  int array_size = map.height * map.width;
+	 find_min_max(map_array, array_size, &map);
+	// int i = 0;
 	
-	printf("map_array=\n%s\n", map_array); 
-	
+	// printf("map.width:%i\n", map.width);
+// while(i < array_size)
+// {
+//         printf("%ld, ", map_array[i]);
+// 		i++;
+// 		if(i% map.width == 0 )
+// 		{
+// 			//printf("each line:%i\n", map.width);
+// 			 printf("\n");
+// 		}
+// }
+	printf("%ld, %ld", map.z_min, map.z_max);
 	exit(1);
 	
 
