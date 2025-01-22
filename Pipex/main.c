@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 21:54:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/20 22:11:34 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,82 @@ int	validate_input_and_commands(t_data *data, char **av, char **envp)
 	return (1);
 }
 
+void handle_first_child(t_data *data, char **envp)
+{
+    if (dup2(data->input_fd, IN) < 0 || dup2(data->pipe_fd[WRITE], OUT) < 0)
+        err_case(data, NULL);
+    close(data->pipe_fd[READ]);
+    close(data->pipe_fd[WRITE]);
+    close(data->input_fd);
+    execve(data->cmd1_fullpath, data->cmd1_args, envp);
+    perror("");
+    exit(EXIT_FAILURE);
+}
+
+void handle_second_child(t_data *data, char **av, char **envp)
+{
+    data->output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (data->output_fd < 0)
+        err_case_perror(data, av, 4);
+
+    if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
+        err_case(data, NULL);
+    close(data->pipe_fd[READ]);
+    close(data->output_fd);
+    execve(data->cmd2_fullpath, data->cmd2_args, envp);
+    perror("");
+    exit(EXIT_FAILURE);
+}
+
+void create_pipes_and_forks(t_data *data, char **av, char **envp)
+{
+    if (pipe(data->pipe_fd) < 0)
+        err_case(data, NULL);
+
+    data->pid1 = fork();
+    if (data->pid1 < 0)
+        err_case(data, NULL);
+    if (data->pid1 == 0)
+        handle_first_child(data, envp);
+
+    close(data->pipe_fd[WRITE]);
+
+    data->pid2 = fork();
+    if (data->pid2 < 0)
+        err_case(data, NULL);
+    if (data->pid2 == 0)
+        handle_second_child(data, av, envp);
+
+    close(data->pipe_fd[READ]);
+}
+
+void wait_for_children(t_data *data, int *exit_code)
+{
+    waitpid(data->pid1, NULL, 0);
+    waitpid(data->pid2, exit_code, 0);
+}
+
+int main(int ac, char **av, char **envp)
+{
+    t_data data;
+    int exit_code;
+
+    if (ac != 5)
+        print_usage();
+
+    data = init_data();
+    if (!validate_input_and_commands(&data, av, envp))
+        return (1);
+
+    create_pipes_and_forks(&data, av, envp);
+    wait_for_children(&data, &exit_code);
+
+    close_data(&data);
+    return (exit_code);
+}
+
+
+/*
 int	main(int ac, char **av, char **envp)
 {
 	t_data	data;
@@ -65,7 +141,7 @@ int	main(int ac, char **av, char **envp)
 		close(data.pipe_fd[WRITE]);
 		close(data.input_fd);
 		execve(data.cmd1_fullpath, data.cmd1_args, envp);
-		perror("TEST");
+		perror("");
 		exit(EXIT_FAILURE);
 	}
 	close(data.pipe_fd[WRITE]);
@@ -93,6 +169,7 @@ int	main(int ac, char **av, char **envp)
 	close_data(&data);
 	return (exit_code);
 }
+*/
 
 /*
 ERROR ONE!!
