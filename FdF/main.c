@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/22 16:44:12 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/22 20:37:35 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	main(void)
 	t_data	img;
 	t_mlx_context ctx;
 	
-	char * buffer = read_file_to_buffer("test_maps/100-6.fdf");
+	char * buffer = read_file_to_buffer("test_maps/basictest.fdf");
 
 	t_map map;
 	determine_dimensions(buffer, &map);
@@ -82,7 +82,23 @@ int	main(void)
 // 			 printf("\n");
 // 		}
 // }
-	printf("%ld, %ld", map.z_min, map.z_max);
+	//printf("%ld, %ld", map.z_min, map.z_max);
+	 t_point3d *points = malloc(map.height * map.width * sizeof(t_point3d));
+	 generate_3d_points(&map, map_array, points);
+
+    // Print the generated 3D points
+    // for (int i = 0; i < map.height * map.width; i++) {
+    //     printf("Point %d: (x: %f, y: %f, z: %f)\n", i, points[i].x, points[i].y, points[i].z);
+    // }
+
+	
+
+	
+	t_point2d *iso_points = malloc(map.height * map.width * sizeof(t_point2d));
+	    convert_to_isometric(&map, points, iso_points);
+	t_point2d *iso_points = malloc(map.height * map.width * sizeof(t_point2d));
+	free(points); 
+	free(iso_points);
 	exit(1);
 	
 
@@ -111,3 +127,24 @@ int	main(void)
 // (otherwise can bit shift for more specificity)
 //a triangle is a shape where three lines connect  
 //2 lines meet at each point 
+
+/*
+Isometric Projection Formula
+In isometric projection:
+
+Orthographic: No perspective or distortion; parallel lines remain parallel.
+ Views the object straight-on from one axis (e.g., top, front, side).
+ No foreshortening unless explicitly specified for oblique views.
+ Isometric: Maintains proportions without depth distortion, using equal angles
+ between axes. 
+ Rotates the object so that all three axes (X, Y, Z) are equally foreshortened. 
+ The angle between axes in 2D is 120
+ Shows a pseudo-3D view where all three dimensions are visible.
+ Applies equal foreshortening along all three axes.
+ .
+Perspective: Includes depth distortion to simulate the human eye.
+
+
+
+
+*/

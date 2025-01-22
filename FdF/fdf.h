@@ -15,12 +15,21 @@ typedef struct s_map
     long z_max;       
 } t_map;
 
+typedef struct s_point3d {
+    float x;
+    float y;
+    float z;
+} t_point3d;
 typedef struct s_mlx_context 
 {
    void	* mlx;
     void * mlx_win;
 } t_mlx_context;
 
+typedef struct s_point2d {
+    float x;
+    float y;
+} t_point2d;
 typedef struct	s_data {
 	void	*img;
 	char	*addr;
@@ -38,4 +47,8 @@ void determine_dimensions(const char *buffer, t_map *map);
 void find_min_max(long *array, int array_size, t_map *map);
 long *read_map_into_array(t_map *map, char *buffer);
 void print_map_array(t_map *map);
+
+
+void generate_3d_points(const t_map *map, long *map_array, t_point3d *points);
+void convert_to_isometric(const t_map *map, t_point3d *points, t_point2d *iso_points);
 #endif

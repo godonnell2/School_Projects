@@ -189,10 +189,48 @@ void find_min_max(long *array, int array_size, t_map *map) {
     }
 }
 
+
+void generate_3d_points(const t_map *map, long *map_array, t_point3d *points) 
+{
+    int index = 0;
+    int y = 0; 
+    while (y < map->height) {
+        int x = 0; 
+        while (x < map->width) 
+        {
+            points[index].x = x; 
+            points[index].y = y; 
+            points[index].z = map_array[y * map->width + x]; 
+            index++; 
+            x++; 
+        }
+        y++; 
+    }
+}
+
+
+void convert_to_isometric(const t_map *map, t_point3d *points, t_point2d *iso_points) {
+    float angle = M_PI / 6; // 30 degrees for isometric projection
+    int i = 0; // Initialize the loop counter
+    while (i < map->width * map->height) {
+        iso_points[i].x = (points[i].x - points[i].y) * cos(angle);
+        iso_points[i].y = (points[i].x + points[i].y) * sin(angle) - points[i].z;
+        i++; // Increment the loop counter
+    }
+}
+
+
+
 // read ints and skip newlines and spaces until EOF or all
 //  (then check how many elements you were expecting)
 //Convert 3d pts to 2dpts
 // find the edges and the vertices
-//find min and max FINISHED
+//find min and max FINISHED like the square printing
+//calc x,y so that i have 3d pts(x, y,z ) 
+//calculate the edges only dependent on the width and the height
+// the edges are just teh grid
+// scale min max
 
-
+// The grid edges will form the structure, and the z values will create the
+//  "height" variations that make the grid look like a 3D terrain in 
+//  isometric projection.
