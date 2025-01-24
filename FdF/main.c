@@ -6,30 +6,30 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/24 14:27:15 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/24 17:55:20 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h>
 
-void my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
-	char *dst;
+	char	*dst;
 
 	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
 	*(unsigned int *)dst = color;
 }
 
 // bresenhams line algorithm
-void draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
+void	draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
 {
-	int dx;
-	int dy;
-	int sx;
-	int sy;
-	int err;
-	int e2;
+	int	dx;
+	int	dy;
+	int	sx;
+	int	sy;
+	int	err;
+	int	e2;
 
 	dx = abs(x1 - x0);
 	dy = abs(y1 - y0);
@@ -40,7 +40,7 @@ void draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
 	{
 		my_mlx_pixel_put(data, x0, y0, color);
 		if (x0 == x1 && y0 == y1)
-			break;
+			break ;
 		e2 = err * 2;
 		if (e2 > -dy)
 		{
@@ -56,70 +56,66 @@ void draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
 }
 
 // Specialised event handlers
-int main(void)
+int	main(void)
 {
-	t_data img;
-	t_mlx_context ctx;
-	char *buffer;
-	t_map map;
-	long *map_array;
-	int array_size;
-	t_point3d *points;
-	t_point2d *iso_points;
-	t_point2d start;
-	t_point2d end;
+	t_data			img;
+	t_mlx_context	ctx;
+	char			*buffer;
+	t_map			map;
+	long			*map_array;
+	int				array_size;
+	t_point3d		*points;
+	t_point2d		*iso_points;
+	t_point2d		start;
+	t_point2d		end;
+	int				window_width;
+	int				window_height;
+	int				edges_count;
 
 	buffer = read_file_to_buffer("test_maps/basictest.fdf");
 	determine_dimensions(buffer, &map);
 	map_array = read_map_into_array(&map, buffer); // PRINTING CORRECTLY
-
 	array_size = map.rows * map.cols;
 	find_min_max(map_array, array_size, &map);
-
 	points = malloc(map.rows * map.cols * sizeof(t_point3d));
 	generate_3d_points(&map, map_array, points); // PRINTING CORRECTLY
-
-
 	iso_points = calloc(map.rows * map.cols, sizeof(t_point2d));
-	int window_width = 1200;
-	int window_height = 900;
-
+	window_width = 1200;
+	window_height = 900;
 	convert_to_isometric(&map, points, iso_points);
 	scale_and_offset_points(iso_points, &map, window_width, window_height);
 	ctx.mlx = mlx_init();
-
-	ctx.mlx_win = mlx_new_window(ctx.mlx, window_width, window_height, "Hello world!");
+	ctx.mlx_win = mlx_new_window(ctx.mlx, window_width, window_height,
+			"Hello world!");
 	img.img = mlx_new_image(ctx.mlx, window_width, window_height);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
-								 &img.endian);
+			&img.endian);
 	// my_mlx_pixel_put(&img, 5, 5, 0x00FF0000);
 	//  draw_line(&img, 10, 220, 10, 320, 0x00FF0000);
-
 	printf("Total points in iso_points: %d\n", map.cols * map.rows);
 	for (int i = 0; i < map.cols * map.rows; i++)
 	{
 		printf("iso_points[%d]: (x: %f, y: %f)\n", i, iso_points[i].x,
-			   iso_points[i].y);
+			iso_points[i].y);
 	}
-
-	 t_edge *edges = NULL; // Pointer for dynamically allocated edges
-	   int edges_count = 0;
-populate_edges(&map, &edges, &edges_count);
+	t_edge *edges = NULL; // Pointer for dynamically allocated edges
+	edges_count = 0;
+	populate_edges(&map, &edges, &edges_count);
 	// Draw lines based on edges
-	  for (int i = 0; i < edges_count; i++) {
-        if (edges[i].start < 0 || edges[i].start >= map.cols * map.rows ||
-            edges[i].end < 0 || edges[i].end >= map.cols * map.rows) {
-            fprintf(stderr, "Invalid edge indices: start=%d, end=%d\n", edges[i].start, edges[i].end);
-            continue;
-        }
-
+	for (int i = 0; i < edges_count; i++)
+	{
+		if (edges[i].start < 0 || edges[i].start >= map.cols * map.rows
+			|| edges[i].end < 0 || edges[i].end >= map.cols * map.rows)
+		{
+			fprintf(stderr, "Invalid edge indices: start=%d, end=%d\n",
+				edges[i].start, edges[i].end);
+			continue ;
+		}
 		start = iso_points[edges[i].start];
 		end = iso_points[edges[i].end];
-
 		draw_line(&img, start.x, start.y, end.x, end.y, 0x00FF0000);
 	}
 	mlx_put_image_to_window(ctx.mlx, ctx.mlx_win, img.img, 0, 0);
-
 	mlx_hook(ctx.mlx_win, 17, 0, handle_exit, &ctx);
 	mlx_key_hook(ctx.mlx_win, handle_keypress, &ctx);
 	free(points);
@@ -128,6 +124,7 @@ populate_edges(&map, &edges, &edges_count);
 	// NEED TO BE AT END!!!
 	mlx_loop(ctx.mlx);
 }
+
 // 17 = DestroyNotify    NAME OF LIB used by minilibx for linux = x11 x.h
 // OS has told x that the window close button has been pressed
 // 0 is the mask it says no mask! look at ALL bits

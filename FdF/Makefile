@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/15 10:30:16 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/24 18:06:08 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CFLAGS = -Wall -Wextra -Werror -g -Iminilibx_macos
 #linker flags
 LDFLAGS = -L ./minilibx_macos \
     -l mlx -framework OpenGL -framework Appkit
-SRC = main.c parse_map.c keymouse_controls.c 
+SRC = main.c parse_map.c keymouse_controls.c prep_data_for_drawing.c
 		
 	
 
