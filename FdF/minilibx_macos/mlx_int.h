@@ -52,8 +52,8 @@ typedef struct	glsl_info_s
 
 typedef struct	mlx_img_list_s
 {
-  int			width;
-  int			height;
+  int			cols;
+  int			rows;
   char			*buffer;
   GLfloat		vertexes[8];
   struct mlx_img_list_s	*next;
@@ -98,5 +98,5 @@ int     mlx_int_str_str(char *str,char *find,int len);
 int     mlx_int_str_str_cote(char *str,char *find,int len);
 int	mlx_destroy_image(mlx_ptr_t *mlx_ptr, mlx_img_list_t *img_ptr);
 void	*mlx_new_image();
-void    *mlx_xpm_to_image(mlx_ptr_t *xvar,char **xpm_data,int *width,int *height);
+void    *mlx_xpm_to_image(mlx_ptr_t *xvar,char **xpm_data,int *cols,int *rows);
 int	mlx_do_sync(mlx_ptr_t *mlx_ptr);
