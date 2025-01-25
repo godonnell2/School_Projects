@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 07:53:14 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 17:08:26 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,84 @@
 #include <stdio.h> //NEED TO REPLACE WITH OWN
 #include <string.h>
 #include <unistd.h>
+
+static int	validate_line(const char *line_start, int *cols, int first_line)
+{
+	int	current_width;
+
+	current_width = count_words(line_start);
+	if (first_line)
+	{
+		*cols = current_width;
+	}
+	else if (current_width != *cols)
+	{
+		handle_error("Error: inconsistent cols in map data");
+	}
+	return (current_width);
+}
+
+static const char	*find_next_line(const char *buffer)
+{
+	while (*buffer && *buffer != '\n')
+		buffer++;
+	if (*buffer == '\n')
+		buffer++;
+	return (buffer);
+}
+
+void	determine_dimensions(const char *buffer, t_map *map)
+{
+	int			rows;
+	int			cols;
+	int			first_line;
+	const char	*line_start = buffer;
+
+	rows = 0;
+	cols = 0;
+	first_line = 1;
+	while (*buffer)
+	{
+		buffer = find_next_line(buffer);
+		if (buffer > line_start)
+		{
+			validate_line(line_start, &cols, first_line);
+			first_line = 0;
+		}
+		rows++;
+	}
+	map->rows = rows;
+	map->cols = cols;
+}
+
+long	*read_map_into_array(t_map *map, char *buffer)
+{
+	int		array_size;
+	long	*map_array;
+	char	*tmp_buff;
+	int		i;
+
+	array_size = map->rows * map->cols;
+	map_array = malloc(array_size * sizeof(long));
+	if (!map_array)
+	{
+		fprintf(stderr, "Memory allocation failed for map_array.\n");
+		exit(EXIT_FAILURE);
+	}
+	tmp_buff = buffer;
+	i = 0;
+	while (i < array_size)
+	{
+		tmp_buff = skip_whitespace(tmp_buff);
+		if (*tmp_buff == '\0')
+			break ;
+		tmp_buff = parse_number(tmp_buff, &map_array[i]);
+		i++;
+	}
+	if (i < array_size)
+		fprintf(stderr, "Expected %d elems, but only %d .\n", array_size, i);
+	return (map_array);
+}
 
 // READ THE WHOLE FILE INTO A STRING(BUFFER)
 // DETERMINE WIDTH AND HEIGHT
@@ -74,114 +152,6 @@
 // }
 // TOO MANY LINES
 
-static int	count_words(const char *line)
-{
-	int	count;
-	int	in_word;
-
-	count = 0;
-	in_word = 0;
-	while (*line && *line != '\n')
-	{
-		if (*line != ' ' && !in_word)
-		{
-			count++;
-			in_word = 1;
-		}
-		else if (*line == ' ')
-		{
-			in_word = 0;
-		}
-		line++;
-	}
-	return (count);
-}
-
-void	determine_dimensions(const char *buffer, t_map *map)
-{
-	int			cols;
-	int			first_line;
-	const char	*line_start = buffer;
-	int			current_width;
-	int			rows;
-
-	rows = 0;
-	cols = 0;
-	first_line = 1;
-	while (*buffer)
-	{
-		while (*buffer && *buffer != '\n')
-			buffer++;
-		if (buffer > line_start)
-		{
-			current_width = count_words(line_start);
-			if (first_line)
-			{
-				cols = current_width;
-				first_line = 0;
-			}
-			else if (current_width != cols)
-				handle_error("Error: inconsistent cols in map data");
-		}
-		if (*buffer == '\n')
-		{
-			buffer++;
-			rows++;
-		}
-	}
-	map->rows = rows;
-	map->cols = cols;
-}
-
-// TOO MANY LINES
-// Skip any leading whitespace
-// Check for end of buffer
-// Move the pointer to the end of the number
-
-static char	*skip_whitespace(char *buffer)
-{
-	while (*buffer == ' ' || *buffer == '\n')
-		buffer++;
-	return (buffer);
-}
-
-static char	*parse_number(char *buffer, long *value)
-{
-	*value = atol(buffer);
-	while (*buffer != ' ' && *buffer != '\n' && *buffer != '\0')
-		buffer++;
-	return (buffer);
-}
-
-long	*read_map_into_array(t_map *map, char *buffer)
-{
-	int		array_size;
-	long	*map_array;
-	char	*tmp_buff;
-	int		i;
-
-	array_size = map->rows * map->cols;
-	map_array = malloc(array_size * sizeof(long));
-	if (!map_array)
-	{
-		fprintf(stderr, "Memory allocation failed for map_array.\n");
-		exit(EXIT_FAILURE);
-	}
-	tmp_buff = buffer;
-	i = 0;
-	while (i < array_size)
-	{
-		tmp_buff = skip_whitespace(tmp_buff);
-		if (*tmp_buff == '\0')
-			break ;
-		tmp_buff = parse_number(tmp_buff, &map_array[i]);
-		i++;
-	}
-	if (i < array_size)
-		fprintf(stderr, "Expected %d elems, but only %d .\n", array_size, i);
-	return (map_array);
-}
-
 // long	*read_map_into_array(t_map *map, char *buffer)
 // {
 // 	int		array_size;
@@ -210,3 +180,44 @@ long	*read_map_into_array(t_map *map, char *buffer)
 // 		fprintf(stderr, "Expected %d eles, %d found.\n", array_size, i);
 // 	return (map_array);
 // }
+
+// void	determine_dimensions(const char *buffer, t_map *map)
+// {
+// 	int			cols;
+// 	int			first_line;
+// 	const char	*line_start = buffer;
+// 	int			current_width;
+// 	int			rows;
+
+// 	rows = 0;
+// 	cols = 0;
+// 	first_line = 1;
+// 	while (*buffer)
+// 	{
+// 		while (*buffer && *buffer != '\n')
+// 			buffer++;
+// 		if (buffer > line_start)
+// 		{
+// 			current_width = count_words(line_start);
+// 			if (first_line)
+// 			{
+// 				cols = current_width;
+// 				first_line = 0;
+// 			}
+// 			else if (current_width != cols)
+// 				handle_error("Error: inconsistent cols in map data");
+// 		}
+// 		if (*buffer == '\n')
+// 		{
+// 			buffer++;
+// 			rows++;
+// 		}
+// 	}
+// 	map->rows = rows;
+// 	map->cols = cols;
+// }
+
+// TOO MANY LINES
+// Skip any leading whitespace
+// Check for end of buffer
+// Move the pointer to the end of the number

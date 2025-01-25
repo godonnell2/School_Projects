@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:33:21 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 07:47:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 08:04:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,29 @@
 #include <string.h>
 #include <unistd.h>
 #define BUFFSIZE 1024
+
+int	count_words(const char *line)
+{
+	int	count;
+	int	in_word;
+
+	count = 0;
+	in_word = 0;
+	while (*line && *line != '\n')
+	{
+		if (*line != ' ' && !in_word)
+		{
+			count++;
+			in_word = 1;
+		}
+		else if (*line == ' ')
+		{
+			in_word = 0;
+		}
+		line++;
+	}
+	return (count);
+}
 
 void	handle_error(const char *message)
 {
