@@ -6,54 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/24 17:55:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 07:26:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h>
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
-{
-	char	*dst;
-
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int *)dst = color;
-}
-
-// bresenhams line algorithm
-void	draw_line(t_data *data, int x0, int y0, int x1, int y1, int color)
-{
-	int	dx;
-	int	dy;
-	int	sx;
-	int	sy;
-	int	err;
-	int	e2;
-
-	dx = abs(x1 - x0);
-	dy = abs(y1 - y0);
-	sx = (x0 < x1) ? 1 : -1;
-	sy = (y0 < y1) ? 1 : -1;
-	err = dx - dy;
-	while (1)
-	{
-		my_mlx_pixel_put(data, x0, y0, color);
-		if (x0 == x1 && y0 == y1)
-			break ;
-		e2 = err * 2;
-		if (e2 > -dy)
-		{
-			err -= dy;
-			x0 += sx;
-		}
-		if (e2 < dx)
-		{
-			err += dx;
-			y0 += sy;
-		}
-	}
-}
 
 // Specialised event handlers
 int	main(void)
@@ -113,7 +72,8 @@ int	main(void)
 		}
 		start = iso_points[edges[i].start];
 		end = iso_points[edges[i].end];
-		draw_line(&img, start.x, start.y, end.x, end.y, 0x00FF0000);
+		t_line line = {start.x, start.y, end.x, end.y, 0x00FF0000};
+		draw_line(&img, &line);
 	}
 	mlx_put_image_to_window(ctx.mlx, ctx.mlx_win, img.img, 0, 0);
 	mlx_hook(ctx.mlx_win, 17, 0, handle_exit, &ctx);

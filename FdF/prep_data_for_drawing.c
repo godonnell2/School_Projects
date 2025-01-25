@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/24 18:38:58 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 06:15:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,39 +124,45 @@ void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 // if (x < cols - 1)
 // Connect to the bottom neighbor
 // if (y < rows - 1)
-void	populate_edges(t_map *map, t_edge **edges, int *edges_count)
-{
-	int	total_edges;
-	int	current_index;
+// void	populate_edges(t_map *map, t_edge **edges, int *edges_count)
+// {
+// 	int	total_edges;
+// 	int	y;
+// 	int	x;
+// 	int	current_index;
 
-	total_edges = (map->cols - 1) * map->rows + (map->rows - 1) * map->cols;
-	*edges = malloc(total_edges * sizeof(t_edge));
-	if (edges == NULL)
-	{
-		fprintf(stderr, "Memory allocation failed for edges.\n");
-		exit(EXIT_FAILURE);
-	}
-	*edges_count = 0;
-	for (int y = 0; y < map->rows; y++)
-	{
-		for (int x = 0; x < map->cols; x++)
-		{
-			current_index = y * map->cols + x;
-			if (x < map->cols - 1)
-			{
-				(*edges)[*edges_count].start = current_index;
-				(*edges)[*edges_count].end = current_index + 1;
-				(*edges_count)++;
-			}
-			if (y < map->rows - 1)
-			{
-				(*edges)[*edges_count].start = current_index;
-				(*edges)[*edges_count].end = current_index + map->cols;
-				(*edges_count)++;
-			}
-		}
-	}
-}
+// 	total_edges = (map->cols - 1) * map->rows + (map->rows - 1) * map->cols;
+// 	*edges = malloc(total_edges * sizeof(t_edge));
+// 	if (*edges == NULL)
+// 	{
+// 		fprintf(stderr, "Memory allocation failed for edges.\n");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	*edges_count = 0;
+// 	y = 0;
+// 	while (y < map->rows)
+// 	{
+// 		x = 0;
+// 		while (x < map->cols)
+// 		{
+// 			current_index = y * map->cols + x;
+// 			if (x < map->cols - 1)
+// 			{
+// 				(*edges)[*edges_count].start = current_index;
+// 				(*edges)[*edges_count].end = current_index + 1;
+// 				(*edges_count)++;
+// 			}
+// 			if (y < map->rows - 1)
+// 			{
+// 				(*edges)[*edges_count].start = current_index;
+// 				(*edges)[*edges_count].end = current_index + map->cols;
+// 				(*edges_count)++;
+// 			}
+// 			x++;
+// 		}
+// 		y++;
+// 	}
+// }
 
 // read ints and skip newlines and spaces until EOF or all
 //  (then check how many elements you were expecting)
