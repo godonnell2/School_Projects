@@ -6,35 +6,34 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 17:39:32 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 17:59:20 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h>
 
-static void	initialize_context(t_mlx_context *ctx, t_data *img, int width,
-		int height)
+static void initialize_context(t_mlx_context *ctx, t_data *img, int width,
+							   int height)
 {
 	ctx->mlx = mlx_init();
-	ctx->mlx_win = mlx_new_window(ctx->mlx, width, height, "Hello world!");
+	ctx->mlx_win = mlx_new_window(ctx->mlx, width, height, "This is my map on tv");
 	img->img = mlx_new_image(ctx->mlx, width, height);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
-			&img->line_length, &img->endian);
+								  &img->line_length, &img->endian);
 }
 
-static t_point2d	*prepare_iso_points(t_map *map, long *map_array, int width,
-		int height)
+static t_point2d *prepare_iso_points(t_map *map, long *map_array, int width,
+									 int height)
 {
-	t_point3d	*points;
-	t_point2d	*iso_points;
+	t_point3d *points;
+	t_point2d *iso_points;
 
 	points = malloc(map->rows * map->cols * sizeof(t_point3d));
 	iso_points = calloc(map->rows * map->cols, sizeof(t_point2d));
 	if (!points || !iso_points)
 	{
-		fprintf(stderr, "Memory allocation failed.\n");
-		exit(EXIT_FAILURE);
+		 handle_error("Memory allocation failed.");
 	}
 	generate_3d_points(map, map_array, points);
 	convert_to_isometric(map, points, iso_points);
@@ -43,18 +42,16 @@ static t_point2d	*prepare_iso_points(t_map *map, long *map_array, int width,
 	return (iso_points);
 }
 
-static void	render_edge(t_data *img, t_edge *edge, t_map *map,
-		t_point2d *iso_points)
+static void render_edge(t_data *img, t_edge *edge, t_map *map,
+						t_point2d *iso_points)
 {
-	t_point2d	start;
-	t_point2d	end;
-	t_line		line;
+	t_point2d start;
+	t_point2d end;
+	t_line line;
 
-	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0
-		|| edge->end >= map->cols * map->rows)
+	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0 || edge->end >= map->cols * map->rows)
 	{
-		fprintf(stderr, "edge start=%d, end=%d\n", edge->start, edge->end);
-		return ;
+		 handle_error("invalid edges");
 	}
 	start = iso_points[edge->start];
 	end = iso_points[edge->end];
@@ -66,11 +63,11 @@ static void	render_edge(t_data *img, t_edge *edge, t_map *map,
 	draw_line(img, &line);
 }
 
-static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
+static void render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 {
-	int		edges_count;
-	t_edge	*edges;
-	int		i;
+	int edges_count;
+	t_edge *edges;
+	int i;
 
 	edges = NULL;
 	populate_edges(map, &edges, &edges_count);
@@ -83,20 +80,23 @@ static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 	free(edges);
 }
 
-int	main(void)
+int main(int argc, char **argv)
 {
-	t_app		app;
-	//long		*map_array;
-	//t_point2d	*iso_points;
-	char		*buffer;
+	t_app app;
+	char *buffer;
 
+	if (argc < 2)
+	{
+		  handle_error("Usage: <program_name> <map_file>");
+		return 1;
+	}
 	app.window_width = 1200;
 	app.window_height = 900;
-	buffer = read_file_to_buffer("test_maps/basictest.fdf");
+	buffer = read_file_to_buffer(argv[1]);
 	determine_dimensions(buffer, &app.map);
 	app.map_array = read_map_into_array(&app.map, buffer);
-	app.iso_points = prepare_iso_points(&app.map, app.map_array, app.window_width,
-			app.window_height);
+	app.iso_points = prepare_iso_points(&app.map, app.map_array,
+										app.window_width, app.window_height);
 	initialize_context(&app.ctx, &app.img, app.window_width, app.window_height);
 	render_edges(&app.img, &app.map, app.iso_points);
 	mlx_put_image_to_window(app.ctx.mlx, app.ctx.mlx_win, app.img.img, 0, 0);
@@ -157,7 +157,7 @@ int	main(void)
 // 		if (edges[i].start < 0 || edges[i].start >= map.cols * map.rows
 // 			|| edges[i].end < 0 || edges[i].end >= map.cols * map.rows)
 // 		{
-// 			fprintf(stderr, "Invalid edge indices: start=%d, end=%d\n",
+// 			ft_printf(stderr, "Invalid edge indices: start=%d, end=%d\n",
 // 				edges[i].start, edges[i].end);
 // 			continue ;
 // 		}

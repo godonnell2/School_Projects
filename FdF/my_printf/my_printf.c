@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:42:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 06:47:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 17:53:27 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	ft_putstr_fd(char *s, int fd)
 	}
 }
 
-static size_t	ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
 	int	i;
 

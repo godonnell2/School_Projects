@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 17:08:26 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 18:26:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,15 +70,14 @@ long	*read_map_into_array(t_map *map, char *buffer)
 {
 	int		array_size;
 	long	*map_array;
-	char	*tmp_buff;
+	const char * tmp_buff;
 	int		i;
 
 	array_size = map->rows * map->cols;
 	map_array = malloc(array_size * sizeof(long));
 	if (!map_array)
 	{
-		fprintf(stderr, "Memory allocation failed for map_array.\n");
-		exit(EXIT_FAILURE);
+		 handle_error("Memory allocation failed for map_array.\n");
 	}
 	tmp_buff = buffer;
 	i = 0;
@@ -91,7 +90,7 @@ long	*read_map_into_array(t_map *map, char *buffer)
 		i++;
 	}
 	if (i < array_size)
-		fprintf(stderr, "Expected %d elems, but only %d .\n", array_size, i);
+		handle_error("Incorrect number of elements.\n");
 	return (map_array);
 }
 
@@ -177,7 +176,7 @@ long	*read_map_into_array(t_map *map, char *buffer)
 // 		i++;
 // 	}
 // 	if (i < array_size)
-// 		fprintf(stderr, "Expected %d eles, %d found.\n", array_size, i);
+// 		ft_printf(stderr, "Expected %d eles, %d found.\n", array_size, i);
 // 	return (map_array);
 // }
 

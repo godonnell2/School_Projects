@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 06:15:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/25 17:50:11 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 // 	*edges = malloc(total_edges * sizeof(t_edge));
 // 	if (*edges == NULL)
 // 	{
-// 		fprintf(stderr, "Memory allocation failed for edges.\n");
+// 		ft_printf(stderr, "Memory allocation failed for edges.\n");
 // 		exit(EXIT_FAILURE);
 // 	}
 // 	*edges_count = 0;
