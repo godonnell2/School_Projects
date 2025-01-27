@@ -6,17 +6,18 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:33:21 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 17:55:04 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:57:58 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+#define BUFFSIZE 1024
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h> //NEED TO REPLACE WITH OWN
 #include <string.h>
 #include <unistd.h>
-#define BUFFSIZE 1024
+
 
 int	count_words(const char *line)
 {
@@ -100,7 +101,7 @@ char	*read_file_to_buffer(const char *filename)
 		if (bytes_read == 0)
 			break ;
 		total += bytes_read;
-		if (total + BUFFSIZE > total)
+		if (total + bytes_read> total)
 			buff = resize_buffer(buff, total, total + BUFFSIZE + 1);
 	}
 	buff[total] = '\0';

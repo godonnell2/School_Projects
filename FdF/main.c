@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 17:59:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:37:25 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,24 +23,54 @@ static void initialize_context(t_mlx_context *ctx, t_data *img, int width,
 								  &img->line_length, &img->endian);
 }
 
-static t_point2d *prepare_iso_points(t_map *map, long *map_array, int width,
-									 int height)
-{
-	t_point3d *points;
-	t_point2d *iso_points;
+static t_point2d *prepare_iso_points(t_map *map, t_map_point *map_array, int width, int height) {
+    t_point3d *points;
+    t_point2d *iso_points;
 
-	points = malloc(map->rows * map->cols * sizeof(t_point3d));
-	iso_points = calloc(map->rows * map->cols, sizeof(t_point2d));
-	if (!points || !iso_points)
-	{
-		 handle_error("Memory allocation failed.");
-	}
-	generate_3d_points(map, map_array, points);
-	convert_to_isometric(map, points, iso_points);
-	scale_and_offset_points(iso_points, map, width, height);
-	free(points);
-	return (iso_points);
+    // Allocate memory for points and iso_points
+    points = malloc(map->rows * map->cols * sizeof(t_point3d));
+    iso_points = calloc(map->rows * map->cols, sizeof(t_point2d));
+
+    // Check for memory allocation failure
+    if (!points || !iso_points) {
+        if (points) free(points); // Free points if allocated
+        if (iso_points) free(iso_points); // Free iso_points if allocated
+        handle_error("Memory allocation failed.");
+        return NULL; // Return NULL to indicate failure
+    }
+
+    // Generate 3D points using the provided map and map_array
+    generate_3d_points(map, map_array, points); // Use the parameters instead of app.map
+
+    // Convert to isometric points
+    convert_to_isometric(map, points, iso_points);
+
+    // Scale and offset points
+    scale_and_offset_points(iso_points, map, width, height);
+
+    // Free the allocated points array
+    free(points);
+
+    return iso_points; // Return the iso_points
 }
+// static t_point2d *prepare_iso_points(t_map *map, t_map_point *map_array, int width,
+// 									 int height)
+// {
+// 	t_point3d *points;
+// 	t_point2d *iso_points;
+
+// 	points = malloc(map->rows * map->cols * sizeof(t_point3d));
+// 	iso_points = calloc(map->rows * map->cols, sizeof(t_point2d));
+// 	if (!points || !iso_points)
+// 	{
+// 		 handle_error("Memory allocation failed.");
+// 	}
+// 	 generate_3d_points(&app.map, app.map.map_array, points);;
+// 	convert_to_isometric(map, points, iso_points);
+// 	scale_and_offset_points(iso_points, map, width, height);
+// 	free(points);
+// 	return (iso_points);
+// }
 
 static void render_edge(t_data *img, t_edge *edge, t_map *map,
 						t_point2d *iso_points)
@@ -55,11 +85,14 @@ static void render_edge(t_data *img, t_edge *edge, t_map *map,
 	}
 	start = iso_points[edge->start];
 	end = iso_points[edge->end];
+	if (start.x == end.x && start.y == end.y) {
+        return; 
+    }
 	line.x0 = start.x;
 	line.y0 = start.y;
 	line.x1 = end.x;
 	line.y1 = end.y;
-	line.color = 0x00FF0000;
+	line.color = map->map_array[edge->start].color;
 	draw_line(img, &line);
 }
 
@@ -84,18 +117,25 @@ int main(int argc, char **argv)
 {
 	t_app app;
 	char *buffer;
-
+	int default_colour = 0xFFFFFF;
 	if (argc < 2)
 	{
 		  handle_error("Usage: <program_name> <map_file>");
 		return 1;
 	}
-	app.window_width = 1200;
-	app.window_height = 900;
+	app.window_width = 1100;
+	app.window_height = 800;
 	buffer = read_file_to_buffer(argv[1]);
+	if (!buffer) {
+        handle_error("buffer read error"); 
+    }
 	determine_dimensions(buffer, &app.map);
-	app.map_array = read_map_into_array(&app.map, buffer);
-	app.iso_points = prepare_iso_points(&app.map, app.map_array,
+	app.map.map_array = read_map_into_array(&app.map, buffer, default_colour);
+	if (!app.map.map_array) {
+        free(buffer); 
+        return 1; 
+    }
+	app.iso_points = prepare_iso_points(&app.map, app.map.map_array,
 										app.window_width, app.window_height);
 	initialize_context(&app.ctx, &app.img, app.window_width, app.window_height);
 	render_edges(&app.img, &app.map, app.iso_points);
@@ -103,6 +143,8 @@ int main(int argc, char **argv)
 	mlx_hook(app.ctx.mlx_win, 17, 0, handle_exit, &app.ctx);
 	mlx_key_hook(app.ctx.mlx_win, handle_keypress, &app.ctx);
 	mlx_loop(app.ctx.mlx);
+	free(buffer);
+    free(app.map.map_array);
 	return (0);
 }
 // Specialised event handlers

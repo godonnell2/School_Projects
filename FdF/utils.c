@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 08:09:15 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 18:28:30 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:35:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,42 @@ const char *parse_number(const char *buffer, long *value)
     buffer = my_atol(buffer, value);
     buffer = skip_whitespace(buffer);
     return buffer;
+}
+
+const char *parse_hex_color(const char *str, int *color)
+{
+    *color = 0; 
+
+  
+    if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+    {
+        str += 2; 
+        while (is_hex_digit(*str))
+        {
+            *color = (*color * 16) + hex_to_int(*str);
+            str++;
+        }
+    }
+    else
+    {
+        handle_error("Invalid color format.\n");
+    }
+
+    return str;
+}
+
+int is_hex_digit(char c)
+{
+    return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
+}
+
+int hex_to_int(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    return 0;
 }

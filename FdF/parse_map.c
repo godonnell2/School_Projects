@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 18:26:39 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:26:44 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,15 +66,17 @@ void	determine_dimensions(const char *buffer, t_map *map)
 	map->cols = cols;
 }
 
-long	*read_map_into_array(t_map *map, char *buffer)
+//instead of a long use another struct that contains the long and a colour 
+//and to this function you pass a default colour, if it does not have a comma colour
+t_map_point	* read_map_into_array(t_map *map, char *buffer, int default_colour)
 {
 	int		array_size;
-	long	*map_array;
+	t_map_point	*map_array;
 	const char * tmp_buff;
 	int		i;
 
 	array_size = map->rows * map->cols;
-	map_array = malloc(array_size * sizeof(long));
+	map_array = malloc(array_size * sizeof(t_map_point));
 	if (!map_array)
 	{
 		 handle_error("Memory allocation failed for map_array.\n");
@@ -86,7 +88,17 @@ long	*read_map_into_array(t_map *map, char *buffer)
 		tmp_buff = skip_whitespace(tmp_buff);
 		if (*tmp_buff == '\0')
 			break ;
-		tmp_buff = parse_number(tmp_buff, &map_array[i]);
+		tmp_buff = parse_number(tmp_buff, &map_array[i].z);
+        if (*tmp_buff == ',')
+        {
+            tmp_buff++;
+            tmp_buff = parse_hex_color(tmp_buff, &map_array[i].color);
+        }
+        else
+        {
+            
+            map_array[i].color = default_colour;
+        }
 		i++;
 	}
 	if (i < array_size)

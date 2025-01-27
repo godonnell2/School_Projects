@@ -6,12 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/25 17:50:11 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:34:06 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include <stdio.h> //NEED TO REPLACE WITH OWN
+// DO I EVEN NEED THIS BELOW
 
 void	find_min_max(long *array, int array_size, t_map *map)
 {
@@ -40,7 +40,7 @@ void	find_min_max(long *array, int array_size, t_map *map)
 	}
 }
 
-void	generate_3d_points(t_map *map, long *map_array, t_point3d *points)
+void	generate_3d_points(t_map *map, t_map_point *map_array, t_point3d *points)
 {
 	int	index;
 	int	y;
@@ -53,9 +53,9 @@ void	generate_3d_points(t_map *map, long *map_array, t_point3d *points)
 		x = 0;
 		while (x < map->cols)
 		{
-			points[index].x = x;
-			points[index].y = y;
-			points[index].z = map_array[y * map->cols + x];
+			points[index].x = (float)x;
+			points[index].y = (float)y;
+			points[index].z = (float)map_array[y * map->cols + x].z;;
 			index++;
 			x++;
 		}
@@ -69,6 +69,7 @@ void	generate_3d_points(t_map *map, long *map_array, t_point3d *points)
 // Apply the isometric projection formula
 // 0.523599 radians = 30 degrees
 // Store the resulting 2D point in the iso_points array
+// x is indepent of the z interesting interseting 
 
 void	convert_to_isometric(t_map *map, t_point3d *points,
 		t_point2d *iso_points)
@@ -90,22 +91,29 @@ void	convert_to_isometric(t_map *map, t_point3d *points,
 
 // Center horizontally
 // Center vertically
+
 void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 		int window_width, int window_height)
 {
-	int	total_points;
-	int	offset_x;
-	int	offset_y;
-	int	i;
+	int		total_points;
+	float	scale_factor;
+	int		offset_x;
+	int		offset_y;
+	int		i;
 
 	total_points = map->cols * map->rows;
+
+	// Calculate a dynamic scale factor to fit the map into the window
+	scale_factor = fmin(window_width / (map->cols * 2.0), window_height / (map->rows * 2.0));
+
 	offset_x = window_width / 2;
 	offset_y = window_height / 2;
+
 	i = 0;
 	while (i < total_points)
 	{
-		iso_points[i].x *= SCALE_FACTOR;
-		iso_points[i].y *= SCALE_FACTOR;
+		iso_points[i].x *= scale_factor;
+		iso_points[i].y *= scale_factor;
 		iso_points[i].x += offset_x;
 		iso_points[i].y += offset_y;
 		i++;
