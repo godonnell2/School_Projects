@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/28 18:50:30 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/28 20:53:12 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,9 +24,11 @@ endif
 
 SRC = main.c \
       parse_map.c \
+      parse_map_two.c \
       keymouse_controls.c \
       prep_data_for_drawing.c \
       prep_data_for_drawing_two.c \
+      prep_data_for_drawing_three.c \
       draw.c \
       read_to_buffer.c \
       utils.c \

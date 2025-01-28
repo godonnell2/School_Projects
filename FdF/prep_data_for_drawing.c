@@ -6,14 +6,14 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 18:59:47 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:12:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h>
 
-void	find_min_max(float *array, int array_size, t_map *map)
+void	find_min_max(t_map_point *map_array, int array_size, t_map *map)
 {
 	int	i;
 
@@ -21,25 +21,52 @@ void	find_min_max(float *array, int array_size, t_map *map)
 	{
 		map->z_min = 0;
 		map->z_max = 0;
-		handle_error("Array size is 0 or neg. Setting minmax to 0.\n");
+		handle_error("Array size is 0 or negative. Setting min/max to 0.\n");
 		return ;
 	}
-	map->z_min = array[0];
-	map->z_max = array[0];
+	map->z_min = map_array[0].z;
+	map->z_max = map_array[0].z;
 	i = 1;
 	while (i < array_size)
 	{
-		if (array[i] < map->z_min)
+		if (map_array[i].z < map->z_min)
 		{
-			map->z_min = array[i];
+			map->z_min = map_array[i].z;
 		}
-		if (array[i] > map->z_max)
+		if (map_array[i].z > map->z_max)
 		{
-			map->z_max = array[i];
+			map->z_max = map_array[i].z;
 		}
 		i++;
 	}
 }
+// void	find_min_max(float *array, int array_size, t_map *map)
+// {
+// 	int	i;
+
+// 	if (array_size <= 0)
+// 	{
+// 		map->z_min = 0;
+// 		map->z_max = 0;
+// 		handle_error("Array size is 0 or neg. Setting minmax to 0.\n");
+// 		return ;
+// 	}
+// 	map->z_min = array[0];
+// 	map->z_max = array[0];
+// 	i = 1;
+// 	while (i < array_size)
+// 	{
+// 		if (array[i] < map->z_min)
+// 		{
+// 			map->z_min = array[i];
+// 		}
+// 		if (array[i] > map->z_max)
+// 		{
+// 			map->z_max = array[i];
+// 		}
+// 		i++;
+// 	}
+// }
 
 // so basically this is how we drop the z axis
 // because screens dont have a z axis

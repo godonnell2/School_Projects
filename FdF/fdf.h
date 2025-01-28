@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 18:59:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:56:21 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,18 @@ typedef struct s_bresenham
 	int				e2;
 }					t_bresenham;
 
-typedef struct s_map_point {
-    float z;       // Z value
-    int color;    // Color value in hexadecimal
-} t_map_point;
+typedef struct s_map_point
+{
+	float			z;
+	int				color;
+}					t_map_point;
 
 typedef struct s_map
 {
 	int				cols;
 	int				rows;
-//	int ***array; // 3D array to hold the map data (z values)
- t_map_point *map_array; // Array of map points
+	//	Array of map points
+	t_map_point		*map_array;
 	float			z_min;
 	float			z_max;
 }					t_map;
@@ -112,15 +113,15 @@ char				*read_file_to_buffer(const char *filename);
 void				handle_error(const char *message);
 void				determine_dimensions(const char *buffer, t_map *map);
 
-const char				*skip_whitespace(const char *buffer);
-int	my_isdigit(char c);
-size_t	ft_strlen(const char *str);
-const char *parse_number(const char *buffer, float *value);
-const char *parse_hex_color(const char *str, int *color);
-float my_strtof(const char *str, char **endptr);
+const char			*skip_whitespace(const char *buffer);
+int					my_isdigit(char c);
+size_t				ft_strlen(const char *str);
+const char			*parse_number(const char *buffer, float *value);
+const char			*parse_hex_color(const char *str, int *color);
+float				my_strtof(const char *str, char **endptr);
 
-
-t_map_point		*read_map_into_array(t_map *map, char *buffer, int default_colour);
+t_map_point			*read_map_into_array(t_map *map, char *buffer,
+						int default_colour);
 void				print_map_array(t_map *map);
 void				generate_horizontal_edges(t_map *map, t_edge *edges,
 						int *edge_index);
@@ -128,15 +129,16 @@ void				generate_vertical_edges(t_map *map, t_edge *edges,
 						int *edge_index);
 void				populate_edges(t_map *map, t_edge **edges,
 						int *edges_count);
+void				find_min_max(t_map_point *map_array, int array_size,
+						t_map *map);
 
-void				find_min_max(float *array, int array_size, t_map *map);
-
+t_point2d			*prepare_iso_points(t_map *map, t_map_point *map_array,
+						int width, int height);
 void				convert_to_isometric(t_map *map, t_point3d *points,
 						t_point2d *iso_points);
 void				scale_and_offset_points(t_point2d *iso_points, t_map *map,
 						int window_width, int window_height);
 
 void				draw_line(t_data *data, t_line *line);
-
 
 #endif
