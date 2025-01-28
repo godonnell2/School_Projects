@@ -6,14 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 16:34:06 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 16:42:19 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-// DO I EVEN NEED THIS BELOW
-
-void	find_min_max(long *array, int array_size, t_map *map)
+#include <stdio.h>
+void	find_min_max(float *array, int array_size, t_map *map)
 {
 	int	i;
 
@@ -21,13 +20,16 @@ void	find_min_max(long *array, int array_size, t_map *map)
 	{
 		map->z_min = 0;
 		map->z_max = 0;
+		   handle_error("Array size is 0 or negative. Setting min and max to 0.\n");
 		return ;
 	}
 	map->z_min = array[0];
 	map->z_max = array[0];
+	  
 	i = 1;
 	while (i < array_size)
 	{
+		
 		if (array[i] < map->z_min)
 		{
 			map->z_min = array[i];
@@ -38,30 +40,9 @@ void	find_min_max(long *array, int array_size, t_map *map)
 		}
 		i++;
 	}
+	
 }
 
-void	generate_3d_points(t_map *map, t_map_point *map_array, t_point3d *points)
-{
-	int	index;
-	int	y;
-	int	x;
-
-	index = 0;
-	y = 0;
-	while (y < map->rows)
-	{
-		x = 0;
-		while (x < map->cols)
-		{
-			points[index].x = (float)x;
-			points[index].y = (float)y;
-			points[index].z = (float)map_array[y * map->cols + x].z;;
-			index++;
-			x++;
-		}
-		y++;
-	}
-}
 
 // so basically this is how we drop the z axis
 // because screens dont have a z axis
@@ -70,31 +51,46 @@ void	generate_3d_points(t_map *map, t_map_point *map_array, t_point3d *points)
 // 0.523599 radians = 30 degrees
 // Store the resulting 2D point in the iso_points array
 // x is indepent of the z interesting interseting 
+ //30° rotation.
+// need to invert y coordinate   iso_y = window_height - iso_y; he origin (0, 0) is the upper left corner of the window,
+//  the x and y axis respectivelyInversion of Y-Axis: 
+// etric projection of a 3D point  (x,y,z) onto a 2D plane involves a rotation of the point in 3D space. 
+//  Since the y-axis in MLX points down, you may need to invert the y-coordinate after 
+//  calculating the isometric y-coordinate.
+//  The formula you're using is a simplified version of this transformation:
+
+// iso_x = (x - y) * cos(θ)
+// iso_y = (x + y) * sin(θ) - z
+ 
 
 void	convert_to_isometric(t_map *map, t_point3d *points,
-		t_point2d *iso_points)
+		t_point2d *iso_points, int window_height)
 {
 	float	iso_x;
 	float	iso_y;
 	int		i;
-
+(void) window_height;
 	i = 0;
 	while (i < map->rows * map->cols)
 	{
+		
 		iso_x = (points[i].x - points[i].y) * cos(0.523599);
-		iso_y = (points[i].x + points[i].y) * sin(0.523599) - points[i].z;
+		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z/10);
+
 		iso_points[i].x = iso_x;
 		iso_points[i].y = iso_y;
+		
 		i++;
 	}
 }
 
 // Center horizontally
 // Center vertically
-
+#include <stdio.h>
 void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 		int window_width, int window_height)
 {
+	
 	int		total_points;
 	float	scale_factor;
 	int		offset_x;
@@ -103,11 +99,11 @@ void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 
 	total_points = map->cols * map->rows;
 
-	// Calculate a dynamic scale factor to fit the map into the window
-	scale_factor = fmin(window_width / (map->cols * 2.0), window_height / (map->rows * 2.0));
+
+  scale_factor = fmin(window_width / 1.6f, window_height / 1.6f);
 
 	offset_x = window_width / 2;
-	offset_y = window_height / 2;
+	offset_y = window_height / 4;
 
 	i = 0;
 	while (i < total_points)
@@ -116,7 +112,9 @@ void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
 		iso_points[i].y *= scale_factor;
 		iso_points[i].x += offset_x;
 		iso_points[i].y += offset_y;
+
 		i++;
+		
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 16:26:44 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 16:39:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	determine_dimensions(const char *buffer, t_map *map)
 
 //instead of a long use another struct that contains the long and a colour 
 //and to this function you pass a default colour, if it does not have a comma colour
+
 t_map_point	* read_map_into_array(t_map *map, char *buffer, int default_colour)
 {
 	int		array_size;
@@ -82,24 +83,34 @@ t_map_point	* read_map_into_array(t_map *map, char *buffer, int default_colour)
 		 handle_error("Memory allocation failed for map_array.\n");
 	}
 	tmp_buff = buffer;
+    
 	i = 0;
+    
 	while (i < array_size)
 	{
 		tmp_buff = skip_whitespace(tmp_buff);
 		if (*tmp_buff == '\0')
 			break ;
+          
 		tmp_buff = parse_number(tmp_buff, &map_array[i].z);
+    
         if (*tmp_buff == ',')
         {
+            
             tmp_buff++;
+       
             tmp_buff = parse_hex_color(tmp_buff, &map_array[i].color);
+          
+             
         }
         else
         {
             
             map_array[i].color = default_colour;
         }
+      
 		i++;
+       
 	}
 	if (i < array_size)
 		handle_error("Incorrect number of elements.\n");

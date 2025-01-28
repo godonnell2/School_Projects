@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 16:36:08 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/27 22:43:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ typedef struct s_bresenham
 }					t_bresenham;
 
 typedef struct s_map_point {
-    long z;       // Z value
+    float z;       // Z value
     int color;    // Color value in hexadecimal
 } t_map_point;
 
@@ -56,8 +56,8 @@ typedef struct s_map
 	int				rows;
 //	int ***array; // 3D array to hold the map data (z values)
  t_map_point *map_array; // Array of map points
-	long			z_min;
-	long			z_max;
+	float			z_min;
+	float			z_max;
 }					t_map;
 
 typedef struct s_point3d
@@ -113,7 +113,7 @@ void				handle_error(const char *message);
 void				determine_dimensions(const char *buffer, t_map *map);
 
 const char				*skip_whitespace(const char *buffer);
-const char *parse_number(const char *buffer, long *value);
+const char *parse_number(const char *buffer, float *value);
 
 t_map_point		*read_map_into_array(t_map *map, char *buffer, int default_colour);
 void				print_map_array(t_map *map);
@@ -124,13 +124,14 @@ void				generate_vertical_edges(t_map *map, t_edge *edges,
 void				populate_edges(t_map *map, t_edge **edges,
 						int *edges_count);
 
-void				find_min_max(long *array, int array_size, t_map *map);
+void				find_min_max(float *array, int array_size, t_map *map);
+//void				find_min_max(float *array, int array_size, t_map *map);
 // void				generate_3d_points(t_map *map, long *map_array,
 // 						t_point3d *points);
-void				generate_3d_points(t_map *map, t_map_point  *map_array,
-		t_point3d *points);
+//void				generate_3d_points(t_map *map, t_map_point  *map_array,
+//		t_point3d *points);
 void				convert_to_isometric(t_map *map, t_point3d *points,
-						t_point2d *iso_points);
+						t_point2d *iso_points, int window_height);
 void				scale_and_offset_points(t_point2d *iso_points, t_map *map,
 						int window_width, int window_height);
 

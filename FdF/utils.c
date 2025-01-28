@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 08:09:15 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 15:35:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 16:38:25 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,70 +20,39 @@ const char	*skip_whitespace(const char *buffer)
 	return (buffer);
 }
 
-static char	*check_sign_and_skip(const char **str, int *sign)
-{
-	*str = skip_whitespace(*str);
-	if (**str == '-' || **str == '+')
-	{
-		if (**str == '-')
-			*sign = -1;
-		(*str)++;
-	}
-	return ((char *)*str);
-}
 
-static char	*my_atol(const char *str, long *value)
-{
-	long	result;
-	int		sign;
+#include <stdio.h>
+// if (endptr == str) {
+        //return str;  // No valid number found, return original string
+const char *parse_number(const char *str, float *value) {
+   
+    char *endptr;
+    *value = strtof(str, &endptr);  
+ 
+    if (endptr == str) {
+        return str;  
+    }
 
-	result = 0;
-	sign = 1;
-	str = check_sign_and_skip(&str, &sign);
-	while (*str >= '0' && *str <= '9')
-	{
-		if (result > (LONG_MAX - (*str - '0')) / 10)
-		{
-			if (sign == 1)
-				*value = LONG_MAX;
-			else
-				*value = LONG_MIN;
-			return ((char *)str);
-		}
-		result = result * 10 + (*str - '0');
-		str++;
-	}
-	*value = result * sign;
-	return ((char *)str);
-}
+   
+    str = endptr;
 
-const char *parse_number(const char *buffer, long *value)
-{
-    buffer = my_atol(buffer, value);
-    buffer = skip_whitespace(buffer);
-    return buffer;
+
+    str = skip_whitespace(str);
+
+
+    return str;  
 }
 
 const char *parse_hex_color(const char *str, int *color)
 {
-    *color = 0; 
+    char *end_ptr;
 
-  
-    if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
-    {
-        str += 2; 
-        while (is_hex_digit(*str))
-        {
-            *color = (*color * 16) + hex_to_int(*str);
-            str++;
-        }
-    }
-    else
-    {
-        handle_error("Invalid color format.\n");
-    }
-
-    return str;
+    if (str[0] == '0' && str[1] == 'x')
+        str += 2;
+    
+    *color = strtol(str, &end_ptr, 16);
+    
+    return end_ptr;
 }
 
 int is_hex_digit(char c)
