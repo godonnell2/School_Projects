@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/25 18:01:01 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/28 18:50:30 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,8 +29,11 @@ SRC = main.c \
       prep_data_for_drawing_two.c \
       draw.c \
       read_to_buffer.c \
-      utils.c
-
+      utils.c \
+      utils_two.c \
+      utils_three.c \
+      error_handling.c 
+      
 OBJ = $(SRC:.c=.o)
 NAME = fdf
 

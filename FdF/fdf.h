@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 22:43:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:59:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,12 @@ void				handle_error(const char *message);
 void				determine_dimensions(const char *buffer, t_map *map);
 
 const char				*skip_whitespace(const char *buffer);
+int	my_isdigit(char c);
+size_t	ft_strlen(const char *str);
 const char *parse_number(const char *buffer, float *value);
+const char *parse_hex_color(const char *str, int *color);
+float my_strtof(const char *str, char **endptr);
+
 
 t_map_point		*read_map_into_array(t_map *map, char *buffer, int default_colour);
 void				print_map_array(t_map *map);
@@ -125,22 +130,13 @@ void				populate_edges(t_map *map, t_edge **edges,
 						int *edges_count);
 
 void				find_min_max(float *array, int array_size, t_map *map);
-//void				find_min_max(float *array, int array_size, t_map *map);
-// void				generate_3d_points(t_map *map, long *map_array,
-// 						t_point3d *points);
-//void				generate_3d_points(t_map *map, t_map_point  *map_array,
-//		t_point3d *points);
+
 void				convert_to_isometric(t_map *map, t_point3d *points,
-						t_point2d *iso_points, int window_height);
+						t_point2d *iso_points);
 void				scale_and_offset_points(t_point2d *iso_points, t_map *map,
 						int window_width, int window_height);
 
 void				draw_line(t_data *data, t_line *line);
 
-//uint32_t get_color(float normalized_z);
-//void adjust_map(long *array, int array_size, t_map *map, uint32_t *colors);
-const char *parse_hex_color(const char *str, int *color);
-int hex_to_int(char c);
-int is_hex_digit(char c);
 
 #endif

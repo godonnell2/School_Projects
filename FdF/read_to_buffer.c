@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:33:21 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/27 15:57:58 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:53:48 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 #define BUFFSIZE 1024
 #include <fcntl.h>
 #include <limits.h>
-#include <stdio.h> //NEED TO REPLACE WITH OWN
 #include <string.h>
 #include <unistd.h>
-
 
 int	count_words(const char *line)
 {
@@ -42,24 +40,24 @@ int	count_words(const char *line)
 	return (count);
 }
 
-static size_t	ft_strlen(const char *str)
-{
-	int	i;
+// static size_t	ft_strlen(const char *str)
+// {
+// 	int	i;
 
-	i = 0;
-	while (str[i])
-	{
-		i++;
-	}
-	return (i);
-}
+// 	i = 0;
+// 	while (str[i])
+// 	{
+// 		i++;
+// 	}
+// 	return (i);
+// }
 
-void	handle_error(const char *message)
-{
-	write(STDERR_FILENO, message, ft_strlen(message));
-    write(STDERR_FILENO, "\n", 1); 
-    exit(1);
-}
+// void	handle_error(const char *message)
+// {
+// 	write(STDERR_FILENO, message, ft_strlen(message));
+// 	write(STDERR_FILENO, "\n", 1);
+// 	exit(1);
+// }
 
 static void	handle_read_error(char *buff, int fd, const char *message)
 {
@@ -101,7 +99,7 @@ char	*read_file_to_buffer(const char *filename)
 		if (bytes_read == 0)
 			break ;
 		total += bytes_read;
-		if (total + bytes_read> total)
+		if (total + bytes_read > total)
 			buff = resize_buffer(buff, total, total + BUFFSIZE + 1);
 	}
 	buff[total] = '\0';

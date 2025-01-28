@@ -17,7 +17,7 @@ int	handle_exit(void *param)
 {
 	t_app	*app;
 
-	 handle_error("Exiting...");
+	handle_error("Exiting...");
 	app = (t_app *)param;
 	if (app->ctx.mlx_win)
 		mlx_destroy_window(app->ctx.mlx, app->ctx.mlx_win);
@@ -31,7 +31,7 @@ int	handle_exit(void *param)
 // 65307 is the keycode for ESC in MLX on Linux //53 mac
 int	handle_keypress(int keycode, void *param)
 {
-	 handle_error("keycode failure");
+	handle_error("keycode failure");
 	if (keycode == 65307 || keycode == 53)
 	{
 		handle_exit(param);
