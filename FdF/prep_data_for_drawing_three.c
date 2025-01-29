@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:31:12 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 20:37:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 21:08:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 
 // you have to bring z to zero before you start to get (0,1)
 // which is why you minus min z
-// float	*extract_z_values(t_map_point *map_array, int size)
+// float	*extract_z_values(t_map_point *values_z_color, int size)
 // Normalize x, y to the [0, 1] range based on the number of rows and columns
-void	populate_z_values(t_point3d *points, t_map_point *map_array, t_map *map)
+void populate_z_values(t_point3d *points, const t_map *map)
 {
-	float	range_z;
-	int		index;
-	int		y;
-	int		x;
+	float range_z;
+	int index;
+	t_map_point *values_z_color = map->values_z_color;
+	int y;
+	int x;
 
 	range_z = map->z_max - map->z_min;
 	y = 0;
@@ -36,8 +37,7 @@ void	populate_z_values(t_point3d *points, t_map_point *map_array, t_map *map)
 			if (range_z == 0)
 				points[index].z = 0;
 			else
-				points[index].z = (float)(map_array[index].z - map->z_min)
-					/ range_z;
+				points[index].z = (float)(values_z_color[index].z - map->z_min) / range_z;
 			x++;
 		}
 		y++;
@@ -47,9 +47,9 @@ void	populate_z_values(t_point3d *points, t_map_point *map_array, t_map *map)
 // Normalize x, y to the [0,1] range based on the number of rows and cols
 // eg points[index].x = (float)x / (map->cols - 1);
 
-static t_point3d	*allocate_points(t_map *map)
+static t_point3d *allocate_points(const t_map *map)
 {
-	t_point3d	*points;
+	t_point3d *points;
 
 	points = malloc(map->rows * map->cols * sizeof(t_point3d));
 	if (!points)
@@ -57,21 +57,11 @@ static t_point3d	*allocate_points(t_map *map)
 	return (points);
 }
 
-static t_point2d	*allocate_iso_points(t_map *map)
+static void populate_xy(t_point3d *points, const t_map *map)
 {
-	t_point2d	*iso_points;
-
-	iso_points = calloc(map->rows * map->cols, sizeof(t_point2d));
-	if (!iso_points)
-		handle_error("Memory allocation failed for iso_points.");
-	return (iso_points);
-}
-
-static void	populate_coordinates(t_point3d *points, t_map *map)
-{
-	int	index;
-	int	y;
-	int	x;
+	int index;
+	int y;
+	int x;
 
 	y = 0;
 	while (y < map->rows)
@@ -88,25 +78,27 @@ static void	populate_coordinates(t_point3d *points, t_map *map)
 	}
 }
 
-t_point2d	*prepare_iso_points(t_map *map, t_map_point *map_array, int width,
-		int height)
+t_point2d *prepare_iso_points(const t_map *map,
+							  int window_width,
+							  int window_height)
 {
-	t_point3d	*points;
-	t_point2d	*iso_points;
-
+	t_point3d *points;
+	t_point2d *iso_points;
 	points = allocate_points(map);
 	if (!points)
 		return (NULL);
-	iso_points = allocate_iso_points(map);
+
+	iso_points = malloc(map->rows * map->cols * sizeof(t_point2d));
 	if (!iso_points)
 	{
 		free(points);
+		handle_error("Memory allocation failed for iso_points.");
 		return (NULL);
 	}
-	populate_z_values(points, map_array, map);
-	populate_coordinates(points, map);
+	populate_xy(points, map);
+	populate_z_values(points, map);
 	convert_to_isometric(map, points, iso_points);
-	scale_and_offset_points(iso_points, map, width, height);
+	scale_and_offset_points(iso_points, map, window_width, window_height);
 	free(points);
 	return (iso_points);
 }

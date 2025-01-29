@@ -6,20 +6,22 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/28 20:53:12 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/29 15:46:48 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g -Iminilibx_macos 
+
 #linker flags
 # Define OS-specific flags
 ifeq ($(shell uname), Darwin)  # macOS
+CFLAGS = -Wall -Wextra -Werror -g -Iminilibx_macos 
     LDFLAGS = -L ./minilibx_macos \
               -l mlx -framework OpenGL -framework Appkit
 else  # Assume Linux
-    LDFLAGS = -L ./minilibx_macos \
-              -l mlx -l X11 -l Xext -l Xrender -l GL -lm
+CFLAGS = -Wall -Wextra -Werror -g -Iminilibx-linux 
+    LDFLAGS = -L./minilibx-linux \
+              -l mlx_Linux -l X11 -l Xext -l Xrender -l GL -lm
 endif
 
 SRC = main.c \
@@ -42,7 +44,7 @@ NAME = fdf
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:33:21 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 18:53:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:17:58 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,25 +39,6 @@ int	count_words(const char *line)
 	}
 	return (count);
 }
-
-// static size_t	ft_strlen(const char *str)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	while (str[i])
-// 	{
-// 		i++;
-// 	}
-// 	return (i);
-// }
-
-// void	handle_error(const char *message)
-// {
-// 	write(STDERR_FILENO, message, ft_strlen(message));
-// 	write(STDERR_FILENO, "\n", 1);
-// 	exit(1);
-// }
 
 static void	handle_read_error(char *buff, int fd, const char *message)
 {

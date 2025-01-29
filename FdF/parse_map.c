@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 20:54:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:40:46 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,18 @@
 // and to this function you pass a default colour,
 // if it does not have a comma colour
 
-static t_map_point	*allocate_map_array(int size)
+static t_map_point *allocate_or_fail(int size)
 {
-	t_map_point	*map_array;
+	t_map_point *values_z_color;
 
-	map_array = malloc(size * sizeof(t_map_point));
-	if (!map_array)
-		handle_error("Memory allocation failed for map_array.\n");
-	return (map_array);
+	values_z_color = malloc(size * sizeof(t_map_point));
+	if (!values_z_color)
+		handle_error("Memory allocation failed for values_z_color.\n");
+	return (values_z_color);
 }
 
-static const char	*parse_map_point(const char *buffer, t_map_point *point,
-		int default_colour)
+static const char *parse_map_point(const char *buffer, t_map_point *point,
+								   int default_colour)
 {
 	buffer = skip_whitespace(buffer);
 	if (*buffer == '\0')
@@ -50,24 +50,24 @@ static const char	*parse_map_point(const char *buffer, t_map_point *point,
 	return (buffer);
 }
 
-t_map_point	*read_map_into_array(t_map *map, char *buffer, int default_colour)
+t_map_point *read_z_color(int array_size, char *buffer, int default_colour)
 {
-	int			array_size;
-	t_map_point	*map_array;
-	const char	*tmp_buff = buffer;
-	int			i;
-
-	array_size = map->rows * map->cols;
-	map_array = allocate_map_array(array_size);
+	t_map_point *values_z_color;
+	const char *tmp_buff = buffer;
+	int i;
+	values_z_color = allocate_or_fail(array_size);
 	i = 0;
 	while (i < array_size)
 	{
-		tmp_buff = parse_map_point(tmp_buff, &map_array[i], default_colour);
+		tmp_buff = parse_map_point(tmp_buff, &values_z_color[i], default_colour);
 		i++;
 	}
 	if (i < array_size)
+	{
+		free(values_z_color);
 		handle_error("Incorrect number of elements.\n");
-	return (map_array);
+	}
+	return (values_z_color);
 }
 
 // READ THE WHOLE FILE INTO A STRING(BUFFER)

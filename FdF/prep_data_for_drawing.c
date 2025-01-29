@@ -6,67 +6,36 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/28 20:12:45 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 21:08:28 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h>
 
-void	find_min_max(t_map_point *map_array, int array_size, t_map *map)
+void find_min_max(t_map *map)
 {
-	int	i;
+	int i;
+	int array_size;
+	t_map_point *values = map->values_z_color;
+	array_size = map->cols * map->rows;
 
-	if (array_size <= 0)
-	{
-		map->z_min = 0;
-		map->z_max = 0;
-		handle_error("Array size is 0 or negative. Setting min/max to 0.\n");
-		return ;
-	}
-	map->z_min = map_array[0].z;
-	map->z_max = map_array[0].z;
+	map->z_min = map->values_z_color[0].z;
+	map->z_max = map->values_z_color[0].z;
 	i = 1;
 	while (i < array_size)
 	{
-		if (map_array[i].z < map->z_min)
+		if (values[i].z < map->z_min)
 		{
-			map->z_min = map_array[i].z;
+			map->z_min = values[i].z;
 		}
-		if (map_array[i].z > map->z_max)
+		if (values[i].z > map->z_max)
 		{
-			map->z_max = map_array[i].z;
+			map->z_max = values[i].z;
 		}
 		i++;
 	}
 }
-// void	find_min_max(float *array, int array_size, t_map *map)
-// {
-// 	int	i;
-
-// 	if (array_size <= 0)
-// 	{
-// 		map->z_min = 0;
-// 		map->z_max = 0;
-// 		handle_error("Array size is 0 or neg. Setting minmax to 0.\n");
-// 		return ;
-// 	}
-// 	map->z_min = array[0];
-// 	map->z_max = array[0];
-// 	i = 1;
-// 	while (i < array_size)
-// 	{
-// 		if (array[i] < map->z_min)
-// 		{
-// 			map->z_min = array[i];
-// 		}
-// 		if (array[i] > map->z_max)
-// 		{
-// 			map->z_max = array[i];
-// 		}
-// 		i++;
-// 	}
-// }
 
 // so basically this is how we drop the z axis
 // because screens dont have a z axis
@@ -89,19 +58,18 @@ void	find_min_max(t_map_point *map_array, int array_size, t_map *map)
 // iso_x = (x - y) * cos(θ)
 // iso_y = (x + y) * sin(θ) - z
 
-void	convert_to_isometric(t_map *map, t_point3d *points,
-		t_point2d *iso_points)
+void convert_to_isometric(const t_map *map, const t_point3d *points,
+						  t_point2d *iso_points)
 {
-	float	iso_x;
-	float	iso_y;
-	int		i;
+	float iso_x;
+	float iso_y;
+	int i;
 
 	i = 0;
 	while (i < map->rows * map->cols)
 	{
 		iso_x = (points[i].x - points[i].y) * cos(0.523599);
-		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z
-				/ 10);
+		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z / 10);
 		iso_points[i].x = iso_x;
 		iso_points[i].y = iso_y;
 		i++;
@@ -110,14 +78,14 @@ void	convert_to_isometric(t_map *map, t_point3d *points,
 // Center horizontally
 // Center vertically
 
-void	scale_and_offset_points(t_point2d *iso_points, t_map *map,
-		int window_width, int window_height)
+void scale_and_offset_points(t_point2d *iso_points, const t_map *map,
+							 int window_width, int window_height)
 {
-	int		total_points;
-	float	scale_factor;
-	int		offset_x;
-	int		offset_y;
-	int		i;
+	int total_points;
+	float scale_factor;
+	int offset_x;
+	int offset_y;
+	int i;
 
 	total_points = map->cols * map->rows;
 	scale_factor = fmin(window_width / 1.6f, window_height / 1.6f);
