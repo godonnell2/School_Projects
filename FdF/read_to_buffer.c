@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:33:21 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 20:17:58 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 21:46:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ static void	handle_read_error(char *buff, int fd, const char *message)
 {
 	if (buff)
 		free(buff);
-	close(fd);
+	if (fd != -1)
+		close(fd);
 	handle_error(message);
 }
 
@@ -70,7 +71,7 @@ char	*read_file_to_buffer(const char *filename)
 	fd = open(filename, O_RDONLY);
 	buff = malloc(BUFFSIZE + 1);
 	if (fd == -1 || !buff)
-		handle_read_error(NULL, fd, "Error with fd or malloc");
+		handle_read_error(buff, fd, "Error with fd or malloc");
 	total = 0;
 	while (1)
 	{

@@ -13,7 +13,7 @@
 #include "fdf.h"
 #include <mlx.h>
 
-void free_iso_points(t_app *app)
+void	free_iso_points(t_app *app)
 {
 	if (app->iso_points)
 	{
@@ -22,7 +22,7 @@ void free_iso_points(t_app *app)
 	}
 }
 
-void free_map_array(t_app *app)
+void	free_map_array(t_app *app)
 {
 	if (app->map.values_z_color)
 	{
@@ -31,7 +31,7 @@ void free_map_array(t_app *app)
 	}
 }
 
-void destroy_window_and_image(t_app *app)
+void	destroy_window_and_image(t_app *app)
 {
 	if (app->ctx.mlx_win)
 	{
@@ -45,9 +45,9 @@ void destroy_window_and_image(t_app *app)
 	}
 }
 
-int handle_exit(void *param)
+int	handle_exit(void *param)
 {
-	t_app *app;
+	t_app	*app;
 
 	app = (t_app *)param;
 	handle_error("Exiting...");
@@ -58,7 +58,7 @@ int handle_exit(void *param)
 }
 
 // 65307 is the keycode for ESC in MLX on Linux //53 mac
-int handle_keypress(int keycode, void *param)
+int	handle_keypress(int keycode, void *param)
 {
 	if (keycode == 65307 || keycode == 53)
 	{

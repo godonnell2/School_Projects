@@ -13,13 +13,14 @@
 #include "fdf.h"
 #include <stdio.h>
 
-void find_min_max(t_map *map)
+void	find_min_max(t_map *map)
 {
-	int i;
-	int array_size;
-	t_map_point *values = map->values_z_color;
-	array_size = map->cols * map->rows;
+	int			i;
+	int			array_size;
+	t_map_point	*values;
 
+	values = map->values_z_color;
+	array_size = map->cols * map->rows;
 	map->z_min = map->values_z_color[0].z;
 	map->z_max = map->values_z_color[0].z;
 	i = 1;
@@ -58,18 +59,19 @@ void find_min_max(t_map *map)
 // iso_x = (x - y) * cos(θ)
 // iso_y = (x + y) * sin(θ) - z
 
-void convert_to_isometric(const t_map *map, const t_point3d *points,
-						  t_point2d *iso_points)
+void	convert_to_isometric(const t_map *map, const t_point3d *points,
+		t_point2d *iso_points)
 {
-	float iso_x;
-	float iso_y;
-	int i;
+	float	iso_x;
+	float	iso_y;
+	int		i;
 
 	i = 0;
 	while (i < map->rows * map->cols)
 	{
 		iso_x = (points[i].x - points[i].y) * cos(0.523599);
-		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z / 10);
+		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z
+				/ 10);
 		iso_points[i].x = iso_x;
 		iso_points[i].y = iso_y;
 		i++;
@@ -78,14 +80,14 @@ void convert_to_isometric(const t_map *map, const t_point3d *points,
 // Center horizontally
 // Center vertically
 
-void scale_and_offset_points(t_point2d *iso_points, const t_map *map,
-							 int window_width, int window_height)
+void	scale_and_offset_points(t_point2d *iso_points, const t_map *map,
+		int window_width, int window_height)
 {
-	int total_points;
-	float scale_factor;
-	int offset_x;
-	int offset_y;
-	int i;
+	int		total_points;
+	float	scale_factor;
+	int		offset_x;
+	int		offset_y;
+	int		i;
 
 	total_points = map->cols * map->rows;
 	scale_factor = fmin(window_width / 1.6f, window_height / 1.6f);
