@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 18:07:08 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 21:08:28 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:59:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,50 +59,31 @@ void	find_min_max(t_map *map)
 // iso_x = (x - y) * cos(θ)
 // iso_y = (x + y) * sin(θ) - z
 
-void	convert_to_isometric(const t_map *map, const t_point3d *points,
-		t_point2d *iso_points)
+void	to_pixel_coords(const t_map *map, const t_point3d *points,
+		t_point2d *iso_points, t_point2d window_size)
 {
-	float	iso_x;
-	float	iso_y;
-	int		i;
+	float		iso_x;
+	float		iso_y;
+	float		scale_factor;
+	t_point2d	offset;
+	int			i;
 
+	scale_factor = fmin(window_size.x / 1.6f, window_size.y / 1.6f);
+	offset.x = window_size.x / 2;
+	offset.y = window_size.y / 4;
 	i = 0;
 	while (i < map->rows * map->cols)
 	{
 		iso_x = (points[i].x - points[i].y) * cos(0.523599);
 		iso_y = (points[i].x + points[i].y) * sin(0.523599) - (points[i].z
 				/ 10);
-		iso_points[i].x = iso_x;
-		iso_points[i].y = iso_y;
+		iso_points[i].x = iso_x * scale_factor + offset.x;
+		iso_points[i].y = iso_y * scale_factor + offset.y;
 		i++;
 	}
 }
 // Center horizontally
 // Center vertically
-
-void	scale_and_offset_points(t_point2d *iso_points, const t_map *map,
-		int window_width, int window_height)
-{
-	int		total_points;
-	float	scale_factor;
-	int		offset_x;
-	int		offset_y;
-	int		i;
-
-	total_points = map->cols * map->rows;
-	scale_factor = fmin(window_width / 1.6f, window_height / 1.6f);
-	offset_x = window_width / 2;
-	offset_y = window_height / 4;
-	i = 0;
-	while (i < total_points)
-	{
-		iso_points[i].x *= scale_factor;
-		iso_points[i].y *= scale_factor;
-		iso_points[i].x += offset_x;
-		iso_points[i].y += offset_y;
-		i++;
-	}
-}
 
 // t_edge edges[] = {
 // 	{.start = 0, .end = 1},

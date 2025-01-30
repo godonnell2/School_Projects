@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_path.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:11:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 21:05:58 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:48:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,12 +85,8 @@ void	resolve_command_full_path(char **envp, char *cmd, char *full_path)
 /*
 etrieve the value of the PATH environment variable from an array of
 environment variables. The PATH variable contains a list of directories that
-the system searches for executable files.
-*/
-/*
-char		*envp[] = {
-"PATH=/usr/local/bin:/usr/bin:/bin",
-NULL // End of environment variables
+the system searches for executable files.my_printf2.c: OK!
+
 };
 char		*cmd = "ls";
 char		*full_path = cmd_path(envp, cmd);

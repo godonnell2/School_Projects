@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 22:39:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:14:59 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	validate_input_and_commands(t_data *data, char **av, char **envp)
+static int	validate_input_and_commands(t_data *data, char **av, char **envp)
 {
 	data->input_fd = open(av[1], O_RDONLY);
 	if (data->input_fd < 0)
@@ -22,101 +22,138 @@ int	validate_input_and_commands(t_data *data, char **av, char **envp)
 		err_case_cmd(data, av, 2);
 	resolve_command_full_path(envp, data->cmd1_args[0], data->cmd1_fullpath);
 	if (data->cmd1_fullpath[0] == '\0')
-	{
 		err_case_cmd(data, av, 2);
-	}
 	data->cmd2_args = ft_split_buff(av[3], ' ', data->buff_two);
 	if (data->cmd2_args[0] == NULL)
-	{
 		err_case_cmd(data, av, 3);
-	}
 	resolve_command_full_path(envp, data->cmd2_args[0], data->cmd2_fullpath);
 	if (data->cmd2_fullpath[0] == '\0')
-	{
 		err_case_cmd(data, av, 3);
-	}
 	return (1);
 }
 
-void handle_first_child(t_data *data, char **envp)
+static void	handle_first_child(t_data *data, char **envp)
 {
-    if (dup2(data->input_fd, IN) < 0 || dup2(data->pipe_fd[WRITE], OUT) < 0)
-        err_case(data, NULL);
-    close(data->pipe_fd[READ]);
-    close(data->pipe_fd[WRITE]);
-    close(data->input_fd);
-    execve(data->cmd1_fullpath, data->cmd1_args, envp);
-    perror("");
-    exit(EXIT_FAILURE);
+	if (dup2(data->input_fd, IN) < 0 | > cmd1_args, envp)
+		;
+	perror("");
+	exit(EXIT_FAILURE);
 }
 
-void handle_second_child(t_data *data, char **av, char **envp)
+static void	handle_second_child(t_data *data, char **av, char **envp)
 {
-    data->output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (data->output_fd < 0)
-        err_case_perror(data, av, 4);
-
-    if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
-        err_case(data, NULL);
-    close(data->pipe_fd[READ]);
-    close(data->output_fd);
-    execve(data->cmd2_fullpath, data->cmd2_args, envp);
-    perror("");
-    exit(EXIT_FAILURE);
+	data->output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (data->output_fd < 0)
+		err_case_perror(data, av, 4);
+	if (dup2(data->pipe_fd[READ], IN) < 0 || dup2(data->output_fd, OUT) < 0)
+		err_case(data, NULL);
+	close(data->pipe_fd[READ]);
+	close(data->output_fd);
+	execve(data->cmd2_fullpath, data->cmd2_args, envp);
+	perror("");
+	exit(EXIT_FAILURE);
 }
 
-void create_pipes_and_forks(t_data *data, char **av, char **envp)
+static void	create_pipes_and_forks(t_data *data, char **av, char **envp)
 {
-    if (pipe(data->pipe_fd) < 0)
-        err_case(data, NULL);
-
-    data->pid1 = fork();
-    if (data->pid1 < 0)
-        err_case(data, NULL);
-    if (data->pid1 == 0)
-        handle_first_child(data, envp);
-
-    close(data->pipe_fd[WRITE]);
-
-    data->pid2 = fork();
-    if (data->pid2 < 0)
-        err_case(data, NULL);
-    if (data->pid2 == 0)
-        handle_second_child(data, av, envp);
-
-    close(data->pipe_fd[READ]);
+	if (pipe(data->pipe_fd) < 0)
+		err_case(data, NULL);
+	data->pid1 = fork();
+	if (data->pid1 < 0)
+		err_case(data, NULL);
+	if (data->pid1 == 0)
+		handle_first_child(data, envp);
+	close(data->pipe_fd[WRITE]);
+	data->pid2 = fork();
+	if (data->pid2 < 0)
+		err_case(data, NULL);
+	if (data->pid2 == 0)
+		handle_second_child(data, av, envp);
+	close(data->pipe_fd[READ]);
 }
 
-void wait_for_children(t_data *data, int *exit_code)
+int	main(int ac, char **av, char **envp)
 {
-    waitpid(data->pid1, NULL, 0);
-    waitpid(data->pid2, exit_code, 0);
+	t_data	data;
+
+	if (ac != 5)
+		print_usage();
+	data = init_data();
+	if (!validate_input_and_commands(&data, av, envp))
+		return (1);
+	create_pipes_and_forks(&data, av, envp);
+	waitpid(data.pid1, NULL, 0);
+	waitpid(data.pid2, NULL, 0);
+	close_data(&data);
+	return (0);
 }
-
-int main(int ac, char **av, char **envp)
-{
-    t_data data;
-    int exit_code;
-
-    if (ac != 5)
-        print_usage();
-
-    data = init_data();
-    if (!validate_input_and_commands(&data, av, envp))
-        return (1);
-
-    create_pipes_and_forks(&data, av, envp);
-    wait_for_children(&data, &exit_code);
-
-    close_data(&data);
-    return (exit_code);
-}
-
 
 /*
+When you pass 0 as the third argument to waitpid, it means that you are not
+using any special options. The function will block (i.e., wait)
+ until the specified child process (in this case, data.pid1) terminates.
+*/
+
+/*
+<<<<<<< HEAD
+=======
+int	main(int ac, char **av, char **envp)
+{
+	t_data	data;
+	int		exit_code;
+
+	exit_code = 0;
+	if (ac != 5)
+		print_usage();
+	data = init_data();
+	if (!validate_input_and_commands(&data, av, envp))
+	{
+		return (1);
+	}
+	if (pipe(data.pipe_fd) < 0)
+		err_case(&data, av);
+	data.pid1 = fork();
+	if (data.pid1 < 0)
+		err_case(&data, av);
+	if (data.pid1 == 0)
+	{
+		if (dup2(data.input_fd, IN) < 0 || dup2(data.pipe_fd[WRITE], OUT) < 0)
+			err_case(&data, av);
+		close(data.pipe_fd[READ]);
+		close(data.pipe_fd[WRITE]);
+		close(data.input_fd);
+		execve(data.cmd1_fullpath, data.cmd1_args, envp);
+		perror("");
+		exit(EXIT_FAILURE);
+	}my_printf2.c: OK!
+ac - 1);
+	data.pid2 = fork();
+	if (data.pid2 < 0)
+		err_case(&data, av);
+	if (data.pid2 == 0)
+	{
+		if (dup2(data.pipe_fd[READ], IN) < 0 || dup2(data.output_fd, OUT) < 0)
+			err_case(&data, av);
+		close(data.pipe_fd[READ]);
+		close(data.output_fd);
+		execve(data.cmd2_fullpath, data.cmd2_args, envp);
+		perror("");
+		exit(EXIT_FAILURE);
+	}
+	close(data.pipe_fd[READ]);
+	close(data.output_fd);
+	waitpid(data.pid1, NULL, 0);
+	waitpid(data.pid2, &exit_code, 0);
+	close_data(&data);
+	return (exit_code);
+}
+*/
+
+/*
+>>>>>>> 40886d6f2ebf7de93f24aa94198ba32ae39266e2
 ERROR ONE!!
 valgrind --trace-children=yes --track-fds=yes ./pipex infile "" "" FIXED
-valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cat" "" out 
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cat" "" out
 FIXED I THINK??!!!
 maybe this is an issue with if data->pid != 0 return data->pid
 
@@ -125,7 +162,7 @@ valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "cd" "wc -l" pwd
 one extra open fd NOT SURE ABOUT THIS ONE
 
 ERROR THREE
-valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "sleep 1" 
+valgrind --trace-children=yes --track-fds=yes ./pipex input.txt "sleep 1"
 "sleep 10" out
 time ./pipex input.txt "sleep 2" "sleep 2" out
 printf("fds input=%d pipe[0]=%d pipe[1]=%d\n", data.input_fd,
@@ -184,9 +221,7 @@ attempt to write to it, you need to close the write end of the pipe in the
 second child process.
 The second child process is responsible for reading from the pipe and writing
  the output to the specified file.
-The second child does not write to the pipe; it only reads from it using
-data->pipe_fd[READ].
- Why Close WRITE?
+The second child does not write to the waitpid(data.pid2, NULL, 0);
 a) Avoid Resource Waste:
 The second child does not need the WRITE of the pipe.
 Keeping it open unnecessarily consumes system resources, as the operating

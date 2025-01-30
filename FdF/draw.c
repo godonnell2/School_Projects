@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:23:50 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 13:31:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:30:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,11 @@ static void	update_bresenham(t_bresenham *vars, t_point2d *start)
 
 void	draw_line(t_data *t_data_pix, t_point2d start, t_point2d end, int color)
 {
-	//THIS IS ISSUE
 	t_bresenham	vars;
 
 	vars.dx = abs((int)end.x - (int)start.x);
 	vars.dy = abs((int)end.y - (int)start.y);
-	if (start.x < end.x )
+	if (start.x < end.x)
 		vars.sx = 1;
 	else
 		vars.sx = -1;
@@ -55,7 +54,7 @@ void	draw_line(t_data *t_data_pix, t_point2d start, t_point2d end, int color)
 	while (1)
 	{
 		put_pixel(t_data_pix, start.x, start.y, color);
-		if (start.x == end.x  && start.y== end.y)
+		if (start.x == end.x && start.y == end.y)
 			break ;
 		vars.e2 = vars.err * 2;
 		update_bresenham(&vars, &start);

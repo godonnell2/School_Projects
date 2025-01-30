@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:31:12 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 11:55:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:56:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ t_point2d	*prepare_iso_points(const t_map *map, int window_width,
 		return (NULL);
 	}
 	populate_normalise_3d_points(points, map);
-	convert_to_isometric(map, points, iso_points);
+	to_pixel_coords(map, points, iso_points);
 	scale_and_offset_points(iso_points, map, window_width, window_height);
 	free(points);
 	return (iso_points);

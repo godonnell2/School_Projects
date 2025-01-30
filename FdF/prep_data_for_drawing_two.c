@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:16:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 13:19:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:56:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,7 @@ static void	populate_normalise_3d_points(t_point3d *points, const t_map *map)
 	}
 }
 
-t_point2d	*prepare_iso_points(const t_map *map, int window_width,
-		int window_height)
+t_point2d	*prepare_iso_points(const t_map *map, t_point2d window_size)
 {
 	t_point3d	*points;
 	t_point2d	*iso_points;
@@ -94,8 +93,7 @@ t_point2d	*prepare_iso_points(const t_map *map, int window_width,
 		return (NULL);
 	}
 	populate_normalise_3d_points(points, map);
-	convert_to_isometric(map, points, iso_points);
-	scale_and_offset_points(iso_points, map, window_width, window_height);
+	to_pixel_coords(map, points, iso_points, window_size);
 	free(points);
 	return (iso_points);
 }

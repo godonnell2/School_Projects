@@ -5,12 +5,14 @@
 #                                                     +:+ +:+         +:+      #
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/12/29 07:36:00 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/20 13:53:11 by gro-donn         ###   ########.fr        #
+#    Created: 2025/01/30 21:15:32 by gro-donn          #+#    #+#              #
+#    Updated: 2025/01/30 21:15:33 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-CC = gcc
+
+NAME = pipex
+CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 SRC = main.c \
 	helper.c \
@@ -22,7 +24,7 @@ SRC = main.c \
 	my_printf2.c
 
 OBJ = $(SRC:.c=.o)
-NAME = pipex
+
 
 all: $(NAME)
 

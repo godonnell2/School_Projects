@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 13:31:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:52:27 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,15 @@ The angles between the axes are equal (typically 120 degrees).
 The x, y, and z coordinates are transformed to give a sense of depth.
 */
 
-static void	initialize_context(t_mlx_context *ctx, t_data *img, int width,
-		int height)
+static void	initialize_context(t_mlx_context *ctx, t_data *img,
+		t_point2d window_size)
 {
 	ctx->mlx = mlx_init();
 	if (!ctx->mlx)
 		handle_error("Error: Failed to initialize mlx");
-	ctx->mlx_win = mlx_new_window(ctx->mlx, width, height,
+	ctx->mlx_win = mlx_new_window(ctx->mlx, window_size.x, window_size.y,
 			"This is my map on tv");
-	img->img = mlx_new_image(ctx->mlx, width, height);
+	img->img = mlx_new_image(ctx->mlx, window_size.x, window_size.y);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 			&img->line_length, &img->endian);
 }
@@ -34,10 +34,10 @@ static void	initialize_context(t_mlx_context *ctx, t_data *img, int width,
 static void	render_edge(t_data *img, t_edge *edge, t_map *map,
 		t_point2d *iso_points)
 {
-	// THIS IS ISSUE
 	t_point2d	start;
 	t_point2d	end;
 
+	// THIS IS ISSUE
 	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0
 		|| edge->end >= map->cols * map->rows)
 		handle_error("invalid edges");
@@ -97,13 +97,12 @@ int	main(int argc, char **argv)
 	t_app	app;
 	int		default_colour;
 
-	app.window_width = 1100;
-	app.window_height = 800;
+	app.window_size.x = 1100;
+	app.window_size.y = 800;
 	default_colour = 0xFFFFFF;
 	app.map = read_and_init_map(argc, argv, default_colour);
-	app.iso_points = prepare_iso_points(&app.map, app.window_width,
-			app.window_height);
-	initialize_context(&app.ctx, &app.img, app.window_width, app.window_height);
+	app.iso_points = prepare_iso_points(&app.map, app.window_size);
+	initialize_context(&app.ctx, &app.img, app.window_size);
 	render_edges(&app.img, &app.map, app.iso_points);
 	mlx_put_image_to_window(app.ctx.mlx, app.ctx.mlx_win, app.img.img, 0, 0);
 	mlx_hook(app.ctx.mlx_win, 17, 0, handle_exit, &app);
