@@ -1,0 +1,22 @@
+
+services:
+  your_service_name:
+    image: ubuntu:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: host
+    
+#services:
+  c-dev-env:
+    build:
+      context: .
+    container_name: my-c-container
+    volumes:
+      - ../:/workspace
+    stdin_open: true
+    tty: true

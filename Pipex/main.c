@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 22:11:34 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/29 22:39:24 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,64 +112,6 @@ int main(int ac, char **av, char **envp)
     return (exit_code);
 }
 
-
-/*
-int	main(int ac, char **av, char **envp)
-{
-	t_data	data;
-	int		exit_code;
-
-	exit_code = 0;
-	if (ac != 5)
-		print_usage();
-	data = init_data();
-	if (!validate_input_and_commands(&data, av, envp))
-	{
-		return (1);
-	}
-	if (pipe(data.pipe_fd) < 0)
-		err_case(&data, av);
-	
-	data.pid1 = fork();
-	if (data.pid1 < 0)
-		err_case(&data, av);
-	if (data.pid1 == 0)
-	{
-		if (dup2(data.input_fd, IN) < 0 || dup2(data.pipe_fd[WRITE], OUT) < 0)
-			err_case(&data, av);
-		close(data.pipe_fd[READ]);
-		close(data.pipe_fd[WRITE]);
-		close(data.input_fd);
-		execve(data.cmd1_fullpath, data.cmd1_args, envp);
-		perror("");
-		exit(EXIT_FAILURE);
-	}
-	close(data.pipe_fd[WRITE]);
-	close(data.input_fd);
-	data.output_fd = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (data.output_fd < 0)
-		err_case_perror(&data, av, ac - 1);
-	data.pid2 = fork();
-	if (data.pid2 < 0)
-		err_case(&data, av);
-	if (data.pid2 == 0)
-	{
-		if (dup2(data.pipe_fd[READ], IN) < 0 || dup2(data.output_fd, OUT) < 0)
-			err_case(&data, av);
-		close(data.pipe_fd[READ]);
-		close(data.output_fd);
-		execve(data.cmd2_fullpath, data.cmd2_args, envp);
-		perror("");
-		exit(EXIT_FAILURE);
-	}
-	close(data.pipe_fd[READ]);
-	close(data.output_fd);
-	waitpid(data.pid1, NULL, 0);
-	waitpid(data.pid2, &exit_code, 0);
-	close_data(&data);
-	return (exit_code);
-}
-*/
 
 /*
 ERROR ONE!!

@@ -6,11 +6,11 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/30 11:56:39 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/30 20:50:32 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-CC = gcc
+CC = cc
 
 #linker flags
 # Define OS-specific flags
@@ -35,9 +35,9 @@ SRC = main.c \
       utils_two.c \
       utils_three.c \
       error_handling.c 
-      
-OBJ = $(SRC:.c=.o)
+
 NAME = fdf
+OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
