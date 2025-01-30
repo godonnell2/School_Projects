@@ -15,6 +15,7 @@
 
 # define READ 0  // index for the read end of the pipe
 # define WRITE 1 // index for the write end of the pipe
+# define PATH_MAX 10000
 # define IN 0
 # define OUT 1
 # define SPLIT_BUFF_SIZE 102400

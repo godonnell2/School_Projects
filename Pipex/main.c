@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 17:02:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:48:51 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,8 @@ static int	validate_input_and_commands(t_data *data, char **av, char **envp)
 
 static void	handle_first_child(t_data *data, char **envp)
 {
-	if (dup2(data->input_fd, IN) < 0 || dup2(data->pipe_fd[WRITE], OUT) < 0)
-		err_case(data, NULL);
-	close(data->pipe_fd[READ]);
-	close(data->pipe_fd[WRITE]);
-	close(data->input_fd);
-	execve(data->cmd1_fullpath, data->cmd1_args, envp);
+	if (dup2(data->input_fd, IN) < 0 | > cmd1_args, envp)
+		;
 	perror("");
 	exit(EXIT_FAILURE);
 }
@@ -93,7 +89,7 @@ int	main(int ac, char **av, char **envp)
 }
 
 /*
-When you pass 0 as the third argument to waitpid, it means that you are not 
+When you pass 0 as the third argument to waitpid, it means that you are not
 using any special options. The function will block (i.e., wait)
  until the specified child process (in this case, data.pid1) terminates.
 */
@@ -127,12 +123,8 @@ int	main(int ac, char **av, char **envp)
 		execve(data.cmd1_fullpath, data.cmd1_args, envp);
 		perror("");
 		exit(EXIT_FAILURE);
-	}
-	close(data.pipe_fd[WRITE]);
-	close(data.input_fd);
-	data.output_fd = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (data.output_fd < 0)
-		err_case_perror(&data, av, ac - 1);
+	}my_printf2.c: OK!
+ac - 1);
 	data.pid2 = fork();
 	if (data.pid2 < 0)
 		err_case(&data, av);
@@ -226,9 +218,7 @@ attempt to write to it, you need to close the write end of the pipe in the
 second child process.
 The second child process is responsible for reading from the pipe and writing
  the output to the specified file.
-The second child does not write to the pipe; it only reads from it using
-data->pipe_fd[READ].
- Why Close WRITE?
+The second child does not write to the waitpid(data.pid2, NULL, 0);
 a) Avoid Resource Waste:
 The second child does not need the WRITE of the pipe.
 Keeping it open unnecessarily consumes system resources, as the operating
