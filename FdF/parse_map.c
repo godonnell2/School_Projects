@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 20:40:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 10:11:54 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,6 @@
 // instead of a long use another struct that contains the long and a colour
 // and to this function you pass a default colour,
 // if it does not have a comma colour
-
-static t_map_point	*allocate_or_fail(int size)
-{
-	t_map_point	*values_z_color;
-
-	values_z_color = malloc(size * sizeof(t_map_point));
-	if (!values_z_color)
-		handle_error("Memory allocation failed for values_z_color.\n");
-	return (values_z_color);
-}
 
 static const char	*parse_map_point(const char *buffer, t_map_point *point,
 		int default_colour)
@@ -56,7 +46,9 @@ t_map_point	*read_z_color(int array_size, char *buffer, int default_colour)
 	const char	*tmp_buff = buffer;
 	int			i;
 
-	values_z_color = allocate_or_fail(array_size);
+	values_z_color = malloc(array_size * sizeof(t_map_point));
+	if (!values_z_color)
+		handle_error("Memory allocation failed for values_z_color.\n");
 	i = 0;
 	while (i < array_size)
 	{
@@ -71,6 +63,56 @@ t_map_point	*read_z_color(int array_size, char *buffer, int default_colour)
 	}
 	return (values_z_color);
 }
+
+static int	validate_line(const char *line_start, int *cols, int first_row)
+{
+	int	current_width;
+
+	current_width = count_words(line_start);
+	if (first_row)
+	{
+		*cols = current_width;
+	}
+	else if (current_width != *cols)
+	{
+		handle_error("Error: inconsistent cols in map data");
+	}
+	return (current_width);
+}
+
+static const char	*find_next_line(const char *buffer)
+{
+	while (*buffer && *buffer != '\n')
+		buffer++;
+	if (*buffer == '\n')
+		buffer++;
+	return (buffer);
+}
+
+void	determine_dimensions(const char *buffer, t_map *map)
+{
+	int			rows;
+	int			cols;
+	int			first_row;
+	const char	*line_start = buffer;
+
+	rows = 0;
+	cols = 0;
+	first_row = 1;
+	while (*buffer)
+	{
+		buffer = find_next_line(buffer);
+		if (buffer > line_start)
+		{
+			validate_line(line_start, &cols, first_row);
+			first_row = 0;
+		}
+		rows++;
+	}
+	map->rows = rows;
+	map->cols = cols;
+}
+
 
 // READ THE WHOLE FILE INTO A STRING(BUFFER)
 // DETERMINE WIDTH AND HEIGHT

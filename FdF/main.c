@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 21:11:47 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 10:29:38 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 	free(edges);
 }
 
+
 static t_map	read_and_init_map(int argc, char **argv, int default_colour)
 {
 	char	*buffer;
@@ -86,6 +87,7 @@ static t_map	read_and_init_map(int argc, char **argv, int default_colour)
 		free(buffer);
 		handle_error("There's no point, no points\n");
 	}
+	
 	map.values_z_color = read_z_color(map.cols * map.rows, buffer,
 			default_colour);
 	free(buffer);
