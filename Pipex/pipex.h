@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 08:22:36 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/20 21:14:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 16:44:44 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,17 +64,12 @@ char		**ft_split_buff(char const *s, char sep, void *buff);
 void		print_usage(void);
 t_data		init_data(void);
 void		close_data(t_data *data);
-
+void		resolve_command_full_path(char **envp, char *cmd, char *full_path);
 void		err_case(t_data *data, char **av);
 void		err_case_cmd(t_data *data, char **av, int i);
 void		err_case_perror(t_data *data, char **av, int i);
 
-pid_t		first_child(t_data *data, char **av, char **envp);
-pid_t		second_child(t_data *data, int ac, char **av, char **envp);
-void		resolve_command_full_path(char **envp, char *cmd, char *full_path);
 void		ft_printf(const char *mandatory_string, ...);
-
-int			main(int ac, char **av, char **envp);
 
 void		ft_printchar(char c, int fd);
 char		*ft_strchr(const char *s, int c);
