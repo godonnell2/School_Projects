@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 10:29:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:31:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ static void	initialize_context(t_mlx_context *ctx, t_data *img, int width,
 static void	render_edge(t_data *img, t_edge *edge, t_map *map,
 		t_point2d *iso_points)
 {
+	// THIS IS ISSUE
 	t_point2d	start;
 	t_point2d	end;
-	t_line		line;
 
 	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0
 		|| edge->end >= map->cols * map->rows)
@@ -45,12 +45,7 @@ static void	render_edge(t_data *img, t_edge *edge, t_map *map,
 	end = iso_points[edge->end];
 	if (start.x == end.x && start.y == end.y)
 		return ;
-	line.x0 = start.x;
-	line.y0 = start.y;
-	line.x1 = end.x;
-	line.y1 = end.y;
-	line.color = map->values_z_color[edge->start].color;
-	draw_line(img, &line);
+	draw_line(img, start, end, map->values_z_color[edge->start].color);
 }
 
 static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
@@ -59,8 +54,12 @@ static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 	t_edge	*edges;
 	int		i;
 
-	edges = NULL;
-	populate_edges(map, &edges, &edges_count);
+	edges_count = (map->cols - 1) * map->rows + (map->rows - 1) * map->cols;
+	edges = populate_edges(map, edges_count);
+	if (!edges)
+	{
+		handle_error("Memory allocation failed for  populate edges.\n");
+	}
 	i = 0;
 	while (i < edges_count)
 	{
@@ -69,7 +68,6 @@ static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 	}
 	free(edges);
 }
-
 
 static t_map	read_and_init_map(int argc, char **argv, int default_colour)
 {
@@ -87,7 +85,6 @@ static t_map	read_and_init_map(int argc, char **argv, int default_colour)
 		free(buffer);
 		handle_error("There's no point, no points\n");
 	}
-	
 	map.values_z_color = read_z_color(map.cols * map.rows, buffer,
 			default_colour);
 	free(buffer);

@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/29 21:08:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:24:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,13 +123,7 @@ float my_strtof(const char *str, char **endptr);
 
 t_map_point *read_z_color(int num_elems, char *buffer,
 						  int default_colour);
-void print_map_array(t_map *map);
-void generate_horizontal_edges(t_map *map, t_edge *edges,
-							   int *edge_index);
-void generate_vertical_edges(t_map *map, t_edge *edges,
-							 int *edge_index);
-void populate_edges(t_map *map, t_edge **edges,
-					int *edges_count);
+t_edge *populate_edges(t_map *map, int edges_count);
 void find_min_max(
 	t_map *map);
 
@@ -140,6 +134,6 @@ void convert_to_isometric(const t_map *map, const t_point3d *points,
 void scale_and_offset_points(t_point2d *iso_points, const t_map *map,
 							 int window_width, int window_height);
 
-void draw_line(t_data *data, t_line *line);
+void	draw_line(t_data *t_data_pix, t_point2d start, t_point2d end, int color);
 
 #endif

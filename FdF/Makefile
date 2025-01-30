@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/30 10:12:48 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/01/30 11:56:39 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,6 @@ SRC = main.c \
       keymouse_controls.c \
       prep_data_for_drawing.c \
       prep_data_for_drawing_two.c \
-      prep_data_for_drawing_three.c \
       draw.c \
       read_to_buffer.c \
       utils.c \

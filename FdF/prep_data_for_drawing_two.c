@@ -6,68 +6,96 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:16:04 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/26 19:56:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:19:56 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 #include <stdio.h> //NEED TO REPLACE WITH OWN
 
-void	generate_horizontal_edges(t_map *map, t_edge *edges, int *edge_index)
-{
-	int	y;
-	int	x;
-	int	current_index;
+// typedef struct s_edge
+// {
+// 	int start;
+// 	int end;
+// } t_edge;
+// need -1 for out of bounds access it can only have neighbour
+// if it is not the last one
+// if the index does not correspond to the last col create an edge
+// from index to index +1
+// and then if index does not correspond to the last row create an edge
+// index to index + cols
 
-	y = 0;
-	while (y < map->rows)
+t_edge	*populate_edges(t_map *map, int total_edges)
+{
+	int		i;
+	int		index;
+	t_edge	*edges;
+
+	edges = malloc(total_edges * sizeof(t_edge));
+	if (edges == NULL)
+		return (NULL);
+	i = 0;
+	index = 0;
+	while (index < map->cols * map->rows)
 	{
-		x = 0;
-		while (x < map->cols - 1)
+		if (index % map->cols < map->cols - 1)
 		{
-			current_index = y * map->cols + x;
-			edges[*edge_index].start = current_index;
-			edges[*edge_index].end = current_index + 1;
-			(*edge_index)++;
-			x++;
+			edges[i].start = index;
+			edges[i++].end = index + 1;
 		}
-		y++;
+		if (index / map->cols < map->rows - 1)
+		{
+			edges[i].start = index;
+			edges[i++].end = index + map->cols;
+		}
+		index++;
+	}
+	return (edges);
+}
+
+static void	populate_normalise_3d_points(t_point3d *points, const t_map *map)
+{
+	float		range_z;
+	int			i;
+	t_map_point	*values_z_color;
+
+	values_z_color = map->values_z_color;
+	range_z = map->z_max - map->z_min;
+	i = 0;
+	while (i < (map->rows * map->cols))
+	{
+		points[i].x = (float)(i % map->cols) / (map->cols - 1);
+		points[i].y = (float)(i / map->cols) / (map->rows - 1);
+		if (range_z == 0)
+			points[i].z = 0;
+		else
+			points[i].z = (float)(values_z_color[i].z - map->z_min) / range_z;
+		i++;
 	}
 }
 
-void	generate_vertical_edges(t_map *map, t_edge *edges, int *edge_index)
+t_point2d	*prepare_iso_points(const t_map *map, int window_width,
+		int window_height)
 {
-	int	y;
-	int	x;
-	int	current_index;
+	t_point3d	*points;
+	t_point2d	*iso_points;
 
-	y = 0;
-	while (y < map->rows - 1)
+	points = malloc(map->rows * map->cols * sizeof(t_point3d));
+	if (!points)
 	{
-		x = 0;
-		while (x < map->cols)
-		{
-			current_index = y * map->cols + x;
-			edges[*edge_index].start = current_index;
-			edges[*edge_index].end = current_index + map->cols;
-			(*edge_index)++;
-			x++;
-		}
-		y++;
+		handle_error("Memory allocation failed for points.");
+		return (NULL);
 	}
-}
-
-void	populate_edges(t_map *map, t_edge **edges, int *edges_count)
-{
-	int	total_edges;
-
-	total_edges = (map->cols - 1) * map->rows + (map->rows - 1) * map->cols;
-	*edges = malloc(total_edges * sizeof(t_edge));
-	if (*edges == NULL)
+	iso_points = malloc(map->rows * map->cols * sizeof(t_point2d));
+	if (!iso_points)
 	{
-		handle_error("Memory allocation failed for  populate edges.\n");
+		free(points);
+		handle_error("Memory allocation failed for iso_points.");
+		return (NULL);
 	}
-	*edges_count = 0;
-	generate_horizontal_edges(map, *edges, edges_count);
-	generate_vertical_edges(map, *edges, edges_count);
+	populate_normalise_3d_points(points, map);
+	convert_to_isometric(map, points, iso_points);
+	scale_and_offset_points(iso_points, map, window_width, window_height);
+	free(points);
+	return (iso_points);
 }

@@ -25,7 +25,6 @@ int	my_isdigit(char c)
 	return (c >= '0' && c <= '9');
 }
 
-
 const char	*parse_number(const char *str, float *value)
 {
 	char	*endptr;

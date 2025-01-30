@@ -113,7 +113,6 @@ void	determine_dimensions(const char *buffer, t_map *map)
 	map->cols = cols;
 }
 
-
 // READ THE WHOLE FILE INTO A STRING(BUFFER)
 // DETERMINE WIDTH AND HEIGHT
 // LOOK FOR NEW LINE  = rows
