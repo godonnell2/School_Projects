@@ -6,12 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:23:50 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 21:30:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/31 10:29:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include <stdio.h>
 
 static void	put_pixel(t_data *t_data_pix, int x, int y, int color)
 {

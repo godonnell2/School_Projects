@@ -6,12 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 21:52:27 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/01/31 10:29:16 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-
 /*
 The three-dimensional space is represented in two dimensions.
 The angles between the axes are equal (typically 120 degrees).
@@ -37,7 +36,6 @@ static void	render_edge(t_data *img, t_edge *edge, t_map *map,
 	t_point2d	start;
 	t_point2d	end;
 
-	// THIS IS ISSUE
 	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0
 		|| edge->end >= map->cols * map->rows)
 		handle_error("invalid edges");
