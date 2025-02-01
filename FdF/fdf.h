@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 17:58:11 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 21:56:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/01 11:13:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,8 @@ int					my_isdigit(char c);
 size_t				ft_strlen(const char *str);
 const char			*parse_number(const char *buffer, float *value);
 const char			*parse_hex_color(const char *str, int *color);
+int					get_digit_value(char c, int base);
+int					is_digit_or_hex(char c, int base);
 float				my_strtof(const char *str, char **endptr);
 
 t_map_point			*read_z_color(int num_elems, char *buffer,

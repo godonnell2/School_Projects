@@ -6,11 +6,12 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/31 10:29:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/01 07:57:28 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+
 /*
 The three-dimensional space is represented in two dimensions.
 The angles between the axes are equal (typically 120 degrees).
@@ -133,6 +134,36 @@ Orthographic: No perspective or distortion; parallel lines remain parallel.
 Perspective: Includes depth distortion to simulate the human eye.
 
 
+Little Endian
+In Little-endian,
+	LSB (Least significant byte) is stored first or to a lower memory
+address. Intel x86,
+Pentium are using this Little Endian.
 
+Thus, the little-endian byte order means, when the computer writes a word
+ (Multi Byte) into memory, it begins by writing the Lowest byte to lowest mem
+ address and continues until it has written the highest byte to the highest
+ memory addr. It does this by writing subsequent and ascending memory addresses,
+ no matter the endianness.
 
+Big Endian
+In Big Endian, MSB (Most significant byte) is stored first or to a lower
+ memory address. Big-endian is implemented in PowerPC and most networking
+  devices
+
+  ctx->mlx is the MLX instance (or connection to the MLX library)
+  MiniLibX works by maintaining an internal state for rendering.
+This state is stored in the mlx pointer returned by mlx_init().
+Functions like mlx_new_image() need this pointer to allocate
+memory within the correct graphical environme
+mlx_get_data_addr() retrieves low-level image data:
+img->addr: Pointer to the image pixel data (we will modify this to draw).
+img->bits_per_pixel: Number of bits used for each pixel.
+img->line_length: The number of bytes per row of the image.
+img->endian: Defines whether pixels are stored big-endian or little-endian.
+After calling this function, you will have a window and an empty image
+ready to be drawn on. You can modify the pixel data using img->addr,
+then display it using	mlx_put_image_to_window(void).
+mlx_put_image_to_window(app.ctx.mlx, app.ctx.mlx_win, app.img.img, 0, 0);
+The position (in pixels) where the image should be placed in the window.
 */

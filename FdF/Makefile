@@ -6,7 +6,7 @@
 #    By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/29 23:23:23 by gro-donn          #+#    #+#              #
-#    Updated: 2025/01/31 10:29:05 by gro-donn         ###   ########.fr        #
+#    Updated: 2025/02/01 11:18:57 by gro-donn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,6 @@ SRC = main.c \
       read_to_buffer.c \
       utils.c \
       utils_two.c \
-      utils_three.c \
       error_handling.c 
 
 NAME = fdf

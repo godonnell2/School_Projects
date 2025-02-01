@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 06:23:50 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/31 10:29:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/01 07:24:53 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,3 +59,18 @@ void	draw_line(t_data *t_data_pix, t_point2d start, t_point2d end, int color)
 		update_bresenham(&vars, &start);
 	}
 }
+
+/*
+dx is the total horizontal distance between start and end.
+dy is the total vertical distance.
+If start.x < end.x, move right (sx = 1), otherwise move left (sx = -1).
+If start.y < end.y, move up (sy = 1), otherwise move down (sy = -1).
+Initialize the error term (vars.err = dx - dy):
+This keeps track of whether to move horizontally or diagonally
+First condition (vars->e2 > -vars->dy):
+If the error value e2 is greater than -dy, move horizontally (x += sx).
+Reduce the error by dy.
+Second condition (vars->e2 < vars->dx):
+If e2 is smaller than dx, move vertically (y += sy).
+Increase the error by dx.
+*/
