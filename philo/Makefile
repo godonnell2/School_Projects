@@ -1,8 +1,9 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g 
+CFLAGS = -Wall -Wextra -Werror -g #-O3optimisation
 
 SRC = main.c \
-	utils.c 
+	utils.c \
+	init_checks.c 
    
 NAME = philo
 OBJ = $(SRC:.c=.o)
