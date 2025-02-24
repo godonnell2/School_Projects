@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/24 13:18:42 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/24 15:08:04 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,10 @@ void	philo_sleep(t_philo *philos, t_params *params)
 void	die(t_philo *philos)
 {
 	size_t	time_ms;
-
-	time_ms = get_current_time();
+    time_ms = get_current_time();
+printf("Philosopher %d died. Last meal time: %zu, Current time: %zu, Time since last meal: %zu\n",
+       philos->id, philos->last_meal_time, get_current_time(), get_current_time() - philos->last_meal_time);
+	
 	philos->is_dead = 1;
 	printf("%zu %d died\n", time_ms, philos->id);
 }
@@ -61,88 +63,57 @@ Delay before second fork: Allows slight desynchronization to avoid two adjacent 
 ✅ Immediate last_meal_time update: Ensures the death check mechanism doesn't falsely detect starvation due to a delayed update.
 */
 //all odd philos have a tiny eat at the beginning 
-void	eat(t_philo *philos, t_params *params)
-{
-	size_t	start_time_ms;
+void eat(t_philo *philos, t_params *params) {
+    size_t start_time_ms = get_current_time();
 
-	start_time_ms = get_current_time();
-	if (params->total_philos == 1)
-	{
-		pthread_mutex_lock(philos->l_fork);
-        
-		printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
-		// Wait until they die
-		usleep(params->time_until_die * 1000);
-		// Unlock the fork before dying
-		pthread_mutex_unlock(philos->l_fork);
-		die(philos);
-		return ;
-	}
+    if (params->total_philos == 1) {
+        pthread_mutex_lock(philos->l_fork);
+        printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
+        usleep(params->time_until_die * 1000);
+        pthread_mutex_unlock(philos->l_fork);
+        die(philos);
+        return;
+    }
+
+    if (philos->id % 2 == 1) {
+        pthread_mutex_lock(philos->r_fork);
+        printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+        pthread_mutex_lock(philos->l_fork);
+        printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+    } else {
+        pthread_mutex_lock(philos->l_fork);
+        printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+        pthread_mutex_lock(philos->r_fork);
+        printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+    }
+
+    // Update last_meal_time before eating
+    pthread_mutex_lock(&philos->meal_lock);
+    philos->last_meal_time = get_current_time();
+    pthread_mutex_unlock(&philos->meal_lock);
+
+    printf("%zu %d is eating\n", start_time_ms, philos->id);
+    usleep(params->duration_eating * 1000); // Simulate eating
 
     pthread_mutex_lock(&philos->meal_lock);
-	philos->last_meal_time = get_current_time();
-    pthread_mutex_unlock(&philos->meal_lock); // OMG moving the unlock up here made the difference between life and death
-    // so that the monitor thread doesn’t think the philosopher is starving.
- 
-	if (philos->id % 2 == 1)
-	{
-        size_t lock_start_time_ms = get_current_time();
-		pthread_mutex_lock(philos->r_fork);
-         philos->is_holding_fork= 1;
-		printf("%zu %d has taken a fork\n", lock_start_time_ms, philos->id);
-         size_t wait_time = get_current_time() - lock_start_time_ms;
-         printf("%zu %d waited %zu ms to take right fork\n", get_current_time(), philos->id, wait_time);
-        usleep(10);  // Short delay before picking up the second fork think this made it worse
-		
-        lock_start_time_ms = get_current_time();
-        pthread_mutex_lock(philos->l_fork);
-        wait_time = get_current_time() - lock_start_time_ms;
-        printf("%zu %d waited %zu ms to take left fork\n", get_current_time(), philos->id, wait_time);
-		printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
-	}
-	else
-	{
-       
-          size_t lock_start_time_ms = get_current_time();
-		pthread_mutex_lock(philos->l_fork);
-        philos->is_holding_fork= 1;
-         size_t wait_time = get_current_time() - lock_start_time_ms;
-		printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
-          printf("%zu %d waited %zu ms to take left fork\n", get_current_time(), philos->id, wait_time);
-          
-        usleep(100);  // Short delay before picking up the second fork
-        lock_start_time_ms = get_current_time();
-		pthread_mutex_lock(philos->r_fork);
-		printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
-         wait_time = get_current_time() - lock_start_time_ms;
-          printf("%zu %d waited %zu ms to take right fork\n", get_current_time(), philos->id, wait_time);
-	}
+    philos->meals_eaten++;
+    pthread_mutex_unlock(&philos->meal_lock);
 
-    size_t time_since_last_meal = get_current_time() - philos->last_meal_time;
-    if (time_since_last_meal > params->time_until_die / 2 && time_since_last_meal < params->time_until_die - 200)
-    usleep(250);   
-	printf("%zu %d is eating\n", start_time_ms, philos->id);
-	philos->meals_eaten++;
-    printf("Philosopher %d has eaten %d times\n", philos->id, philos->meals_eaten);
-	usleep(params->duration_eating * 1000);
-
-	pthread_mutex_unlock(philos->l_fork);
-	pthread_mutex_unlock(philos->r_fork);
+    pthread_mutex_unlock(philos->l_fork);
+    pthread_mutex_unlock(philos->r_fork);
 }
-
-
 
 int	check_die(t_philo *philos, t_params *params)
 {
 	size_t	time_since_last_meal;
 
 	pthread_mutex_lock(&philos->meal_lock);
-	time_since_last_meal = get_current_time() - philos->last_meal_time;
+	time_since_last_meal = get_current_time() - philos->last_meal_time ;
 	pthread_mutex_unlock(&philos->meal_lock);
 
    // printf("Philosopher %d: Time since last meal: %zu,\n",
           // philos->id, time_since_last_meal);
-	return (time_since_last_meal >= params->time_until_die);
+	return (time_since_last_meal >= (params->time_until_die + 1));
 }
 
 
@@ -157,36 +128,41 @@ int	monitor_die(t_philo *philos, t_params *params)
 	while (simulation_running) 
 	{
 		
-
-		for (int i = 0; i < params->total_philos; i++)
+for (int i = 0; i < params->total_philos; i++)
 		{
+            
+			// **Check if a philosopher has died**
 			if (check_die(&philos[i], params))
 			{
-                if (philos[i].is_holding_fork)
-                {
-                 // Let them finish their turn if they are already eating
-                continue;
-                }
-				die(&philos[i]); 
-				return (1);        
+                printf("Philosopher %d died while holding fork? %d\n", philos[i].id, philos[i].is_holding_fork);
+				die(&philos[i]);
+				simulation_running = 0;
+				return (1);  // Stop simulation immediately
 			}
-            
-	
-			if (philos[i].meals_eaten >= params->total_num_need_eats && !philos[i].is_finished)
+
+			// **Check if philosopher has finished eating**
+			pthread_mutex_lock(&philos[i].meal_lock);
+			if (params->total_num_need_eats != -1 && philos[i].meals_eaten >= params->total_num_need_eats)
 			{
-				philos[i].is_finished = 1;  // Mark as finished
-				finished_philos++;
-				printf("Philosopher %d has finished eating the required meals.\n", philos[i].id);
+				if (!philos[i].is_finished) // Only count once
+				{
+					philos[i].is_finished = 1;
+					finished_philos++;
+				}
 			}
-           
+			pthread_mutex_unlock(&philos[i].meal_lock);
 		}
-		if (finished_philos == params->total_philos)
+
+		// **Stop when all philosophers have finished eating**
+		if (params->total_num_need_eats != -1 && finished_philos == params->total_philos)
 		{
 			simulation_running = 0;
 			return (0);
 		}
-		usleep(200); // Small sleep to avoid CPU overuse was 100 
+
+		usleep(5000); // Small delay to reduce CPU usage
 	}
+
 	return (0);
 }
 
@@ -203,18 +179,17 @@ void	*routine(void *arg)
 	while (1)
 	{
        
-		if (check_die(philos, params) == 1)
-		{
-			die(philos);
-			return NULL ;
-		}
-         
-		eat(philos, params);
-        
+		
         if (check_die(philos, params) == 1)
 		{
 			die(philos);
-			return NULL ;
+			return (NULL);  
+		}
+		eat(philos, params);
+        if (check_die(philos, params) == 1)
+		{
+			die(philos);
+			return (NULL);  
 		}
 		philo_sleep(philos, params);
         if (check_die(philos, params) == 1)
@@ -222,10 +197,9 @@ void	*routine(void *arg)
 			die(philos);
 			return (NULL);
 		}
-        
 		think(philos);
 		meals_eaten++;
-         if (meals_eaten >= params->total_num_need_eats)
+        if (params->total_num_need_eats != -1 && meals_eaten >= params->total_num_need_eats)
 		{
 			break ;
 		}
@@ -260,29 +234,49 @@ int	main(int ac, char **av)
  for (int i = 0; i < total_philos; i++)
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
 
-	// Scenario 1: Stop when a philosopher dies
-	if (params.total_num_need_eats == -1)  // No meal limit was given
+	// **Monitor Simulation**
+	if (params.total_num_need_eats == -1)
 	{
-		if (monitor_die(philos, &params)) // Stops when a philosopher dies
+		// **No meal limit → Stop when a philosopher dies**
+		if (monitor_die(philos, &params))
 			return (0);
 	}
-  
-  // NEED TO DO AN ELSE FOR REQUIRED NUM OF MEALS
-    
+	else
+	{
+		// **Meal limit given → Stop when all philosophers finish eating**
+		while (1)
+		{
+			int finished_philos = 0;
+			for (int i = 0; i < total_philos; i++)
+			{
+				pthread_mutex_lock(&philos[i].meal_lock);
+				if (philos[i].meals_eaten >= params.total_num_need_eats)
+					finished_philos++;
+				pthread_mutex_unlock(&philos[i].meal_lock);
+			}
+			if (finished_philos == total_philos)
+				break;
+			usleep(200);
+		}
+	}
+
+	// **Wait for all threads to finish**
 	for (int i = 0; i < total_philos; i++)
 		pthread_join(philos[i].thread, NULL);
-	
+
+	// **Destroy Mutexes**
 	for (int i = 0; i < total_philos; i++)
 	{
 		pthread_mutex_destroy(&forks[i]);
 		pthread_mutex_destroy(&philos[i].meal_lock);
 	}
-      for (int i = 0; i < total_philos; i++)
+
+	// **Print philosopher meal counts**
+	for (int i = 0; i < total_philos; i++)
 	{
-		printf("Philosopher %d ate %d times.\n", philos[i].id,
-			philos[i].meals_eaten);
+		printf("Philosopher %d ate %d times.\n", philos[i].id, philos[i].meals_eaten);
 	}
-	return (0);
+
 }
 
 /*
@@ -328,6 +322,13 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 Locks a mutex.
 
 If another thread already locked it, the calling thread waits.
+It's possible that Philosopher 2 had just started eating, but the monitor 
+thread checked right before the last_meal_time update.
+If so, this is a race condition where Philosopher 2 was actually eating, 
+but the program thought they were still starving.
 
+Race Condition:
 
+There might be a race condition between updating the last_meal_time and checking for death. If the check_die function runs just after the philosopher picks up the forks but before they update their last_meal_time,
+ it could incorrectly determine that the philosopher has starved.
 */
