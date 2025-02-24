@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/21 08:58:29 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/24 13:18:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,15 @@ void	philo_sleep(t_philo *philos, t_params *params)
 	}
 }
 
+void	die(t_philo *philos)
+{
+	size_t	time_ms;
+
+	time_ms = get_current_time();
+	philos->is_dead = 1;
+	printf("%zu %d died\n", time_ms, philos->id);
+}
+
 /*
 Even though each philosopher follows a strict eat → sleep → think cycle,
 they are running in parallel on separate threads.
@@ -51,16 +60,6 @@ Since	usleep(void) expects microseconds, we need to convert
 Delay before second fork: Allows slight desynchronization to avoid two adjacent philosophers competing at the exact same time.
 ✅ Immediate last_meal_time update: Ensures the death check mechanism doesn't falsely detect starvation due to a delayed update.
 */
-
-void	die(t_philo *philos)
-{
-	size_t	time_ms;
-
-	time_ms = get_current_time();
-	philos->is_dead = 1;
-	printf("%zu %d died\n", time_ms, philos->id);
-}
-
 //all odd philos have a tiny eat at the beginning 
 void	eat(t_philo *philos, t_params *params)
 {
@@ -80,7 +79,7 @@ void	eat(t_philo *philos, t_params *params)
 		return ;
 	}
 
-    	pthread_mutex_lock(&philos->meal_lock);
+    pthread_mutex_lock(&philos->meal_lock);
 	philos->last_meal_time = get_current_time();
     pthread_mutex_unlock(&philos->meal_lock); // OMG moving the unlock up here made the difference between life and death
     // so that the monitor thread doesn’t think the philosopher is starving.
@@ -121,18 +120,17 @@ void	eat(t_philo *philos, t_params *params)
 
     size_t time_since_last_meal = get_current_time() - philos->last_meal_time;
     if (time_since_last_meal > params->time_until_die / 2 && time_since_last_meal < params->time_until_die - 200)
-// If a philosopher is very behind, let them eat first
-//If a philosopher hasn’t eaten for a long time, they will skip the delay and grab forks immediately.
-//If they recently ate, they will pause for 250 microseconds, allowing a starving philosopher to grab the forks first.
-//but onlydo it on philos who are not in immediate danger of dyring
     usleep(250);   
 	printf("%zu %d is eating\n", start_time_ms, philos->id);
 	philos->meals_eaten++;
+    printf("Philosopher %d has eaten %d times\n", philos->id, philos->meals_eaten);
 	usleep(params->duration_eating * 1000);
 
 	pthread_mutex_unlock(philos->l_fork);
 	pthread_mutex_unlock(philos->r_fork);
 }
+
+
 
 int	check_die(t_philo *philos, t_params *params)
 {
@@ -158,7 +156,8 @@ int	monitor_die(t_philo *philos, t_params *params)
 	simulation_running = 1;
 	while (simulation_running) 
 	{
-		finished_philos = 0;
+		
+
 		for (int i = 0; i < params->total_philos; i++)
 		{
 			if (check_die(&philos[i], params))
@@ -172,8 +171,13 @@ int	monitor_die(t_philo *philos, t_params *params)
 				return (1);        
 			}
             
-			if (philos[i].meals_eaten >= params->total_num_need_eats)
+	
+			if (philos[i].meals_eaten >= params->total_num_need_eats && !philos[i].is_finished)
+			{
+				philos[i].is_finished = 1;  // Mark as finished
 				finished_philos++;
+				printf("Philosopher %d has finished eating the required meals.\n", philos[i].id);
+			}
            
 		}
 		if (finished_philos == params->total_philos)
@@ -186,6 +190,7 @@ int	monitor_die(t_philo *philos, t_params *params)
 	return (0);
 }
 
+
 void	*routine(void *arg)
 {
 	int	meals_eaten;
@@ -193,24 +198,42 @@ void	*routine(void *arg)
 	t_philo *philos = (t_philo *)arg;  // Cast the argument back to t_philo
 	t_params *params = philos->params; // Get params from philos struct
 	meals_eaten = 0;
+
+ 
 	while (1)
 	{
+       
 		if (check_die(philos, params) == 1)
 		{
 			die(philos);
-			break ;
+			return NULL ;
 		}
+         
 		eat(philos, params);
+        
+        if (check_die(philos, params) == 1)
+		{
+			die(philos);
+			return NULL ;
+		}
 		philo_sleep(philos, params);
+        if (check_die(philos, params) == 1)
+		{
+			die(philos);
+			return (NULL);
+		}
+        
 		think(philos);
 		meals_eaten++;
-		if (meals_eaten >= params->total_num_need_eats)
+         if (meals_eaten >= params->total_num_need_eats)
 		{
 			break ;
 		}
+		
 	}
 	return (NULL);
 }
+
 
 
 // pthread_mutex_t is a data type that represents a mutex (mutual exclusion) object.
@@ -233,14 +256,19 @@ int	main(int ac, char **av)
 	total_philos = params.total_philos;
 	init_forks_mutexes(forks, total_philos, philos);
 	init_philos(philos, forks, &params);
-	for (int i = 0; i < total_philos; i++)
+
+ for (int i = 0; i < total_philos; i++)
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
-  
-	if (monitor_die(philos, &params))
+
+	// Scenario 1: Stop when a philosopher dies
+	if (params.total_num_need_eats == -1)  // No meal limit was given
 	{
-		// If a philosopher dies, stop everything
-		return (0);
+		if (monitor_die(philos, &params)) // Stops when a philosopher dies
+			return (0);
 	}
+  
+  // NEED TO DO AN ELSE FOR REQUIRED NUM OF MEALS
+    
 	for (int i = 0; i < total_philos; i++)
 		pthread_join(philos[i].thread, NULL);
 	

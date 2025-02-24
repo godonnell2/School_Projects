@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/21 08:56:46 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/23 18:07:07 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	init_params(t_params *params, char **av)
 	if (av[5])
 		params->total_num_need_eats = ft_atoi(av[5]);
 	else
-		params->total_num_need_eats = 10000;
+		params->total_num_need_eats = -1;
 }
 
 // so forks are their own resource kind like opening an fd they need to be initialised
@@ -83,6 +83,7 @@ void	init_philos(t_philo *philos, pthread_mutex_t *forks, t_params *params)
 		philos[i].start_time = get_current_time();
 		philos[i].last_meal_time = get_current_time();
 		philos[i].is_dead = 0;
+        philos[i].is_finished = 0;
         philos[i].is_holding_fork = 0;
 		philos[i].l_fork = &forks[i];
 		philos[i].r_fork = &forks[(i + 1) % params->total_philos];

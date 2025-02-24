@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/21 08:54:51 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/21 11:36:40 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ typedef struct s_params
     size_t duration_eating; 
     size_t duration_sleeping;
     size_t time_until_die;
+    pthread_mutex_t sim_lock; 
+	int simulation_running;  
 } t_params;
 
 typedef struct s_philo 
@@ -38,6 +40,7 @@ typedef struct s_philo
     size_t	start_time;  
     int	is_dead;
     int is_holding_fork;
+    int is_finished;
     pthread_t thread;
     pthread_mutex_t	*r_fork;   //these have to be ptrs to pthread mutex not values!
     // ! otherwise  This creates a separate mutex for each philosopher which would defeat the 
