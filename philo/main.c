@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/24 15:08:04 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/25 11:18:49 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,41 +59,40 @@ Since	usleep(void) expects microseconds, we need to convert
  no and needed for locking because the forks are already ptrs
   // Avoid deadlock: Odd philosophers pick right fork first!!!!!
   otherwise everyone grabs left fork and prog stalls
-Delay before second fork: Allows slight desynchronization to avoid two adjacent philosophers competing at the exact same time.
-✅ Immediate last_meal_time update: Ensures the death check mechanism doesn't falsely detect starvation due to a delayed update.
+Delay before second fork: Allows slight desynchronization to avoid two adjacent
+ philosophers competing at the exact same time.
+✅ Immediate last_meal_time update: Ensures the death check mechanism doesn't
+ falsely detect starvation due to a delayed update.
 */
 //all odd philos have a tiny eat at the beginning 
-void eat(t_philo *philos, t_params *params) {
-    size_t start_time_ms = get_current_time();
-
-    if (params->total_philos == 1) {
-        pthread_mutex_lock(philos->l_fork);
-        printf("%zu %d has taken a fork\n", start_time_ms, philos->id);
+void eat(t_philo *philos, t_params *params) 
+{
+    if (params->total_philos == 1) 
+    {
         usleep(params->time_until_die * 1000);
-        pthread_mutex_unlock(philos->l_fork);
         die(philos);
         return;
     }
-
-    if (philos->id % 2 == 1) {
+    if (philos->id % 2 == 1) 
+    {
         pthread_mutex_lock(philos->r_fork);
         printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
         pthread_mutex_lock(philos->l_fork);
         printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
-    } else {
+    } 
+    else 
+    {
         pthread_mutex_lock(philos->l_fork);
         printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
         pthread_mutex_lock(philos->r_fork);
         printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
     }
-
-    // Update last_meal_time before eating
     pthread_mutex_lock(&philos->meal_lock);
     philos->last_meal_time = get_current_time();
     pthread_mutex_unlock(&philos->meal_lock);
 
-    printf("%zu %d is eating\n", start_time_ms, philos->id);
-    usleep(params->duration_eating * 1000); // Simulate eating
+    printf("%zu %d is eating\n", get_current_time(), philos->id);
+    usleep(params->duration_eating * 1000); 
 
     pthread_mutex_lock(&philos->meal_lock);
     philos->meals_eaten++;
@@ -113,7 +112,7 @@ int	check_die(t_philo *philos, t_params *params)
 
    // printf("Philosopher %d: Time since last meal: %zu,\n",
           // philos->id, time_since_last_meal);
-	return (time_since_last_meal >= (params->time_until_die + 1));
+	return (time_since_last_meal >= (params->time_until_die +1));
 }
 
 
@@ -130,7 +129,6 @@ int	monitor_die(t_philo *philos, t_params *params)
 		
 for (int i = 0; i < params->total_philos; i++)
 		{
-            
 			// **Check if a philosopher has died**
 			if (check_die(&philos[i], params))
 			{
@@ -170,40 +168,24 @@ for (int i = 0; i < params->total_philos; i++)
 void	*routine(void *arg)
 {
 	int	meals_eaten;
-
 	t_philo *philos = (t_philo *)arg;  // Cast the argument back to t_philo
 	t_params *params = philos->params; // Get params from philos struct
 	meals_eaten = 0;
 
- 
 	while (1)
 	{
-       
-		
         if (check_die(philos, params) == 1)
-		{
 			die(philos);
-			return (NULL);  
-		}
 		eat(philos, params);
         if (check_die(philos, params) == 1)
-		{
 			die(philos);
-			return (NULL);  
-		}
 		philo_sleep(philos, params);
         if (check_die(philos, params) == 1)
-		{
 			die(philos);
-			return (NULL);
-		}
 		think(philos);
 		meals_eaten++;
         if (params->total_num_need_eats != -1 && meals_eaten >= params->total_num_need_eats)
-		{
 			break ;
-		}
-		
 	}
 	return (NULL);
 }
@@ -218,7 +200,6 @@ int	main(int ac, char **av)
 	t_params		params;
 	int				total_philos;
 
-	
 	if (ac < 5 || ac > 6)
 	{
 		write(2, "Incorrect number of arguments \n", 31);
@@ -234,16 +215,13 @@ int	main(int ac, char **av)
  for (int i = 0; i < total_philos; i++)
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
 
-	// **Monitor Simulation**
 	if (params.total_num_need_eats == -1)
 	{
-		// **No meal limit → Stop when a philosopher dies**
 		if (monitor_die(philos, &params))
 			return (0);
 	}
 	else
 	{
-		// **Meal limit given → Stop when all philosophers finish eating**
 		while (1)
 		{
 			int finished_philos = 0;
@@ -264,14 +242,12 @@ int	main(int ac, char **av)
 	for (int i = 0; i < total_philos; i++)
 		pthread_join(philos[i].thread, NULL);
 
-	// **Destroy Mutexes**
 	for (int i = 0; i < total_philos; i++)
 	{
 		pthread_mutex_destroy(&forks[i]);
 		pthread_mutex_destroy(&philos[i].meal_lock);
 	}
 
-	// **Print philosopher meal counts**
 	for (int i = 0; i < total_philos; i++)
 	{
 		printf("Philosopher %d ate %d times.\n", philos[i].id, philos[i].meals_eaten);
