@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:23:29 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/25 15:45:25 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:56:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	philo_sleep(t_philo *philos, t_params *params)
 
 void	die(t_philo *philos)
 {
-	printf("Philosopher %d died. Last meal time: %zu, Current time: %zu,Time since last meal: %zu\n", philos->id, philos->last_meal_time,
+	printf("Philosopher %d died\n. Last meal time: %zu\n, Current time:%zu\n,Time since last meal: %zu\n", philos->id, philos->last_meal_time,
 		get_current_time(), get_current_time() - philos->last_meal_time);
 	printf("%zu %d died\n", get_current_time(), philos->id);
 	philos->is_dead = 1;
@@ -59,30 +59,28 @@ Delay before second fork: Allows slight desynchronization to avoid two adjacent
 */
 // all odd philos have a tiny eat at the beginning
 
-void handle_single_philosopher(t_philo *philos, t_params *params)
- {
-    usleep(params->time_until_die * 1000);
-    die(philos);
+void	handle_single_philosopher(t_philo *philos, t_params *params)
+{
+	usleep(params->time_until_die * 1000);
+	die(philos);
 }
 
 void	eat(t_philo *philos, t_params *params)
 {
-      if (params->total_philos == 1) 
-        handle_single_philosopher(philos, params);
+	if (params->total_philos == 1)
+		handle_single_philosopher(philos, params);
 	if (philos->id % 2 == 1)
 	{
 		pthread_mutex_lock(philos->r_fork);
-		printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
 		pthread_mutex_lock(philos->l_fork);
-		printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
 	}
 	else
 	{
 		pthread_mutex_lock(philos->l_fork);
-		printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
 		pthread_mutex_lock(philos->r_fork);
-		printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
 	}
+	printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+	printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
 	pthread_mutex_lock(&philos->meal_lock);
 	philos->last_meal_time = get_current_time();
 	pthread_mutex_unlock(&philos->meal_lock);
@@ -94,4 +92,3 @@ void	eat(t_philo *philos, t_params *params)
 	pthread_mutex_unlock(philos->l_fork);
 	pthread_mutex_unlock(philos->r_fork);
 }
-
