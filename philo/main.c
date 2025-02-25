@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/25 11:18:49 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/25 11:37:26 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,12 @@ void	philo_sleep(t_philo *philos, t_params *params)
 
 void	die(t_philo *philos)
 {
-	size_t	time_ms;
-    time_ms = get_current_time();
-printf("Philosopher %d died. Last meal time: %zu, Current time: %zu, Time since last meal: %zu\n",
+	//size_t	time_ms;
+    //time_ms = get_current_time();
+    printf("Philosopher %d died. Last meal time: %zu, Current time: %zu, Time since last meal: %zu\n",
        philos->id, philos->last_meal_time, get_current_time(), get_current_time() - philos->last_meal_time);
-	
-	philos->is_dead = 1;
-	printf("%zu %d died\n", time_ms, philos->id);
+	printf("%zu %d died\n", get_current_time(), philos->id);
+    philos->is_dead = 1;
 }
 
 /*
@@ -76,7 +75,7 @@ void eat(t_philo *philos, t_params *params)
     if (philos->id % 2 == 1) 
     {
         pthread_mutex_lock(philos->r_fork);
-        printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+        printf("%zu %d has taken a fork\n", get_current_tim e(), philos->id);
         pthread_mutex_lock(philos->l_fork);
         printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
     } 
@@ -115,8 +114,8 @@ int	check_die(t_philo *philos, t_params *params)
 	return (time_since_last_meal >= (params->time_until_die +1));
 }
 
-
-
+//usleep(5000); // Small delay to reduce CPU usage
+// 	if (!philos[i].is_finished) to make sure i only count it once 	
 int	monitor_die(t_philo *philos, t_params *params)
 {
 	int	finished_philos;
@@ -125,24 +124,21 @@ int	monitor_die(t_philo *philos, t_params *params)
 	finished_philos = 0;
 	simulation_running = 1;
 	while (simulation_running) 
-	{
-		
-for (int i = 0; i < params->total_philos; i++)
+	{	
+    for (int i = 0; i < params->total_philos; i++)
 		{
-			// **Check if a philosopher has died**
 			if (check_die(&philos[i], params))
 			{
                 printf("Philosopher %d died while holding fork? %d\n", philos[i].id, philos[i].is_holding_fork);
 				die(&philos[i]);
 				simulation_running = 0;
-				return (1);  // Stop simulation immediately
+				return (-51);  // Stop simulation immediately
 			}
-
 			// **Check if philosopher has finished eating**
 			pthread_mutex_lock(&philos[i].meal_lock);
 			if (params->total_num_need_eats != -1 && philos[i].meals_eaten >= params->total_num_need_eats)
 			{
-				if (!philos[i].is_finished) // Only count once
+				if (!philos[i].is_finished)
 				{
 					philos[i].is_finished = 1;
 					finished_philos++;
@@ -150,17 +146,13 @@ for (int i = 0; i < params->total_philos; i++)
 			}
 			pthread_mutex_unlock(&philos[i].meal_lock);
 		}
-
-		// **Stop when all philosophers have finished eating**
 		if (params->total_num_need_eats != -1 && finished_philos == params->total_philos)
 		{
 			simulation_running = 0;
 			return (0);
 		}
-
-		usleep(5000); // Small delay to reduce CPU usage
+		usleep(5000); 
 	}
-
 	return (0);
 }
 
@@ -189,8 +181,6 @@ void	*routine(void *arg)
 	}
 	return (NULL);
 }
-
-
 
 // pthread_mutex_t is a data type that represents a mutex (mutual exclusion) object.
 int	main(int ac, char **av)
@@ -237,7 +227,6 @@ int	main(int ac, char **av)
 			usleep(200);
 		}
 	}
-
 	// **Wait for all threads to finish**
 	for (int i = 0; i < total_philos; i++)
 		pthread_join(philos[i].thread, NULL);
@@ -305,6 +294,7 @@ but the program thought they were still starving.
 
 Race Condition:
 
-There might be a race condition between updating the last_meal_time and checking for death. If the check_die function runs just after the philosopher picks up the forks but before they update their last_meal_time,
+There might be a race condition between updating the last_meal_time and checking 
+for death. If the check_die function runs just after the philosopher picks up the forks but before they update their last_meal_time,
  it could incorrectly determine that the philosopher has starved.
 */
