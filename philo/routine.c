@@ -1,11 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 15:23:29 by gro-donn          #+#    #+#             */
+/*   Updated: 2025/02/25 15:45:25 by gro-donn         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	think(t_philo *philos)
 {
-	size_t	time_ms;
-
-	time_ms = get_current_time();
-	printf("%zu %d is thinking\n", time_ms, philos->id);
+	printf("%zu %d is thinking\n", get_current_time(), philos->id);
 }
 
 /*
@@ -25,10 +34,7 @@ void	philo_sleep(t_philo *philos, t_params *params)
 
 void	die(t_philo *philos)
 {
-	// size_t	time_ms;
-	// time_ms = get_current_time();
-	printf("Philosopher %d died. Last meal time: %zu, Current time: %zu,
-		Time since last meal: %zu\n", philos->id, philos->last_meal_time,
+	printf("Philosopher %d died. Last meal time: %zu, Current time: %zu,Time since last meal: %zu\n", philos->id, philos->last_meal_time,
 		get_current_time(), get_current_time() - philos->last_meal_time);
 	printf("%zu %d died\n", get_current_time(), philos->id);
 	philos->is_dead = 1;
@@ -52,14 +58,17 @@ Delay before second fork: Allows slight desynchronization to avoid two adjacent
  falsely detect starvation due to a delayed update.
 */
 // all odd philos have a tiny eat at the beginning
+
+void handle_single_philosopher(t_philo *philos, t_params *params)
+ {
+    usleep(params->time_until_die * 1000);
+    die(philos);
+}
+
 void	eat(t_philo *philos, t_params *params)
 {
-	if (params->total_philos == 1)
-	{
-		usleep(params->time_until_die * 1000);
-		die(philos);
-		return ;
-	}
+      if (params->total_philos == 1) 
+        handle_single_philosopher(philos, params);
 	if (philos->id % 2 == 1)
 	{
 		pthread_mutex_lock(philos->r_fork);
@@ -85,3 +94,4 @@ void	eat(t_philo *philos, t_params *params)
 	pthread_mutex_unlock(philos->l_fork);
 	pthread_mutex_unlock(philos->r_fork);
 }
+
