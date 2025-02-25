@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:32 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/21 11:36:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:18:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,9 @@ void	init_forks_mutexes(pthread_mutex_t *forks, int total_philos,
 void	init_params(t_params *params, char **av);
 int	check_args(char **av);
 int	is_digit(char *av);
+void	think(t_philo *philos);
+void	philo_sleep(t_philo *philos, t_params *params);
+void	die(t_philo *philos);
+void eat(t_philo *philos, t_params *params) ;
 
 #endif //PHILO_H
