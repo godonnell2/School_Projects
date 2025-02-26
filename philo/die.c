@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 17:17:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 07:25:24 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 07:48:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,40 +30,47 @@ int	check_die(t_philo *philos, t_params *params)
 	return (time_since_last_meal >= (params->time_until_die + 1));
 }
 
-void check_philosopher_meals(t_philo *philo, int *finished_philos, t_params *params)
+void	check_philosopher_meals(t_philo *philo, int *finished_philos,
+		t_params *params)
 {
-    pthread_mutex_lock(&philo->meal_lock);
-    if (params->total_num_need_eats != -1 && philo->meals_eaten >= params->total_num_need_eats)
-    {
-        if (!philo->is_finished)
-        {
-            philo->is_finished = 1;
-            (*finished_philos)++;
-        }
-    }
-    pthread_mutex_unlock(&philo->meal_lock);
+	pthread_mutex_lock(&philo->meal_lock);
+	if (params->total_num_need_eats != -1
+		&& philo->meals_eaten >= params->total_num_need_eats)
+	{
+		if (!philo->is_finished)
+		{
+			philo->is_finished = 1;
+			(*finished_philos)++;
+		}
+	}
+	pthread_mutex_unlock(&philo->meal_lock);
 }
 
-int monitor_die(t_philo *philos, t_params *params)
+int	monitor_die(t_philo *philos, t_params *params)
 {
-    int finished_philos = 0;
-    int i;
+	int	finished_philos;
+	int	i;
 
-    while (1)  
-    {
-        for (i = 0; i < params->total_philos; i++)
-        {
-            if (check_die(&philos[i], params))  
-            {
-                die(&philos[i]);
-                return (-51); 
-            }
-            check_philosopher_meals(&philos[i], &finished_philos, params);
-        }
-
-        if (params->total_num_need_eats != -1 && finished_philos == params->total_philos)
-            return (0); 
-
-        usleep(5000);
-    }
+	finished_philos = 0;
+	i = 0;
+	while (1)
+	{
+		while (i < params->total_philos)
+		{
+			if (check_die(&philos[i], params))
+			{
+				die(&philos[i]);
+				return (-51);
+			}
+			check_philosopher_meals(&philos[i], &finished_philos, params);
+			i++;
+		}
+		i = 0;
+		if (params->total_num_need_eats != -1
+			&& finished_philos == params->total_philos)
+		{
+			return (0);
+		}
+		usleep(5000);
+	}
 }
