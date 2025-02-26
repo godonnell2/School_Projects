@@ -6,20 +6,98 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/25 17:07:56 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 09:36:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-// KEEP TRACK OF HOW LONG THE PHILOS WAITED TO GET A LOCK TO FIGURE OUT WHATS HAPPENING
 
-// pthread_mutex_t is a data type that represents a mutex (mutual exclusion) object.
+// KEEP TRACK OF HOW LONG PHILOS WAITED TO GET A LOCK TO FIGURE WHATS HAPPENING
+
+// pthread_mutex_t= a data type that represents a mutex (mutual exclusion) obj
+
+void	print_results(t_philo *philos, int total_philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < total_philos)
+	{
+		printf("Philosopher %d ate %d times.\n", philos[i].id,
+			philos[i].meals_eaten);
+		i++;
+	}
+}
+
+void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
+		int total_philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < total_philos)
+	{
+		pthread_join(philos[i].thread, NULL);
+		i++;
+	}
+	i = 0;
+	while (i < total_philos)
+	{
+		pthread_mutex_destroy(&forks[i]);
+		pthread_mutex_destroy(&philos[i].meal_lock);
+		i++;
+	}
+}
+
+void	create_philo_threads(t_philo *philos, int total_philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < total_philos)
+	{
+		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
+		i++;
+	}
+}
+
+// int monitor_philos(t_philo *philos, t_params *params)
+// {
+//     if (params->total_num_need_eats == -1)
+//      {
+//         return (monitor_die(philos, params));
+//     }
+//     else
+//     {
+//         while (1)
+//         {
+//             int finished_philos = 0;
+//             for (int i = 0; i < params->total_philos; i++)
+//             {
+//                 pthread_mutex_lock(&philos[i].meal_lock);
+//                 if (philos[i].meals_eaten >= params->total_num_need_eats)
+//                 {
+//                     finished_philos++;
+//                 }
+//                 pthread_mutex_unlock(&philos[i].meal_lock);
+//             }
+//             if (finished_philos == params->total_philos) {
+//                 break ;
+//             }
+//             usleep(200);
+//         }
+//     }
+//     return (0);
+// }
+
 int	main(int ac, char **av)
 {
 	t_philo			philos[PHILOS_MAX];
 	pthread_mutex_t	forks[PHILOS_MAX];
 	t_params		params;
 	int				total_philos;
+	int				i;
+	int				finished_philos;
 
 	if (ac < 5 || ac > 6)
 	{
@@ -32,10 +110,12 @@ int	main(int ac, char **av)
 	total_philos = params.total_philos;
 	init_forks_mutexes(forks, total_philos, philos);
 	init_philos(philos, forks, &params);
-
- for (int i = 0; i < total_philos; i++)
+	i = 0;
+	while (i < total_philos)
+	{
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
-
+		i++;
+	}
 	if (params.total_num_need_eats == -1)
 	{
 		if (monitor_die(philos, &params))
@@ -45,34 +125,27 @@ int	main(int ac, char **av)
 	{
 		while (1)
 		{
-			int finished_philos = 0;
-			for (int i = 0; i < total_philos; i++)
+			finished_philos = 0;
+			i = 0;
+			while (i < total_philos)
 			{
 				pthread_mutex_lock(&philos[i].meal_lock);
 				if (philos[i].meals_eaten >= params.total_num_need_eats)
 					finished_philos++;
 				pthread_mutex_unlock(&philos[i].meal_lock);
+				i++;
 			}
 			if (finished_philos == total_philos)
-				break;
+				break ;
 			usleep(200);
 		}
 	}
-	// **Wait for all threads to finish**
-	for (int i = 0; i < total_philos; i++)
-		pthread_join(philos[i].thread, NULL);
-
-	for (int i = 0; i < total_philos; i++)
-	{
-		pthread_mutex_destroy(&forks[i]);
-		pthread_mutex_destroy(&philos[i].meal_lock);
-	}
-
-	for (int i = 0; i < total_philos; i++)
-	{
-		printf("Philosopher %d ate %d times.\n", philos[i].id, philos[i].meals_eaten);
-	}
-
+	create_philo_threads(philos, params.total_philos);
+	// monitor_philos(philos, &params);
+	cleanup_resources(philos, forks, params.total_philos);
+		// NEED TO CHECK WITH HELGRIND AT THE MOMENT IM BLIND
+	print_results(philos, params.total_philos);
+	return (0);
 }
 
 /*
@@ -82,7 +155,8 @@ NULL: This argument specifies the thread attributes.
 Passing NULL means that the thread will have default attributes.
 &philos[i].thread = address of thread id
 : This is a pointer to the function that the thread will execute.
-&philos[i]: This is a pointer to the philosopher structure that will be passed as an argument to the routine function.
+&philos[i]: This is a pointer to the philosopher structure that
+ will be passed as an argument to the routine function.
 
 PTHREAD JOIN
 Second loop: Waits for all threads to finish execution.
@@ -94,8 +168,8 @@ Each thread will receive its corresponding philosopher's data.
 A thread is a routine running in background until terminated or interrupted.
 Threads share resources, and have access to resources once at a time.
 
-Real life example: mobiles can play music and receive notifications; the music player
- and the notification app both share the resource sound: when receiving a message,
+example: mobiles can play music and receive notifications; music player
+ and the notification app both share the resource sound: when receiving a msg,
 	the music player stops for a sec,
 	the notification rings and then frees the resource sound again.
 
@@ -118,14 +192,15 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 Locks a mutex.
 
 If another thread already locked it, the calling thread waits.
-It's possible that Philosopher 2 had just started eating, but the monitor 
+It's possible that Philosopher 2 had just started eating, but the monitor
 thread checked right before the last_meal_time update.
-If so, this is a race condition where Philosopher 2 was actually eating, 
+If so, this is a race condition where Philosopher 2 was actually eating,
 but the program thought they were still starving.
 
 Race Condition:
 
-There might be a race condition between updating the last_meal_time and checking 
-for death. If the check_die function runs just after the philosopher picks up the forks but before they update their last_meal_time,
+There might be a race condition between updating the last_meal_time and checking
+for death. If the check_die function runs just after the philosopher picks up
+the forks but before they update their last_meal_time,
  it could incorrectly determine that the philosopher has starved.
 */

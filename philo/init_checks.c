@@ -6,25 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/23 18:07:07 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 09:00:08 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	is_digit(char *av)
-{
-	int	i;
 
-	i = 0;
-	while (av[i] != '\0')
-	{
-		if (av[i] < '0' || av[i] > '9')
-			return (0);
-		i++;
-	}
-	return (1);
-}
 
 int	check_args(char **av)
 {
@@ -90,4 +78,13 @@ void	init_philos(t_philo *philos, pthread_mutex_t *forks, t_params *params)
 		philos[i].params = params;
 		i++;
 	}
+}
+
+void handle_argument_errors(int ac)
+{
+    if (ac < 5 || ac > 6)
+    {
+        write(2, "Incorrect number of arguments \n", 31);
+        exit(-2);
+    }
 }

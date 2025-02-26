@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 17:17:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 07:48:39 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 08:26:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	check_die(t_philo *philos, t_params *params)
 	pthread_mutex_lock(&philos->meal_lock);
 	time_since_last_meal = get_current_time() - philos->last_meal_time;
 	pthread_mutex_unlock(&philos->meal_lock);
-	return (time_since_last_meal >= (params->time_until_die + 1));
+	return (time_since_last_meal >= (params->time_until_die +1));
 }
 
 void	check_philosopher_meals(t_philo *philo, int *finished_philos,
@@ -71,6 +71,6 @@ int	monitor_die(t_philo *philos, t_params *params)
 		{
 			return (0);
 		}
-		usleep(5000);
+		usleep(1000);
 	}
 }

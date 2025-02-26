@@ -1,5 +1,19 @@
 #include "philo.h"
 
+int	is_digit(char *av)
+{
+	int	i;
+
+	i = 0;
+	while (av[i] != '\0')
+	{
+		if (av[i] < '0' || av[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	ft_atoi(char *str)
 {
 	unsigned long long	nb;
