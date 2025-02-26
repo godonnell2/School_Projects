@@ -4,6 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -g #-O3optimisation
 SRC = main.c \
 	utils.c \
 	routine.c \
+	die.c \
 	init_checks.c 
    
 NAME = philo
