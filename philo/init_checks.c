@@ -6,13 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:25 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 09:00:08 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 19:46:45 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-
 
 int	check_args(char **av)
 {
@@ -38,12 +36,14 @@ void	init_params(t_params *params, char **av)
 	params->duration_eating = ft_atoi(av[3]);
 	params->duration_sleeping = ft_atoi(av[4]);
 	if (av[5])
-		params->total_num_need_eats = ft_atoi(av[5]);
+		params->num_eats = ft_atoi(av[5]);
 	else
-		params->total_num_need_eats = -1;
+		params->num_eats = -1;
+	params->simulation_running = 1;
 }
 
-// so forks are their own resource kind like opening an fd they need to be initialised
+// so forks are their own resource kind like opening an fd
+// they need to be initialised
 // before you use assign them to the philos in init philos
 void	init_forks_mutexes(pthread_mutex_t *forks, int total_philos,
 		t_philo *philos)
@@ -58,6 +58,7 @@ void	init_forks_mutexes(pthread_mutex_t *forks, int total_philos,
 		i++;
 	}
 }
+
 // right fork  - first philo shares fork with final filo (circular)
 void	init_philos(t_philo *philos, pthread_mutex_t *forks, t_params *params)
 {
@@ -71,20 +72,11 @@ void	init_philos(t_philo *philos, pthread_mutex_t *forks, t_params *params)
 		philos[i].start_time = get_current_time();
 		philos[i].last_meal_time = get_current_time();
 		philos[i].is_dead = 0;
-        philos[i].is_finished = 0;
-        philos[i].is_holding_fork = 0;
+		philos[i].is_finished = 0;
+		philos[i].is_holding_fork = 0;
 		philos[i].l_fork = &forks[i];
 		philos[i].r_fork = &forks[(i + 1) % params->total_philos];
 		philos[i].params = params;
 		i++;
 	}
-}
-
-void handle_argument_errors(int ac)
-{
-    if (ac < 5 || ac > 6)
-    {
-        write(2, "Incorrect number of arguments \n", 31);
-        exit(-2);
-    }
 }

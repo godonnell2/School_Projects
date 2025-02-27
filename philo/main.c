@@ -6,14 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 09:36:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 19:54:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 // KEEP TRACK OF HOW LONG PHILOS WAITED TO GET A LOCK TO FIGURE WHATS HAPPENING
-
 // pthread_mutex_t= a data type that represents a mutex (mutual exclusion) obj
 
 void	print_results(t_philo *philos, int total_philos)
@@ -47,8 +46,10 @@ void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
 		pthread_mutex_destroy(&philos[i].meal_lock);
 		i++;
 	}
+	pthread_mutex_destroy(&philos[0].params->sim_lock);
 }
 
+// Small delay to avoid race condition during startup DUH!!!
 void	create_philo_threads(t_philo *philos, int total_philos)
 {
 	int	i;
@@ -57,38 +58,10 @@ void	create_philo_threads(t_philo *philos, int total_philos)
 	while (i < total_philos)
 	{
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
+		usleep(100);
 		i++;
 	}
 }
-
-// int monitor_philos(t_philo *philos, t_params *params)
-// {
-//     if (params->total_num_need_eats == -1)
-//      {
-//         return (monitor_die(philos, params));
-//     }
-//     else
-//     {
-//         while (1)
-//         {
-//             int finished_philos = 0;
-//             for (int i = 0; i < params->total_philos; i++)
-//             {
-//                 pthread_mutex_lock(&philos[i].meal_lock);
-//                 if (philos[i].meals_eaten >= params->total_num_need_eats)
-//                 {
-//                     finished_philos++;
-//                 }
-//                 pthread_mutex_unlock(&philos[i].meal_lock);
-//             }
-//             if (finished_philos == params->total_philos) {
-//                 break ;
-//             }
-//             usleep(200);
-//         }
-//     }
-//     return (0);
-// }
 
 int	main(int ac, char **av)
 {
@@ -96,58 +69,30 @@ int	main(int ac, char **av)
 	pthread_mutex_t	forks[PHILOS_MAX];
 	t_params		params;
 	int				total_philos;
-	int				i;
-	int				finished_philos;
 
 	if (ac < 5 || ac > 6)
-	{
-		write(2, "Incorrect number of arguments \n", 31);
-		return (-2);
-	}
+		return (write(2, "Incorrect number of arguments\n", 30));
 	if (check_args(av) == 1)
 		return (-3);
 	init_params(&params, av);
 	total_philos = params.total_philos;
+	pthread_mutex_init(&params.sim_lock, NULL);
+	params.simulation_running = 1;
 	init_forks_mutexes(forks, total_philos, philos);
 	init_philos(philos, forks, &params);
-	i = 0;
-	while (i < total_philos)
-	{
-		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
-		i++;
-	}
-	if (params.total_num_need_eats == -1)
-	{
-		if (monitor_die(philos, &params))
-			return (0);
-	}
-	else
-	{
-		while (1)
-		{
-			finished_philos = 0;
-			i = 0;
-			while (i < total_philos)
-			{
-				pthread_mutex_lock(&philos[i].meal_lock);
-				if (philos[i].meals_eaten >= params.total_num_need_eats)
-					finished_philos++;
-				pthread_mutex_unlock(&philos[i].meal_lock);
-				i++;
-			}
-			if (finished_philos == total_philos)
-				break ;
-			usleep(200);
-		}
-	}
 	create_philo_threads(philos, params.total_philos);
-	// monitor_philos(philos, &params);
+	if (monitor_die(philos, &params) != 0)
+	{
+		pthread_mutex_lock(&params.sim_lock);
+		params.simulation_running = 0;
+		pthread_mutex_unlock(&params.sim_lock);
+	}
 	cleanup_resources(philos, forks, params.total_philos);
-		// NEED TO CHECK WITH HELGRIND AT THE MOMENT IM BLIND
 	print_results(philos, params.total_philos);
 	return (0);
 }
-
+// if (monitor_die(philos, &params) != 0)
+// A philosopher died, simulation ends
 /*
 PTHREAD CREATE
  Spawns all philosophers as independent threads, running in parallel.

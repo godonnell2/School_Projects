@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:23:29 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/25 17:05:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/26 19:49:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,11 @@
 
 void	think(t_philo *philos)
 {
-	printf("%zu %d is thinking\n", get_current_time(), philos->id);
+	pthread_mutex_lock(&philos->params->sim_lock);
+	if (philos->params->simulation_running)
+		printf("%zu %d is thinking\n", get_current_time() - philos->start_time,
+			philos->id);
+	pthread_mutex_unlock(&philos->params->sim_lock);
 }
 
 /*
@@ -25,13 +29,23 @@ void	philo_sleep(t_philo *philos, t_params *params)
 	size_t	start_time_ms;
 
 	start_time_ms = get_current_time();
-	printf("%zu %d is sleeping\n", start_time_ms, philos->id);
-	while ((get_current_time() - start_time_ms) < params->duration_sleeping)
+	pthread_mutex_lock(&params->sim_lock);
+	if (params->simulation_running)
+		printf("%zu %d is sleeping\n", start_time_ms - philos->start_time,
+			philos->id);
+	pthread_mutex_unlock(&params->sim_lock);
+	while (get_current_time() - start_time_ms < params->duration_sleeping)
 	{
-		usleep(100);
+		pthread_mutex_lock(&params->sim_lock);
+		if (!params->simulation_running)
+		{
+			pthread_mutex_unlock(&params->sim_lock);
+			return ;
+		}
+		pthread_mutex_unlock(&params->sim_lock);
+		usleep(500);
 	}
 }
-
 /*
 Even though each philosopher follows a strict eat → sleep → think cycle,
 they are running in parallel on separate threads.
@@ -51,31 +65,70 @@ Delay before second fork: Allows slight desynchronization to avoid two adjacent
 */
 // all odd philos have a tiny eat at the beginning
 
+// Small delay for odd philosophers to reduce contention
 void	eat(t_philo *philos, t_params *params)
 {
-	if (params->total_philos == 1)
+	size_t	start_eating;
+
+	pthread_mutex_lock(&params->sim_lock);
+	if (!params->simulation_running)
 	{
-		usleep(params->time_until_die * 1000);
-		die(philos);
+		pthread_mutex_unlock(&params->sim_lock);
 		return ;
 	}
-	if (philos->id % 2 == 1)
+	pthread_mutex_unlock(&params->sim_lock);
+	if (params->total_philos == 1)
 	{
 		pthread_mutex_lock(philos->r_fork);
+		pthread_mutex_lock(&params->sim_lock);
+		if (params->simulation_running)
+			printf("%zu %d has taken a fork\n", get_current_time()
+				- philos->start_time, philos->id);
+		pthread_mutex_unlock(&params->sim_lock);
+		usleep(params->time_until_die * 1000);
+		pthread_mutex_unlock(philos->r_fork);
+		return ;
+	}
+	if (philos->id % 2 == 0)
+	{
 		pthread_mutex_lock(philos->l_fork);
+		pthread_mutex_lock(philos->r_fork);
 	}
 	else
 	{
-		pthread_mutex_lock(philos->l_fork);
+		usleep(500);
 		pthread_mutex_lock(philos->r_fork);
+		pthread_mutex_lock(philos->l_fork);
 	}
-	printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
-	printf("%zu %d has taken a fork\n", get_current_time(), philos->id);
+	pthread_mutex_lock(&params->sim_lock);
+	if (params->simulation_running)
+	{
+		printf("%zu %d has taken a fork\n", get_current_time()
+			- philos->start_time, philos->id);
+		printf("%zu %d has taken a fork\n", get_current_time()
+			- philos->start_time, philos->id);
+	}
+	pthread_mutex_unlock(&params->sim_lock);
 	pthread_mutex_lock(&philos->meal_lock);
 	philos->last_meal_time = get_current_time();
 	pthread_mutex_unlock(&philos->meal_lock);
-	printf("%zu %d is eating\n", get_current_time(), philos->id);
-	usleep(params->duration_eating * 1000);
+	pthread_mutex_lock(&params->sim_lock);
+	if (params->simulation_running)
+		printf("%zu %d is eating\n", get_current_time() - philos->start_time,
+			philos->id);
+	pthread_mutex_unlock(&params->sim_lock);
+	start_eating = get_current_time();
+	while (get_current_time() - start_eating < params->duration_eating)
+	{
+		pthread_mutex_lock(&params->sim_lock);
+		if (!params->simulation_running)
+		{
+			pthread_mutex_unlock(&params->sim_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&params->sim_lock);
+		usleep(500);
+	}
 	pthread_mutex_lock(&philos->meal_lock);
 	philos->meals_eaten++;
 	pthread_mutex_unlock(&philos->meal_lock);
@@ -87,28 +140,34 @@ void	eat(t_philo *philos, t_params *params)
 // Get params from philos struct
 void	*routine(void *arg)
 {
-	int			meals_eaten;
 	t_philo		*philos;
 	t_params	*params;
 
+	int should_continue ;
 	philos = (t_philo *)arg;
 	params = philos->params;
-	meals_eaten = 0;
 	while (1)
 	{
-		if (check_die(philos, params) == 1)
-			die(philos);
-		eat(philos, params);
-		if (check_die(philos, params) == 1)
-			die(philos);
-		philo_sleep(philos, params);
-		if (check_die(philos, params) == 1)
-			die(philos);
-		think(philos);
-		meals_eaten++;
-		if (params->total_num_need_eats != -1
-			&& meals_eaten >= params->total_num_need_eats)
+		pthread_mutex_lock(&params->sim_lock);
+		should_continue = params->simulation_running;
+		pthread_mutex_unlock(&params->sim_lock);
+		if (!should_continue)
 			break ;
+		eat(philos, params);
+		philo_sleep(philos, params);
+		think(philos);
+		pthread_mutex_lock(&philos->meal_lock);
+		if (params->num_eats != -1 && philos->meals_eaten >= params->num_eats)
+		{
+			philos->is_finished = 1;
+			pthread_mutex_unlock(&philos->meal_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&philos->meal_lock);
+		usleep(100);
 	}
 	return (NULL);
 }
+// usleep(100);
+// Small delay to prevent CPU hogging (that small delay that will
+// make the even and odd philos work together)
