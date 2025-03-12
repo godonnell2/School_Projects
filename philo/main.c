@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 18:02:20 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 19:54:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:25:14 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,11 @@
 
 // KEEP TRACK OF HOW LONG PHILOS WAITED TO GET A LOCK TO FIGURE WHATS HAPPENING
 // pthread_mutex_t= a data type that represents a mutex (mutual exclusion) obj
-
-void	print_results(t_philo *philos, int total_philos)
-{
-	int	i;
-
-	i = 0;
-	while (i < total_philos)
-	{
-		printf("Philosopher %d ate %d times.\n", philos[i].id,
-			philos[i].meals_eaten);
-		i++;
-	}
-}
-
+// pthread_join =waits until each thread finishes, then we can clean up safely
+//If you don’t join threads, their resources (e.g., stack memory) 
+//may not be properly released, leading to memory leaks.
+//otherwise The main thread  will prob proceed to destroy mutexes while philo 
+//threads are still running, causing crashes or undefined behavior.
 void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
 		int total_philos)
 {
@@ -49,7 +40,10 @@ void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
 	pthread_mutex_destroy(&philos[0].params->sim_lock);
 }
 
-// Small delay to avoid race condition during startup DUH!!!
+	//usleep(100);
+// was told to do this but i think it's a bit hacky and uncessary
+// the proper synchronization with mutexes should be enough
+// Small delay to avoid race condition during startup 
 void	create_philo_threads(t_philo *philos, int total_philos)
 {
 	int	i;
@@ -58,7 +52,6 @@ void	create_philo_threads(t_philo *philos, int total_philos)
 	while (i < total_philos)
 	{
 		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
-		usleep(100);
 		i++;
 	}
 }
@@ -68,17 +61,15 @@ int	main(int ac, char **av)
 	t_philo			philos[PHILOS_MAX];
 	pthread_mutex_t	forks[PHILOS_MAX];
 	t_params		params;
-	int				total_philos;
 
 	if (ac < 5 || ac > 6)
 		return (write(2, "Incorrect number of arguments\n", 30));
 	if (check_args(av) == 1)
 		return (-3);
 	init_params(&params, av);
-	total_philos = params.total_philos;
 	pthread_mutex_init(&params.sim_lock, NULL);
 	params.simulation_running = 1;
-	init_forks_mutexes(forks, total_philos, philos);
+	init_forks_mutexes(forks, params.total_philos, philos);
 	init_philos(philos, forks, &params);
 	create_philo_threads(philos, params.total_philos);
 	if (monitor_die(philos, &params) != 0)
@@ -88,7 +79,6 @@ int	main(int ac, char **av)
 		pthread_mutex_unlock(&params.sim_lock);
 	}
 	cleanup_resources(philos, forks, params.total_philos);
-	print_results(philos, params.total_philos);
 	return (0);
 }
 // if (monitor_die(philos, &params) != 0)

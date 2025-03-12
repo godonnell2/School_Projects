@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 17:17:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 19:45:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/03/12 10:07:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,27 @@ int	check_die(t_philo *philos, t_params *params)
 	return (time_since_last_meal >= params->time_until_die);
 }
 
+void	check_meal_count(t_philo *philo, int *finished_philos, t_params *params)
+{
+	pthread_mutex_lock(&philo->meal_lock);
+	if (params->num_eats != -1 && philo->meals_eaten >= params->num_eats)
+		(*finished_philos)++;
+	pthread_mutex_unlock(&philo->meal_lock);
+}
+
+int	check_philosopher_status(t_philo *philo, t_params *params,
+		int *finished_philos)
+{
+	if (check_die(philo, params))
+	{
+		die(philo);
+		return (-1);
+	}
+	check_meal_count(philo, finished_philos, params);
+	return (0);
+}
+
+//  return (-1) A philosopher died
 int	monitor_die(t_philo *philos, t_params *params)
 {
 	int	finished_philos;
@@ -45,18 +66,11 @@ int	monitor_die(t_philo *philos, t_params *params)
 		i = 0;
 		while (i < params->total_philos)
 		{
-			if (check_die(&philos[i], params))
+			if (check_philosopher_status(&philos[i], params,
+					&finished_philos) == -1)
 			{
-				die(&philos[i]);
 				return (-1);
 			}
-			pthread_mutex_lock(&philos[i].meal_lock);
-			if (params->num_eats != -1
-				&& philos[i].meals_eaten >= params->num_eats)
-			{
-				finished_philos++;
-			}
-			pthread_mutex_unlock(&philos[i].meal_lock);
 			i++;
 		}
 		if (params->num_eats != -1 && finished_philos == params->total_philos)

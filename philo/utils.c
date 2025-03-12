@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 09:49:54 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/26 19:36:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/03/12 10:19:35 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,32 +63,27 @@ size_t	get_current_time(void)
 	return (time_now.tv_sec * 1000 + time_now.tv_usec / 1000);
 }
 
-// NEED REVIEW
-int	precise_sleep(size_t ms, pthread_mutex_t *sim_lock, int *simulation_running)
+void	print_results(t_philo *philos, int total_philos)
 {
-	size_t	start;
-	size_t	elapsed;
-	int		running;
+	int	i;
 
-	start = get_current_time();
-	while (1)
+	i = 0;
+	while (i < total_philos)
 	{
-		pthread_mutex_lock(sim_lock);
-		running = *simulation_running;
-		pthread_mutex_unlock(sim_lock);
-		if (!running)
-			return (0);
-		elapsed = get_current_time() - start;
-		if (elapsed >= ms)
-			return (1);
-		if (ms - elapsed > 10)
-			usleep(1000);
-		else
-			usleep(100);
+		printf("Philosopher %d ate %d times.\n", philos[i].id,
+			philos[i].meals_eaten);
+		i++;
 	}
 }
 
 // NEED REVIEW
+// It prevents race conditions when multiple philosophers
+// try to print messages simultaneously.
+// Ensures that checking simulation_running and printing are
+// atomic (happen together safely)
+// Prevents Printing After Simulation Ends
+// Without this check, a philosopher might print after dying,
+// which would be incorrect.
 int	safe_print(t_philo *philo, char *msg)
 {
 	pthread_mutex_lock(&philo->params->sim_lock);

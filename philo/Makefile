@@ -5,6 +5,7 @@ SRC = main.c \
 	utils.c \
 	routine.c \
 	die.c \
+	eat.c \
 	init_checks.c 
    
 NAME = philo
