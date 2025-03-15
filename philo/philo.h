@@ -39,14 +39,14 @@ typedef struct s_params
 // would defeat the whole purpse
 // pthread_create allows only one argument,
 //	add a t_params *params field in t_philo:
-// no ptr for meal_lock cos each philosopher(t_philo) 
+// no ptr for meal_lock cos each philosopher(t_philo)
 //  has its own meal_lock that is not shared with other philosophers.
- // but still need it to be a mutex because it protects
- // mealseaten or lastmealtime 
- // could have a global mutex but this would lock all philos data 
- //and reduce parallelism
-//forks are shared among philosophers, so they are stored in a separate arr,
- //and each philosopher holds pointers to the shared forks.
+// but still need it to be a mutex because it protects
+// mealseaten or lastmealtime
+// could have a global mutex but this would lock all philos data
+// and reduce parallelism
+// forks are shared among philosophers, so they are stored in a separate arr,
+// and each philosopher holds pointers to the shared forks.
 
 typedef struct s_philo
 {

@@ -15,10 +15,10 @@
 // KEEP TRACK OF HOW LONG PHILOS WAITED TO GET A LOCK TO FIGURE WHATS HAPPENING
 // pthread_mutex_t= a data type that represents a mutex (mutual exclusion) obj
 // pthread_join =waits until each thread finishes, then we can clean up safely
-//If you don’t join threads, their resources (e.g., stack memory) 
-//may not be properly released, leading to memory leaks.
-//otherwise The main thread  will prob proceed to destroy mutexes while philo 
-//threads are still running, causing crashes or undefined behavior.
+// If you don’t join threads, their resources (e.g., stack memory)
+// may not be properly released, leading to memory leaks.
+// otherwise The main thread  will prob proceed to destroy mutexes while philo
+// threads are still running, causing crashes or undefined behavior.
 void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
 		int total_philos)
 {
@@ -40,10 +40,10 @@ void	cleanup_resources(t_philo *philos, pthread_mutex_t *forks,
 	pthread_mutex_destroy(&philos[0].params->sim_lock);
 }
 
-	//usleep(100);
+// usleep(100);
 // was told to do this but i think it's a bit hacky and uncessary
 // the proper synchronization with mutexes should be enough
-// Small delay to avoid race condition during startup 
+// Small delay to avoid race condition during startup
 void	create_philo_threads(t_philo *philos, int total_philos)
 {
 	int	i;

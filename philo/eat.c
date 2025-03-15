@@ -14,19 +14,18 @@
 
 /*
 Even though each philosopher follows a strict eat → sleep → think cycle,
-they are running in parallel on separate threads. 
+they are running in parallel on separate threads.
 usleep() expects micros, CONVERT millis to micross by multiplying by 1000.
  no & needed for locking because the forks are already ptrs
 
 AVOID DEADLOCK: Odd philosophers pick right fork first!!!!!
- all odd philos have a tiny  sleep at the beginning desynchronization 
+ all odd philos have a tiny  sleep at the beginning desynchronization
   otherwise everyone grabs left fork and prog stalls
-  
+
 ✅ Immediate last_meal_time update: Ensures the death check mechanism doesn't
  falsely detect starvation due to a delayed update.
  want to let the OS do as much as poss
 */
-
 
 void	handle_single_philosopher(t_philo *philos, t_params *params)
 {
