@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/30 21:14:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:21:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,22 @@ static int	validate_input_and_commands(t_data *data, char **av, char **envp)
 
 static void	handle_first_child(t_data *data, char **envp)
 {
-	if (dup2(data->input_fd, IN) < 0 | > cmd1_args, envp)
-		;
+	  
+    close(data->pipe_fd[WRITE]);
+    if (data->input_fd != STDIN_FILENO) {
+        if (dup2(data->input_fd, STDIN_FILENO) < 0) {
+            perror("dup2 input_fd");
+            exit(EXIT_FAILURE);
+        }
+        close(data->input_fd);
+    }
+
+    if (dup2(data->pipe_fd[WRITE], STDOUT_FILENO) < 0) {
+        perror("dup2 pipe_fd");
+        exit(EXIT_FAILURE);
+    }
+    close(data->pipe_fd[READ]);
+		execve(data->cmd2_fullpath, data->cmd1_args, envp);
 	perror("");
 	exit(EXIT_FAILURE);
 }
