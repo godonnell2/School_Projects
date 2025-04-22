@@ -24,17 +24,19 @@ int skip_cd_cmd(const char *input)
     int i = 0;
     //do we need all space chars?? 
     while (input[i] == ' ' || input[i] == '\t')
-        i++;
+
 
     // Skip 'cd'
-    if (input[i] == 'c' && input[i + 1] == 'd') {
+    if (input[i] == 'c' && input[i + 1] == 'd') 
+    {
         i += 2;
-    } else {
+    } 
+    else 
+    {
         return i; // not a valid cd command, but we'll be defensive
     }
-
-// Skip whitespace after 'cd'
- while (input[i] == ' ' || input[i] == '\t')
+    // Skip whitespace after 'cd'
+    while (input[i] == ' ' || input[i] == '\t')
         i++;
 
     return i;
@@ -50,8 +52,10 @@ int ft_strcmp(const char *s1, const char *s2)
     return (unsigned char)*s1 - (unsigned char)*s2;
 }
 
-t_env_vars *get_env_node(t_env_vars *head, const char *key) {
-    while (head) {
+t_env_vars *get_env_node(t_env_vars *head, const char *key) 
+{
+    while (head) 
+    {
         if (ft_strcmp(head->key, key) == 0)
             return head;
         head = head->next;
@@ -64,16 +68,19 @@ char *ft_strdup(const char *s)
     size_t len = 0;
     const char *p = s;
    
-    while (*p++) {
+    while (*p++) 
+    {
         len++;
     }
    
     char *dup = malloc(len + 1);
-    if (!dup) {
+    if (!dup) 
+    {
         return NULL; 
     }
     
-    for (size_t i = 0; i <= len; i++) {
+    for (size_t i = 0; i <= len; i++) 
+    {
         dup[i] = s[i]; 
     }
     
@@ -81,13 +88,17 @@ char *ft_strdup(const char *s)
 }
 
 
-void set_env_var(t_env_vars **head, const char *key, const char *value) {
+void set_env_var(t_env_vars **head, const char *key, const char *value) 
+{
     t_env_vars *node = get_env_node(*head, key);
 
-    if (node) {
+    if (node) 
+    {
         free(node->value);
         node->value = ft_strdup(value);
-    } else {
+    } 
+    else 
+    {
         node = malloc(sizeof(t_env_vars));
         node->key = ft_strdup(key);
         node->value = ft_strdup(value);
@@ -100,13 +111,14 @@ void set_env_var(t_env_vars **head, const char *key, const char *value) {
 //ptr to head of list hence double ptr
 void ft_cd(char *input, t_env_vars **env_list)
 {
- char old_pwd[10000];
+    char old_pwd[10000];
     char new_pwd[10000];
     char *target_path = NULL;
     int i = skip_cd_cmd(input);
 
     // Get current dir first (for OLDPWD)
-    if (!getcwd(old_pwd, sizeof(old_pwd))) {
+    if (!getcwd(old_pwd, sizeof(old_pwd))) 
+    {
         printf("cd: getcwd");
         return;
     }
@@ -117,14 +129,15 @@ void ft_cd(char *input, t_env_vars **env_list)
     //}
 
     //chdir interprets it relative to the current working directory so works for both rel/abs
-    if (chdir(target_path) == -1) {
+    if (chdir(target_path) == -1) 
+    {
         printf("cd");
         return;
     }
 
-    if (!getcwd(new_pwd, sizeof(new_pwd))) {
-        printf("cd: getcwd");
-
+    if (!getcwd(new_pwd, sizeof(new_pwd))) 
+    {
+        printf("cd: getcwd");//better error handling write to std err
         return;
     }
 
