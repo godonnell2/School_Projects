@@ -51,8 +51,9 @@ char *ft_strdup(const char *s)
     }
    
     char *dup = malloc(len + 1);
-  if (!dup) {
-        write(2, "ft_strdup: malloc failed\n", 26);
+  if (!dup) 
+  {
+        perror("export: malloc in strdup");
         return NULL;
     }
     
@@ -70,8 +71,9 @@ char *ft_strdup(const char *s)
 
 void set_env_var(t_env_vars **head, const char *key, const char *value) 
 {
-      if (!key || !value) {
-        write(2, "error: NULL key/value\n", 23);
+      if (!key || !value) 
+      {
+        perror("export: not key or not value"); //error handle
         return;
     }
     t_env_vars *node = get_env_node(*head, key);
@@ -81,7 +83,7 @@ void set_env_var(t_env_vars **head, const char *key, const char *value)
         char *new_value = ft_strdup(value);
         if(!new_value)
         {
-            write(2, "error", 5);
+            perror("export: fail strdup");
             return;
         }
         free(node->value);
@@ -92,7 +94,7 @@ void set_env_var(t_env_vars **head, const char *key, const char *value)
         node = malloc(sizeof(t_env_vars));
         if (!node)
         {
-            write(2, "malloc failed in set_env_var\n", 30);
+            perror( "export:malloc failed in set_env_var");
             return;
         }
         node->key = ft_strdup(key);

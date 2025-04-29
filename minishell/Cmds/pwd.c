@@ -7,8 +7,7 @@ void ft_pwd()
 
     if(!getcwd(PWD, sizeof(PWD)))
     {
-        printf("error:get cwd in pwd");//maybe dont need to do this??
-        //or maybe write is better can write to stderror
+        perror("pwd:get cwd in pwd");
         return;
     }
 

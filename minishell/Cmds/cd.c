@@ -119,10 +119,9 @@ void ft_cd(char *input, t_env_vars **env_list)
     // Get current dir first (for OLDPWD)
     if (!getcwd(old_pwd, sizeof(old_pwd))) 
     {
-        printf("cd: getcwd");
+        perror("cd: getcwd");
         return;
     }
-
     // Handle special cases (~, -, no arg or . .. )???
    // if (input[i] == '\0' || input[i] == '~' || input[i] == '-') {
     
@@ -131,18 +130,16 @@ void ft_cd(char *input, t_env_vars **env_list)
     //chdir interprets it relative to the current working directory so works for both rel/abs
     if (chdir(target_path) == -1) 
     {
-        printf("cd");
+        perror("cd: did not find target path");
         return;
     }
 
     if (!getcwd(new_pwd, sizeof(new_pwd))) 
     {
-        printf("cd: getcwd");//better error handling write to std err
+       perror("cd");//error handle ok, bad msg?
         return;
     }
-
     set_env_var(env_list, "OLDPWD", old_pwd);
     set_env_var(env_list, "PWD", new_pwd);
-
 
 }
