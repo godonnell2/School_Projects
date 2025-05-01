@@ -1,5 +1,7 @@
+#include "minishell.h"
 #include <stdlib.h>
 #include <unistd.h>
+
 
 // do we have to update the path name before the semicolon??
 /*
