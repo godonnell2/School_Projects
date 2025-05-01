@@ -6,11 +6,32 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:53:18 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/17 15:52:37 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/03/26 08:22:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+char	*cat_strs_char(char *dest, const char *src1, char c, const char *src2)
+{
+	size_t	i;
+
+	i = 0;
+	if (!src1 || !src2)
+	{
+		return (NULL);
+	}
+	while (*src1)
+	{
+		dest[i++] = *src1++;
+	}
+	dest[i++] = c;
+	while (*src2)
+	{
+		dest[i++] = *src2++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
 
 static size_t	count_words(char const *s, char c)
 {

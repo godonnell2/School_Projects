@@ -6,13 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/03/25 18:21:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/05/01 20:25:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	validate_input_and_commands(t_data *data, char **av, char **envp)
+static int validate_input_and_commands(t_data *data, char **av, char **envp)
 {
 	data->input_fd = open(av[1], O_RDONLY);
 	if (data->input_fd < 0)
@@ -32,29 +32,29 @@ static int	validate_input_and_commands(t_data *data, char **av, char **envp)
 	return (1);
 }
 
-static void	handle_first_child(t_data *data, char **envp)
+static void handle_first_child(t_data *data, char **envp)
 {
-	  
-    close(data->pipe_fd[WRITE]);
-    if (data->input_fd != STDIN_FILENO) {
-        if (dup2(data->input_fd, STDIN_FILENO) < 0) {
-            perror("dup2 input_fd");
-            exit(EXIT_FAILURE);
-        }
-        close(data->input_fd);
-    }
+	if (dup2(data->input_fd, STDIN_FILENO) < 0)
+	{
+		perror("dup2 input_fd");
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(data->pipe_fd[WRITE], STDOUT_FILENO) < 0)
+	{
+		perror("dup2 pipe_fd");
+		exit(EXIT_FAILURE);
+	}
 
-    if (dup2(data->pipe_fd[WRITE], STDOUT_FILENO) < 0) {
-        perror("dup2 pipe_fd");
-        exit(EXIT_FAILURE);
-    }
-    close(data->pipe_fd[READ]);
-		execve(data->cmd2_fullpath, data->cmd1_args, envp);
-	perror("");
+	close(data->input_fd);
+	close(data->pipe_fd[READ]);
+	close(data->pipe_fd[WRITE]);
+
+	execve(data->cmd1_fullpath, data->cmd1_args, envp);
+	perror("execve cmd1 failed");
 	exit(EXIT_FAILURE);
 }
 
-static void	handle_second_child(t_data *data, char **av, char **envp)
+static void handle_second_child(t_data *data, char **av, char **envp)
 {
 	data->output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (data->output_fd < 0)
@@ -63,13 +63,33 @@ static void	handle_second_child(t_data *data, char **av, char **envp)
 		err_case(data, NULL);
 	close(data->pipe_fd[READ]);
 	close(data->output_fd);
+	close(data->pipe_fd[WRITE]);
 	execve(data->cmd2_fullpath, data->cmd2_args, envp);
-	perror("");
+	perror("execve cmd2 failed");
 	exit(EXIT_FAILURE);
 }
+int last_exit_code = 0;
 
-static void	create_pipes_and_forks(t_data *data, char **av, char **envp)
+/*
+WIFEXITED(status) checks: did the child exit normally (via exit() or returning from main())?
+
+If yes, then WEXITSTATUS(status) gives you the actual exit code (e.g., 0, 1, 42…).
+
+WIFSIGNALED(status) checks: did the child terminate due to a signal (e.g., Ctrl-C)?
+
+last_exit_code in your main shell loop.
+
+Update it after every command execution.
+
+Be sure to reset it if needed after builtins or errors.
+
+Ensure it works even with pipelines and redirections (i.e., last process in the pipeline).
+
+
+*/
+static void create_pipes_and_forks(t_data *data, char **av, char **envp)
 {
+	int status;
 	if (pipe(data->pipe_fd) < 0)
 		err_case(data, NULL);
 	data->pid1 = fork();
@@ -77,18 +97,34 @@ static void	create_pipes_and_forks(t_data *data, char **av, char **envp)
 		err_case(data, NULL);
 	if (data->pid1 == 0)
 		handle_first_child(data, envp);
+	else
+	{
+		waitpid(data->pid1, &status, 0);
+		if (WIFEXITED(status))
+			last_exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			last_exit_code = 128 + WTERMSIG(status);
+	}
 	close(data->pipe_fd[WRITE]);
 	data->pid2 = fork();
 	if (data->pid2 < 0)
 		err_case(data, NULL);
 	if (data->pid2 == 0)
 		handle_second_child(data, av, envp);
+	else
+	{
+		waitpid(data->pid2, &status, 0);
+		if (WIFEXITED(status))
+			last_exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			last_exit_code = 128 + WTERMSIG(status);
+	}
 	close(data->pipe_fd[READ]);
 }
 
-int	main(int ac, char **av, char **envp)
+int main(int ac, char **av, char **envp)
 {
-	t_data	data;
+	t_data data;
 
 	if (ac != 5)
 		print_usage();
