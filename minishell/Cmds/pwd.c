@@ -1,20 +1,17 @@
-#include <unistd.h>  
-//print working directory 
-void ft_pwd()
+#include <unistd.h>
+
+// print working directory
+void	ft_pwd(void)
 {
-    char PWD[100000];
-   
+	char	pwd[100000];
 
-    if(!getcwd(PWD, sizeof(PWD)))
-    {
-        perror("pwd:get cwd in pwd");
-        return;
-    }
-
-   else
-   {
-    printf("%s\n", PWD);
-   }
-
-
+	if (!getcwd(pwd, sizeof(pwd)))
+	{
+		perror("pwd:get cwd in pwd");
+		return ;
+	}
+	else
+	{
+		printf("%s\n", pwd);
+	}
 }
