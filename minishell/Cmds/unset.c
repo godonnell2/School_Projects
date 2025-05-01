@@ -24,7 +24,10 @@ void	ft_unset(t_env_vars **head, char *key)
 	t_env_vars	*prev;
 
 	if (!head || !key)
+	{
+		last_exit_code = 1; 
 		return ;
+	}
 	curr = *head;
 	prev = NULL;
 	while (curr)
@@ -38,9 +41,11 @@ void	ft_unset(t_env_vars **head, char *key)
 			free(curr->key);
 			free(curr->value);
 			free(curr);
+			last_exit_code = 0;
 			return ;
 		}
 		prev = curr;
 		curr = curr->next;
 	}
+	last_exit_code = 0; 
 }

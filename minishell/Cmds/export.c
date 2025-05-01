@@ -71,6 +71,7 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 	if (!key || !value)
 	{
 		perror("export: invalid key or value");
+		last_exit_code = 1; 
 		return ;
 	}
 	node = get_env_node(*head, key);
@@ -81,14 +82,20 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 			return ;
 		free(node->value);
 		node->value = new_value;
+		last_exit_code = 0;
 	}
 	else
 	{
 		node = create_endnode(key, value);
 		if (!node)
-			return ;
+			{
+			perror("export: node creation failed");
+			last_exit_code = 1;
+			return;
+		}
 		node->next = *head;
 		*head = node;
+		last_exit_code = 10;
 	}
 }
 
