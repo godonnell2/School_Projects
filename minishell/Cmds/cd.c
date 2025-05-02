@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
 // do we have to update the path name before the semicolon??
 /*
 Symbolic Links (Symlinks): Unlike hard links, symlinks are independent files
@@ -104,30 +103,61 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 // ptr to head of list hence double ptr
 // if (input[i] == '\0' || input[i] == '~' || input[i] == '-')
 // chdir interprets it relative to the curr dir so works for both rel/abs
+int	get_current_directory(char *buffer, size_t size)
+{
+	if (!getcwd(buffer, size))
+	{
+		perror("cd: getcwd failed");
+		last_exit_code = 1;
+		return (0);
+	}
+	return (1);
+}
+
+char	*get_target_path(char *input, t_env_vars **env_list)
+{
+	int			i;
+	char		*target_path;
+	t_env_vars	*home;
+
+	i = skip_cd_cmd(input);
+	target_path = input + i;
+	while (*target_path == ' ' || *target_path == '\t')
+	{
+		target_path++;
+	}
+	if (*target_path == '\0')
+	{
+		home = get_env_node(*env_list, "HOME");
+		if (!home || !home->value)
+		{
+			perror("cd: HOME not set");
+			last_exit_code = 1;
+			return (NULL);
+		}
+		target_path = home->value;
+	}
+	return (target_path);
+}
+
 void	ft_cd(char *input, t_env_vars **env_list)
 {
 	char	old_pwd[10000];
 	char	new_pwd[10000];
 	char	*target_path;
-	int		i;
 
-	target_path = NULL;
-	i = skip_cd_cmd(input);
-	if (!getcwd(old_pwd, sizeof(old_pwd)))
-	{
-		perror("cd: getcwd");
+	target_path = get_target_path(input, *env_list);
+	if (!get_current_directory(old_pwd, sizeof(old_pwd)))
 		return ;
-	}
 	if (chdir(target_path) == -1)
 	{
-		perror("cd: did not find target path");
+		perror("cd: did not find target path ie no such dir");
+		last_exit_code = 1;
 		return ;
 	}
-	if (!getcwd(new_pwd, sizeof(new_pwd)))
-	{
-		perror("cd");
+	if (!get_current_directory(new_pwd, sizeof(new_pwd)))
 		return ;
-	}
 	set_env_var(env_list, "OLDPWD", old_pwd);
 	set_env_var(env_list, "PWD", new_pwd);
+	last_exit_code = 0;
 }

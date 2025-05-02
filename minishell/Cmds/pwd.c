@@ -1,5 +1,4 @@
 #include "minishell.h"
-
 #include <unistd.h>
 
 // print working directory

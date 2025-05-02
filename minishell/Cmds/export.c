@@ -1,5 +1,4 @@
 #include "minishell.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,15 +23,20 @@ do i need to check validity of export key words??
 plus need to handle malloc fail in strdup right now im just losing the var!!!!
 */
 
-t_env_vars	*get_env_node(t_env_vars *head, const char *key)
+void	print_export(t_env_vars *env)
 {
-	while (head)
+	while (env)
 	{
-		if (ft_strcmp(head->key, key) == 0)
-			return (head);
-		head = head->next;
+		if (env->key)
+		{
+			printf("declare -x %s", env->key);
+			if (env->value)
+				printf("=\"%s\"", env->value);
+			printf("\n");
+		}
+		env = env->next;
 	}
-	return (NULL);
+	last_exit_code = 0;
 }
 
 char	*ft_strdup(const char *s)
@@ -71,31 +75,23 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 	if (!key || !value)
 	{
 		perror("export: invalid key or value");
-		last_exit_code = 1; 
 		return ;
 	}
 	node = get_env_node(*head, key);
 	if (node)
 	{
 		new_value = ft_strdup(value);
-		if (!new_value)
-			return ;
+		return ;
 		free(node->value);
 		node->value = new_value;
-		last_exit_code = 0;
 	}
 	else
 	{
 		node = create_endnode(key, value);
 		if (!node)
-			{
-			perror("export: node creation failed");
-			last_exit_code = 1;
-			return;
-		}
+			return ;
 		node->next = *head;
 		*head = node;
-		last_exit_code = 10;
 	}
 }
 

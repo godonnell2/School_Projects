@@ -1,5 +1,4 @@
 #include "minishell.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,16 +17,11 @@ unset VAR	Removes the variable VAR.
 
 */
 
-void	ft_unset(t_env_vars **head, char *key)
+static t_env_vars	*extract_node(t_env_vars **head, char *key)
 {
 	t_env_vars	*curr;
 	t_env_vars	*prev;
 
-	if (!head || !key)
-	{
-		last_exit_code = 1; 
-		return ;
-	}
 	curr = *head;
 	prev = NULL;
 	while (curr)
@@ -38,14 +32,35 @@ void	ft_unset(t_env_vars **head, char *key)
 				prev->next = curr->next;
 			else
 				*head = curr->next;
-			free(curr->key);
-			free(curr->value);
-			free(curr);
-			last_exit_code = 0;
-			return ;
+			return (curr);
 		}
 		prev = curr;
 		curr = curr->next;
 	}
-	last_exit_code = 0; 
+	return (NULL);
 }
+
+void	ft_unset(t_env_vars **head, char *key)
+{
+	t_env_vars	*node_to_remove;
+
+	if (!head || !key)
+	{
+		last_exit_code = 1;
+		return ;
+	}
+	node_to_remove = extract_node(head, key);
+	if (node_to_remove)
+	{
+		free(node_to_remove->key);
+		free(node_to_remove->value);
+		free(node_to_remove);
+		last_exit_code = 0;
+	}
+	else
+	{
+		last_exit_code = 0;
+	}
+}
+// Note: Typically unset returns success even if var didn't exist
+// hence the else
