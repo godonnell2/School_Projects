@@ -36,7 +36,7 @@ void	print_export(t_env_vars *env)
 		}
 		env = env->next;
 	}
-	last_exit_code = 0;
+	
 }
 
 char	*ft_strdup(const char *s)
@@ -67,32 +67,34 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
-void	set_env_var(t_env_vars **head, const char *key, const char *value)
+int	set_env_var(t_env_vars **head, const char *key, const char *value)
 {
 	t_env_vars	*node;
 	char		*new_value;
-
+	int exit_code; 
 	if (!key || !value)
 	{
 		perror("export: invalid key or value");
-		return ;
+		return exit_code = 1;
 	}
 	node = get_env_node(*head, key);
 	if (node)
 	{
 		new_value = ft_strdup(value);
-		return ;
 		free(node->value);
 		node->value = new_value;
+		return exit_code = 0;
 	}
 	else
 	{
 		node = create_endnode(key, value);
 		if (!node)
-			return ;
+			return exit_code = 1;
 		node->next = *head;
 		*head = node;
+		return exit_code = 0;
 	}
+	return exit_code = 1;
 }
 
 t_env_vars	*create_endnode(const char *key, const char *value)

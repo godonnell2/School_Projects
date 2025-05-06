@@ -6,7 +6,6 @@ ou're learning how to control I/O at the kernel level —
  0644 = owener read write everyone else read only
 */
 #include "minishell.h"
-
 #include <fcntl.h> // For O_* flags
 #include <sys/wait.h>
 #include <unistd.h> // For open(), write(), close()
@@ -23,7 +22,7 @@ size_t	ft_strlen(const char *str)
 	return (len);
 }
 
-void	ft_append(char *arg, char *filename)
+int	ft_append(char *arg, char *filename)
 {
 	int	fd;
 	int	pid;
@@ -36,10 +35,12 @@ void	ft_append(char *arg, char *filename)
 		write(fd, arg, ft_strlen(arg));
 		write(fd, "\n", 1);
 		close(fd);
+		return exit_code = 0;
 	}
 	else
 	{
 		wait(NULL);
+		return exit_code= 1; 
 	}
 }
 

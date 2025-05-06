@@ -2,19 +2,21 @@
 #include <unistd.h>
 
 // print working directory
-void	ft_pwd(void)
+int	ft_pwd(void)
 {
 	char	pwd[100000];
+	int exit_code; 
 
 	if (!getcwd(pwd, sizeof(pwd)))
 	{
 		perror("pwd:get cwd failed");
-		last_exit_code = 1;
-		return ;
+		return exit_code = 1;
+		
 	}
 	else
 	{
 		printf("%s\n", pwd);
-		last_exit_code = 0;
+		return exit_code = 0;
+		
 	}
 }

@@ -9,7 +9,7 @@ The shell/parser, not echo.
 
 Your shell should expand $VAR before passing the arguments to echo.
 */
-void	ft_echo(char **args)
+int	ft_echo(char **args)
 {
 	int	i;
 	int	newline;
@@ -26,8 +26,10 @@ void	ft_echo(char **args)
 		printf("%s", args[i]);
 		if (args[i + 1])
 			printf(" ");
+			
 		i++;
 	}
 	if (newline)
 		printf("\n");
+		return exit_code = 0;
 }
