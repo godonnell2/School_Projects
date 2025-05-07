@@ -1,11 +1,20 @@
 // cc -lreadline  REMEMBER DUH
 /*
+ cc -Wall -Wextra -g -I$(brew --prefix readline)/include -L$(brew --prefix readline)/lib -lreadline heredoc.c
+   */
+/*
 You want Ctrl+C to not terminate the shell, but instead interrupt the input — ✅
 Ctrl+C (SIGINT) should interrupt the heredoc, print a newline,
  and return to the shell prompt.
 
 Ctrl+D should act like EOF — this is already handled by readline()
 returning NULL.
+
+A SIGINT is sent to the process.
+
+If you don't handle it, the default is: program is terminated.
+
+If you do handle it (like you're doing), your signal handler is called.
 
 The shell should not exit when SIGINT is received during heredoc input.
 
@@ -34,22 +43,32 @@ Then in your main program loop:
 Regularly check the flag
 
 Perform all actual signal response work there (outside the handler)
+The child is still running and stuck in the heredoc loop, even after the parent moves on and returns to the prompt.
 
+Parent sees child exit, but that's likely from an earlier child, or it didn't actually wait correctly (possibly due to overlapping file descriptors).
+
+You're seeing readline prompts from the previous child still running, and they’re interfering with the next shell session.
 */
-//#include "minishell.h"
+// #include "minishell.h"
+#include <stdio.h> //has to come before readline 
 #include <readline/readline.h>
+#include <readline/history.h> //rl_replace_line
 #include <signal.h>
-#include <stdio.h>
+#include <errno.h>      // For errno and EINTR
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <termios.h>
+#include <string.h>
 #define READ 0
 #define WRITE 1
 #define STDIN 0
 
+
+
 volatile sig_atomic_t signal_received;
 
-int	ft_strcmp(const char *s1, const char *s2)
+int ft_strcmp(const char *s1, const char *s2)
 {
 	while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2)
 	{
@@ -59,9 +78,9 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
 
-size_t	ft_strlen(const char *str)
+size_t ft_strlen(const char *str)
 {
-	size_t	len;
+	size_t len;
 
 	len = 0;
 	while (str[len] != '\0')
@@ -70,135 +89,229 @@ size_t	ft_strlen(const char *str)
 	}
 	return (len);
 }
-//error message data if sigaction 
+
+char *mini_getline(void)
+{
+	char *line = NULL;
+	char buf;
+	size_t len = 0;
+	ssize_t r;
+
+	while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
+	{
+		if (buf == '\n')
+			break;
+		char *new_line = realloc(line, len + 2);
+		if (!new_line)
+		{
+			free(line);
+			return NULL;
+		}
+		line = new_line;
+		line[len++] = buf;
+	}
+
+	if (r == -1 && errno == EINTR)
+	{
+		free(line);
+		return strdup(""); // Don't exit on Ctrl+C
+	}
+
+	if (r <= 0 && len == 0)
+		return NULL;
+
+	if (line)
+		line[len] = '\0';
+	return line;
+}
+
 void sigint_handler(int sig)
 {
-    (void)sig;
-    signal_received = 1;
-    write(1, "\n", 1);
-    rl_on_new_line();
-	// prompt appear again 
-	rl_redisplay();
-	
+	(void)sig;
 
+	signal_received = 1;
 }
-//USE MORE complicated prototype whcih is the SAhandler 
+// USE MORE complicated prototype whcih is the SAhandler
+// sets up the conditions to be ready to receive a signal
 void setup_signals(void)
 {
 	struct sigaction sa_int;
+	// this is the struct to handle not quitting on ctrlbackslash
+	struct sigaction sa_quit;
 
 	sa_int.sa_handler = sigint_handler;
-	sa_int.sa_flags = SA_RESTART;
-	//Clears the signal mask (no signals blocked during handler execution)
+	sa_int.sa_flags = 0;
+	// Clears the signal mask (no signals blocked during handler execution)
 	sigemptyset(&sa_int.sa_mask);
-//Actually installs the handler for SIGINT (Ctrl+C)
-	 sigaction(SIGINT, &sa_int, NULL);
-	//Makes the shell ignore SIGQUIT (Ctrl+) 
-	signal(SIGQUIT, SIG_IGN);
+	// Actually installs the handler for SIGINT (Ctrl+C)
+	sigaction(SIGINT, &sa_int, NULL);
+
+	sa_quit.sa_handler = SIG_IGN;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+void suppress_control_echo(void)
+{
+	struct termios term;
+	if (tcgetattr(STDIN_FILENO, &term) == 0)
+	{
+		term.c_lflag &= ~ECHOCTL;
+		tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	}
+}
+
+void restore_control_echo(void)
+{
+    struct termios term;
+    if (tcgetattr(STDIN_FILENO, &term) == 0)
+    {
+        term.c_lflag |= ECHOCTL;  // Re-enable Ctrl character echo
+        tcsetattr(STDIN_FILENO, TCSANOW, &term);
+    }
+}
+
+//Set SIGINT to default behavior, so Ctrl+C kills the child immediately.
+//Also ignore SIGQUIT, just like bash.
+void handle_signal_in_heredoc(void)
+{
+    // Temporary signal ignoring for the child process during heredoc
+    struct sigaction sa_int;
+   struct sigaction sa_quit;
+
+	sa_int.sa_handler = SIG_DFL;  // Ctrl+C should kill heredoc input
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = 0;
+	sigaction(SIGINT, &sa_int, NULL);
+
+	sa_quit.sa_handler = SIG_IGN; // Ignore Ctrl+backslash
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 
-
-
-int ft_heredoc(char * endoffile)
+int ft_heredoc(const char *delimiter)
 {
     int fds[2];
-    //fills it with new file descriptor numbers assigned by the kernel.
     if (pipe(fds) == -1)
     {
-        perror("heredoc:pipe cretion");
+        perror("pipe");
         exit(EXIT_FAILURE);
     }
 
     pid_t pid = fork();
     if (pid == -1)
     {
-        perror("heredoc:fork");
-        exit(EXIT_FAILURE); //is coded in stdlib
+        perror("fork");
+        exit(EXIT_FAILURE);
     }
 
-    if(pid == 0)
+    if (pid == 0)
     {
-		signal(SIGINT, SIG_DFL); // Ctrl+C kills heredoc
-		close(fds[READ]);
-        char *line;
-        while(1)
+        // Child process
+        close(fds[0]);
+        handle_signal_in_heredoc(); // Ignore signals during heredoc process
+
+        suppress_control_echo();
+        
+        while (1)
         {
-            line = readline("> ");
+            char *line;
+            write(STDOUT_FILENO, "> ", 2);
+            line = mini_getline();
             if (!line)
-             {
-                break ;
-            }
-            if((ft_strcmp(endoffile, line)== 0))
+                break;
+            if (ft_strcmp(line, delimiter) == 0)
             {
                 free(line);
-                break ;
+                break;
             }
-
-            write(fds[WRITE],line ,ft_strlen(line));
-            write(fds[WRITE], "\n", 1);
+            write(fds[1], line, ft_strlen(line));
+            write(fds[1], "\n", 1);
             free(line);
         }
-        close(fds[WRITE]);
+
+        restore_control_echo();
+        close(fds[1]);
         exit(EXIT_SUCCESS);
     }
     else
-    //ie we're in the parent
     {
-		 int status;  // Declare status variable here
-        close(fds[WRITE]);
-        //heredocinput becomes stdin for next cmd
-        // need to do another fork to exec the next cmd
-       if (dup2(fds[READ], STDIN_FILENO) == -1)
-        {
-            perror("heredoc:dup2");
-            exit(EXIT_FAILURE);
-        }
-        close(fds[READ]);
-        waitpid(pid, &status, 0);
-		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+        // Parent process
+        close(fds[1]);
+        int status;
+        waitpid(pid, &status, 0); // Wait for child to exit
+        restore_control_echo();
+
+//WIFEXITED(status) if a child exited normally
+        
+		//below if a child was exited using a signal
+	if (WIFSIGNALED(status))
 	{
-    	write(1, "\n", 1);
-    	return -1; // or whatever tells main shell to skip
+	write(STDOUT_FILENO, "\n", 1);  // Ctrl+C newline
+	close(fds[0]);
+	return -1;  // signal killed heredoc
 	}
-		return 0;
-       //so i put the wait at teh end because the command will read from
-       //the pipe while the child writes to it,
-		//preventing deadlock if heredoc hits max size 64KB.
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
+	{
+    return fds[0];  // child succeeded
+	}
+        close(fds[0]);
+        return -1;
     }
 }
 
 
-int	main(void)
+int main(void)
 {
 	setup_signals();
-
+suppress_control_echo();
 	while (1)
 	{
-		char *input = readline("minioutershellprompt: ");
+		if (signal_received)
+		{
+			//so basically in the mainshell when get the signal you have to print a new prompt
+			write(STDOUT_FILENO, "\n", 1);
+			// rl_on_new_line();
+			// rl_replace_line("", 0);
+			// rl_redisplay();
+			signal_received = 0;
+		}
+
+		write(STDOUT_FILENO, "graceoutershell: ", 17);
+	char *input = mini_getline();
 		if (!input)
+		{
+			write(STDOUT_FILENO, "exit\n", 5);
 			break;
+		}
 
 		if (ft_strcmp(input, "heredoc") == 0)
 		{
-			int heredoc_fd = ft_heredoc("EOF");
-			// Simulate command reading from heredoc
-			char buf[1024];
-			ssize_t n;
-			while ((n = read(heredoc_fd, buf, sizeof(buf))) > 0)
-				write(STDOUT_FILENO, buf, n);
-			close(heredoc_fd);
+			write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
+			int fd = ft_heredoc("EOF");
+			if (fd == -1)
+			{
+				write(STDOUT_FILENO, "Main: Heredoc failed", 21);
+			}
+			else
+			{
+				write(STDOUT_FILENO, "Main: Reading from heredoc_fd\n", 31);
+				char buf[1024];
+				int n;
+				while ((n = read(fd, buf, sizeof(buf))) > 0)
+					write(STDOUT_FILENO, buf, n);
+				close(fd);
+				write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
+			}
 		}
-		else if (ft_strcmp(input, "exit") == 0)
-		{
-			free(input);
-			break;
-		}
+
 		free(input);
 	}
 	return 0;
 }
-
 
 /*
 

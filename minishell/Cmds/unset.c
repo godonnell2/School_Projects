@@ -43,11 +43,11 @@ static t_env_vars	*extract_node(t_env_vars **head, char *key)
 int	ft_unset(t_env_vars **head, char *key)
 {
 	t_env_vars	*node_to_remove;
-	int exit_code ; 
+	int exit_code; 
+	
 	if (!head || !key)
 	{
-		return exit_code = 1;
-		 ;
+		return  1;
 	}
 	node_to_remove = extract_node(head, key);
 	if (node_to_remove)
@@ -55,11 +55,11 @@ int	ft_unset(t_env_vars **head, char *key)
 		free(node_to_remove->key);
 		free(node_to_remove->value);
 		free(node_to_remove);
-		return exit_code = 0;
+		return 0;
 	}
 	else
 	{
-		 return exit_code = 0;
+		 return 0;
 	}
 }
 // Note: Typically unset returns success even if var didn't exist

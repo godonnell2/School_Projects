@@ -4,6 +4,8 @@ open is a sys call!!
 ou're learning how to control I/O at the kernel level —
  this is where real shell-building power lives.
  0644 = owener read write everyone else read only
+
+ Creates a child process to handle the write operation (avoid blocking the shell).
 */
 #include "minishell.h"
 #include <fcntl.h> // For O_* flags
@@ -29,19 +31,12 @@ int	ft_append(char *arg, char *filename)
 
 	fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	pid = fork();
-	if (pid == 0)
-	{
-		dup2(fd, STDOUT_FILENO);
-		write(fd, arg, ft_strlen(arg));
-		write(fd, "\n", 1);
-		close(fd);
-		return exit_code = 0;
-	}
-	else
-	{
-		wait(NULL);
-		return exit_code= 1; 
-	}
+	  if (fd == -1) 
+	  return 1;  // Error opening file
+    write(fd, arg, ft_strlen(arg));
+    write(fd, "\n", 1);
+    close(fd);
+    return 0;  // Success
 }
 
 // int	main(void)

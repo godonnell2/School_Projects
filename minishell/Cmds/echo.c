@@ -13,7 +13,7 @@ int	ft_echo(char **args)
 {
 	int	i;
 	int	newline;
-
+	int exit_code; 
 	i = 1;
 	newline = 1;
 	if (args[i] && ft_strcmp(args[i], "-n") == 0)
@@ -31,5 +31,5 @@ int	ft_echo(char **args)
 	}
 	if (newline)
 		printf("\n");
-		return exit_code = 0;
+		return 0;
 }

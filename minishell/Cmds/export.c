@@ -83,18 +83,17 @@ int	set_env_var(t_env_vars **head, const char *key, const char *value)
 		new_value = ft_strdup(value);
 		free(node->value);
 		node->value = new_value;
-		return exit_code = 0;
+		return 0;
 	}
 	else
 	{
 		node = create_endnode(key, value);
 		if (!node)
-			return exit_code = 1;
+			return 1;
 		node->next = *head;
 		*head = node;
-		return exit_code = 0;
+		return 0;
 	}
-	return exit_code = 1;
 }
 
 t_env_vars	*create_endnode(const char *key, const char *value)
