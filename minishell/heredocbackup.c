@@ -50,11 +50,11 @@ Parent sees child exit, but that's likely from an earlier child, or it didn't ac
 You're seeing readline prompts from the previous child still running, and they’re interfering with the next shell session.
 */
 // #include "minishell.h"
-#include <stdio.h> //has to come before readline 
+#include <stdio.h> //has to come before readline
 #include <readline/readline.h>
 #include <readline/history.h> //rl_replace_line
 #include <signal.h>
-#include <errno.h>      // For errno and EINTR
+#include <errno.h> // For errno and EINTR
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -65,30 +65,28 @@ You're seeing readline prompts from the previous child still running, and they�
 #define STDIN 0
 #define INITIAL_SIZE 32
 
-
-
 volatile sig_atomic_t signal_received;
 
 int ft_strcmp(const char *s1, const char *s2)
 {
-	while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2)
-	{
-		s1++;
-		s2++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+    while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2)
+    {
+        s1++;
+        s2++;
+    }
+    return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
 
 size_t ft_strlen(const char *str)
 {
-	size_t len;
+    size_t len;
 
-	len = 0;
-	while (str[len] != '\0')
-	{
-		len++;
-	}
-	return (len);
+    len = 0;
+    while (str[len] != '\0')
+    {
+        len++;
+    }
+    return (len);
 }
 
 char *mini_getline(void)
@@ -99,20 +97,25 @@ char *mini_getline(void)
     char buf;
     ssize_t r;
 
-    if (!line) {
+    if (!line)
+    {
         return NULL;
     }
 
-    while ((r = read(STDIN_FILENO, &buf, 1)) > 0) {
-        if (buf == '\n') {
+    while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
+    {
+        if (buf == '\n')
+        {
             break;
         }
 
         // Check if we need more space
-        if (len + 1 >= capacity) {
+        if (len + 1 >= capacity)
+        {
             capacity *= 2;
             char *new_line = malloc(capacity);
-            if (!new_line) {
+            if (!new_line)
+            {
                 free(line);
                 return NULL;
             }
@@ -125,15 +128,17 @@ char *mini_getline(void)
     }
 
     // Handle signal interruption
-    if (r == -1 && errno == EINTR) {
+    if (r == -1 && errno == EINTR)
+    {
         free(line);
-		 signal_received = 1; 
-		  return NULL; 
-        //return strdup(""); // Return empty string on Ctrl+C
+        signal_received = 1;
+        return NULL;
+        // return strdup(""); // Return empty string on Ctrl+C
     }
 
     // Handle EOF or error
-    if (r <= 0 && len == 0) {
+    if (r <= 0 && len == 0)
+    {
         free(line);
         return NULL;
     }
@@ -180,39 +185,39 @@ char *mini_getline(void)
 
 void sigint_handler(int sig)
 {
-	(void)sig;
+    (void)sig;
 
-	signal_received = 1;
+    signal_received = 1;
 }
 // USE MORE complicated prototype whcih is the SAhandler
 // sets up the conditions to be ready to receive a signal
 void setup_signals(void)
 {
-	struct sigaction sa_int;
-	// this is the struct to handle not quitting on ctrlbackslash
-	struct sigaction sa_quit;
+    struct sigaction sa_int;
+    // this is the struct to handle not quitting on ctrlbackslash
+    struct sigaction sa_quit;
 
-	sa_int.sa_handler = sigint_handler;
-	sa_int.sa_flags = 0;
-	// Clears the signal mask (no signals blocked during handler execution)
-	sigemptyset(&sa_int.sa_mask);
-	// Actually installs the handler for SIGINT (Ctrl+C)
-	sigaction(SIGINT, &sa_int, NULL);
+    sa_int.sa_handler = sigint_handler;
+    sa_int.sa_flags = 0;
+    // Clears the signal mask (no signals blocked during handler execution)
+    sigemptyset(&sa_int.sa_mask);
+    // Actually installs the handler for SIGINT (Ctrl+C)
+    sigaction(SIGINT, &sa_int, NULL);
 
-	sa_quit.sa_handler = SIG_IGN;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+    sa_quit.sa_handler = SIG_IGN;
+    sigemptyset(&sa_quit.sa_mask);
+    sa_quit.sa_flags = 0;
+    sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 void suppress_control_echo(void)
 {
-	struct termios term;
-	if (tcgetattr(STDIN_FILENO, &term) == 0)
-	{
-		term.c_lflag &= ~ECHOCTL;
-		tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	}
+    struct termios term;
+    if (tcgetattr(STDIN_FILENO, &term) == 0)
+    {
+        term.c_lflag &= ~ECHOCTL;
+        tcsetattr(STDIN_FILENO, TCSANOW, &term);
+    }
 }
 
 void restore_control_echo(void)
@@ -220,34 +225,33 @@ void restore_control_echo(void)
     struct termios term;
     if (tcgetattr(STDIN_FILENO, &term) == 0)
     {
-        term.c_lflag |= ECHOCTL;  // Re-enable Ctrl character echo
+        term.c_lflag |= ECHOCTL; // Re-enable Ctrl character echo
         tcsetattr(STDIN_FILENO, TCSANOW, &term);
     }
 }
 
-//Set SIGINT to default behavior, so Ctrl+C kills the child immediately.
-//Also ignore SIGQUIT, just like bash.
+// Set SIGINT to default behavior, so Ctrl+C kills the child immediately.
+// Also ignore SIGQUIT, just like bash.
 void handle_signal_in_heredoc(void)
 {
     // Temporary signal ignoring for the child process during heredoc
     struct sigaction sa_int;
-   struct sigaction sa_quit;
+    struct sigaction sa_quit;
 
-	sa_int.sa_handler = SIG_DFL;  // Ctrl+C should kill heredoc input
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
+    sa_int.sa_handler = SIG_DFL; // Ctrl+C should kill heredoc input
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+    sigaction(SIGINT, &sa_int, NULL);
 
-	sa_quit.sa_handler = SIG_IGN; // Ignore Ctrl+backslash
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+    sa_quit.sa_handler = SIG_IGN; // Ignore Ctrl+backslash
+    sigemptyset(&sa_quit.sa_mask);
+    sa_quit.sa_flags = 0;
+    sigaction(SIGQUIT, &sa_quit, NULL);
 }
-
 
 int ft_heredoc(const char *delimiter)
 {
-	
+
     int fds[2];
     if (pipe(fds) == -1)
     {
@@ -268,24 +272,24 @@ int ft_heredoc(const char *delimiter)
         close(fds[0]);
         handle_signal_in_heredoc(); // Ignore signals during heredoc process
         suppress_control_echo();
-        
+
         while (1)
         {
             char *line;
             write(STDOUT_FILENO, "> ", 2);
             line = mini_getline();
             if (!line)
-			{
-				if (signal_received) 
-				{
-                // Clean exit on signal
-                	restore_control_echo();
-                	close(fds[1]);
-                	exit(EXIT_SUCCESS);  // Exit normally rather than by signal
-            	}
-				break;
-			}
-                
+            {
+                if (signal_received)
+                {
+                    // Clean exit on signal
+                    restore_control_echo();
+                    close(fds[1]);
+                    exit(EXIT_SUCCESS); // Exit normally rather than by signal
+                }
+                break;
+            }
+
             if (ft_strcmp(line, delimiter) == 0)
             {
                 free(line);
@@ -307,75 +311,74 @@ int ft_heredoc(const char *delimiter)
         int status;
         waitpid(pid, &status, 0); // Wait for child to exit
         restore_control_echo();
-		
-//WIFEXITED(status) if a child exited normally
-        
-		//below if a child was exited using a signal
-	// if (WIFSIGNALED(status))
-	// {
-	// 	close(fds[0]);
-	// 	return -1;  // signal killed heredoc
-	// }
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
-		{
-    	return fds[0];  // child succeeded
-		}
-	}
-        close(fds[0]);
-        return -1;
-}
 
+        // WIFEXITED(status) if a child exited normally
+
+        // below if a child was exited using a signal
+        // if (WIFSIGNALED(status))
+        // {
+        // 	close(fds[0]);
+        // 	return -1;  // signal killed heredoc
+        // }
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+        {
+            return fds[0]; // child succeeded
+        }
+    }
+    close(fds[0]);
+    return -1;
+}
 
 int main(void)
 {
-	int in_heredoc= 0;
-	setup_signals();
-	suppress_control_echo();
-	while (1)
-	{
-		if (signal_received) 
-		{
+    int in_heredoc = 0;
+    setup_signals();
+    suppress_control_echo();
+    while (1)
+    {
+        if (signal_received)
+        {
             signal_received = 0;
             // Only print newline if we're not in heredoc
-            if (!in_heredoc) 
-			{
+            if (!in_heredoc)
+            {
                 write(STDOUT_FILENO, "\n", 1);
             }
-		}
-		write(STDOUT_FILENO, "graceoutershell: ", 17);
-		char *input = mini_getline();
-		if (!input)
-		{
-			write(STDOUT_FILENO, "exit\n", 5);
-			break;
-		}
+        }
+        write(STDOUT_FILENO, "graceoutershell: ", 17);
+        char *input = mini_getline();
+        if (!input)
+        {
+            write(STDOUT_FILENO, "exit\n", 5);
+            break;
+        }
 
-		if (ft_strcmp(input, "heredoc") == 0)
-		{
-			write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
-			in_heredoc = 1;
-			int fd = ft_heredoc("EOF");
-			in_heredoc = 0;
-			
-				suppress_control_echo();  // <- THIS prevents ^\ from echoing after ctrl c in heredoc was producing this 
-			if (fd == -1)
-			{
-				write(STDOUT_FILENO, "Main: Heredoc failed", 21);
-			}
-			else
-			{
-				write(STDOUT_FILENO, "Main: Reading from heredoc_fd\n", 31);
-				char buf[1024];
-				int n;
-				while ((n = read(fd, buf, sizeof(buf))) > 0)
-					write(STDOUT_FILENO, buf, n);
-				close(fd);
-				write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
-			}
-		}
-		free(input);
-	}
-	return 0;
+        if (ft_strcmp(input, "heredoc") == 0)
+        {
+            write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
+            in_heredoc = 1;
+            int fd = ft_heredoc("EOF");
+            in_heredoc = 0;
+
+            suppress_control_echo(); // <- THIS prevents ^\ from echoing after ctrl c in heredoc was producing this
+            if (fd == -1)
+            {
+                write(STDOUT_FILENO, "Main: Heredoc failed", 21);
+            }
+            else
+            {
+                write(STDOUT_FILENO, "Main: Reading from heredoc_fd\n", 31);
+                char buf[1024];
+                int n;
+                while ((n = read(fd, buf, sizeof(buf))) > 0)
+                    write(STDOUT_FILENO, buf, n);
+                close(fd);
+                write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
+            }
+        }
+        free(input);
+    }
+    return 0;
 }
 
 /*
@@ -448,7 +451,7 @@ Send network data
 🛠️ What About File Descriptors?
 When you open a file or run a command, the kernel assigns a file descriptor
  — a small number (like 0, 1, 2,
-	3...) — that your process can use to refer to that file, pipe, or device.
+    3...) — that your process can use to refer to that file, pipe, or device.
 
 For example:
 

@@ -48,6 +48,12 @@ The child is still running and stuck in the heredoc loop, even after the parent 
 Parent sees child exit, but that's likely from an earlier child, or it didn't actually wait correctly (possibly due to overlapping file descriptors).
 
 You're seeing readline prompts from the previous child still running, and they’re interfering with the next shell session.
+The child prints a newline and exits with code 130 (standard for SIGINT).
+
+The parent checks WEXITSTATUS and skips reading the pipe.
+
+You return to your prompt cleanly without junk output.
+
 */
 // #include "minishell.h"
 #include <stdio.h> //has to come before readline 
@@ -99,20 +105,25 @@ char *mini_getline(void)
     char buf;
     ssize_t r;
 
-    if (!line) {
+    if (!line)
+    {
         return NULL;
     }
 
-    while ((r = read(STDIN_FILENO, &buf, 1)) > 0) {
-        if (buf == '\n') {
+    while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
+    {
+        if (buf == '\n')
+        {
             break;
         }
 
         // Check if we need more space
-        if (len + 1 >= capacity) {
+        if (len + 1 >= capacity)
+        {
             capacity *= 2;
             char *new_line = malloc(capacity);
-            if (!new_line) {
+            if (!new_line)
+            {
                 free(line);
                 return NULL;
             }
@@ -125,15 +136,17 @@ char *mini_getline(void)
     }
 
     // Handle signal interruption
-    if (r == -1 && errno == EINTR) {
+    if (r == -1 && errno == EINTR)
+    {
         free(line);
-		 signal_received = 1; 
-		  return NULL; 
-        //return strdup(""); // Return empty string on Ctrl+C
+        signal_received = 1;
+        return NULL;
+        // return strdup(""); // Return empty string on Ctrl+C
     }
 
     // Handle EOF or error
-    if (r <= 0 && len == 0) {
+    if (r <= 0 && len == 0)
+    {
         free(line);
         return NULL;
     }
@@ -142,6 +155,7 @@ char *mini_getline(void)
     line[len] = '\0';
     return line;
 }
+
 
 // char *mini_getline(void)
 // {
@@ -181,8 +195,9 @@ char *mini_getline(void)
 void sigint_handler(int sig)
 {
 	(void)sig;
-
-	signal_received = 1;
+	write(STDOUT_FILENO, "\n", 1);
+	// Exit with special code that parent can detect
+	_exit(130);
 }
 // USE MORE complicated prototype whcih is the SAhandler
 // sets up the conditions to be ready to receive a signal
@@ -247,7 +262,6 @@ void handle_signal_in_heredoc(void)
 
 int ft_heredoc(const char *delimiter)
 {
-	
     int fds[2];
     if (pipe(fds) == -1)
     {
@@ -267,6 +281,7 @@ int ft_heredoc(const char *delimiter)
         // Child process
         close(fds[0]);
         handle_signal_in_heredoc(); // Ignore signals during heredoc process
+
         suppress_control_echo();
         
         while (1)
@@ -275,17 +290,7 @@ int ft_heredoc(const char *delimiter)
             write(STDOUT_FILENO, "> ", 2);
             line = mini_getline();
             if (!line)
-			{
-				if (signal_received) 
-				{
-                // Clean exit on signal
-                	restore_control_echo();
-                	close(fds[1]);
-                	exit(EXIT_SUCCESS);  // Exit normally rather than by signal
-            	}
-				break;
-			}
-                
+                break;
             if (ft_strcmp(line, delimiter) == 0)
             {
                 free(line);
@@ -305,45 +310,61 @@ int ft_heredoc(const char *delimiter)
         // Parent process
         close(fds[1]);
         int status;
+
+        // ⛔ Temporarily ignore SIGINT in parent
+        struct sigaction old_int, ignore_int;
+        ignore_int.sa_handler = SIG_IGN;
+        sigemptyset(&ignore_int.sa_mask);
+        ignore_int.sa_flags = 0;
+        sigaction(SIGINT, &ignore_int, &old_int); // save old handler too
+
         waitpid(pid, &status, 0); // Wait for child to exit
+
+         // ✅ Restore original SIGINT handler
+        sigaction(SIGINT, &old_int, NULL);
+
         restore_control_echo();
-		
-//WIFEXITED(status) if a child exited normally
+
+        //WIFEXITED(status) if a child exited normally
         
 		//below if a child was exited using a signal
-	// if (WIFSIGNALED(status))
-	// {
-	// 	close(fds[0]);
-	// 	return -1;  // signal killed heredoc
-	// }
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
-		{
-    	return fds[0];  // child succeeded
-		}
-	}
+	
+	if (WIFSIGNALED(status))
+    {
+	    write(STDOUT_FILENO, "\n", 1);
+	    close(fds[0]);
+	    return -1;
+    }
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+    {
+	write(STDOUT_FILENO, "\n", 1);  // heredoc exited via SIGINT
+	close(fds[0]);
+	return -1;
+    }
         close(fds[0]);
         return -1;
+    }
 }
 
 
 int main(void)
 {
-	int in_heredoc= 0;
 	setup_signals();
-	suppress_control_echo();
+suppress_control_echo();
 	while (1)
 	{
-		if (signal_received) 
+		if (signal_received)
 		{
-            signal_received = 0;
-            // Only print newline if we're not in heredoc
-            if (!in_heredoc) 
-			{
-                write(STDOUT_FILENO, "\n", 1);
-            }
+			//so basically in the mainshell when get the signal you have to print a new prompt
+			write(STDOUT_FILENO, "\n", 1);
+			// rl_on_new_line();
+			// rl_replace_line("", 0);
+			// rl_redisplay();
+			signal_received = 0;
 		}
+
 		write(STDOUT_FILENO, "graceoutershell: ", 17);
-		char *input = mini_getline();
+	char *input = mini_getline();
 		if (!input)
 		{
 			write(STDOUT_FILENO, "exit\n", 5);
@@ -353,14 +374,10 @@ int main(void)
 		if (ft_strcmp(input, "heredoc") == 0)
 		{
 			write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
-			in_heredoc = 1;
 			int fd = ft_heredoc("EOF");
-			in_heredoc = 0;
-			
-				suppress_control_echo();  // <- THIS prevents ^\ from echoing after ctrl c in heredoc was producing this 
 			if (fd == -1)
 			{
-				write(STDOUT_FILENO, "Main: Heredoc failed", 21);
+				write(STDOUT_FILENO, "Main: Heredoc failed\n", 22);
 			}
 			else
 			{
@@ -373,6 +390,7 @@ int main(void)
 				write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
 			}
 		}
+
 		free(input);
 	}
 	return 0;

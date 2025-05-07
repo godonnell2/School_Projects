@@ -63,7 +63,6 @@ You're seeing readline prompts from the previous child still running, and they�
 #define READ 0
 #define WRITE 1
 #define STDIN 0
-#define INITIAL_SIZE 32
 
 
 
@@ -93,90 +92,43 @@ size_t ft_strlen(const char *str)
 
 char *mini_getline(void)
 {
-    size_t capacity = INITIAL_SIZE;
-    size_t len = 0;
-    char *line = malloc(capacity);
-    char buf;
-    ssize_t r;
+	char *line = NULL;
+	char buf;
+	size_t len = 0;
+	ssize_t r;
 
-    if (!line) {
-        return NULL;
-    }
-
-    while ((r = read(STDIN_FILENO, &buf, 1)) > 0) {
-        if (buf == '\n') {
-            break;
-        }
-
-        // Check if we need more space
-        if (len + 1 >= capacity) {
-            capacity *= 2;
-            char *new_line = malloc(capacity);
-            if (!new_line) {
-                free(line);
-                return NULL;
-            }
+	while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
+	{
+		if (buf == '\n')
+			break;
+		char *new_line = malloc(len+2);
+		if (!new_line)
+		{
+			free(line);
+			return NULL;
+		}
+        if (line)
+        {
             memcpy(new_line, line, len);
             free(line);
-            line = new_line;
         }
+		line = new_line;
+		line[len++] = buf;
+	}
 
-        line[len++] = buf;
-    }
+	if (r == -1 && errno == EINTR)
+	{
+		free(line);
+		return strdup(""); // Don't exit on Ctrl+C
+	}
 
-    // Handle signal interruption
-    if (r == -1 && errno == EINTR) {
-        free(line);
-		 signal_received = 1; 
-		  return NULL; 
-        //return strdup(""); // Return empty string on Ctrl+C
-    }
+	if (r <= 0 && len == 0)
+		return NULL;
 
-    // Handle EOF or error
-    if (r <= 0 && len == 0) {
-        free(line);
-        return NULL;
-    }
-
-    // Null-terminate the string
-    line[len] = '\0';
-    return line;
+	if (line)
+		line[len] = '\0';
+	return line;
 }
-
-// char *mini_getline(void)
-// {
-// 	char *line = NULL;
-// 	char buf;
-// 	size_t len = 0;
-// 	ssize_t r;
-
-// 	while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
-// 	{
-// 		if (buf == '\n')
-// 			break;
-// 		char *new_line = realloc(line, len + 2);
-// 		if (!new_line)
-// 		{
-// 			free(line);
-// 			return NULL;
-// 		}
-// 		line = new_line;
-// 		line[len++] = buf;
-// 	}
-
-// 	if (r == -1 && errno == EINTR)
-// 	{
-// 		free(line);
-// 		return strdup(""); // Don't exit on Ctrl+C
-// 	}
-
-// 	if (r <= 0 && len == 0)
-// 		return NULL;
-
-// 	if (line)
-// 		line[len] = '\0';
-// 	return line;
-// }
 
 void sigint_handler(int sig)
 {
@@ -247,7 +199,6 @@ void handle_signal_in_heredoc(void)
 
 int ft_heredoc(const char *delimiter)
 {
-	
     int fds[2];
     if (pipe(fds) == -1)
     {
@@ -267,6 +218,7 @@ int ft_heredoc(const char *delimiter)
         // Child process
         close(fds[0]);
         handle_signal_in_heredoc(); // Ignore signals during heredoc process
+
         suppress_control_echo();
         
         while (1)
@@ -275,17 +227,7 @@ int ft_heredoc(const char *delimiter)
             write(STDOUT_FILENO, "> ", 2);
             line = mini_getline();
             if (!line)
-			{
-				if (signal_received) 
-				{
-                // Clean exit on signal
-                	restore_control_echo();
-                	close(fds[1]);
-                	exit(EXIT_SUCCESS);  // Exit normally rather than by signal
-            	}
-				break;
-			}
-                
+                break;
             if (ft_strcmp(line, delimiter) == 0)
             {
                 free(line);
@@ -306,44 +248,45 @@ int ft_heredoc(const char *delimiter)
         close(fds[1]);
         int status;
         waitpid(pid, &status, 0); // Wait for child to exit
-        restore_control_echo();
-		
+       // restore_control_echo();
+
 //WIFEXITED(status) if a child exited normally
         
 		//below if a child was exited using a signal
-	// if (WIFSIGNALED(status))
-	// {
-	// 	close(fds[0]);
-	// 	return -1;  // signal killed heredoc
-	// }
+	if (WIFSIGNALED(status))
+	{
+	write(STDOUT_FILENO, "\n", 1);  // Ctrl+C newline
+	close(fds[0]);
+	return -1;  // signal killed heredoc
+	}
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
-		{
-    	return fds[0];  // child succeeded
-		}
+	{
+    return fds[0];  // child succeeded
 	}
         close(fds[0]);
         return -1;
+    }
 }
 
 
 int main(void)
 {
-	int in_heredoc= 0;
 	setup_signals();
-	suppress_control_echo();
+suppress_control_echo();
 	while (1)
 	{
-		if (signal_received) 
+		if (signal_received)
 		{
-            signal_received = 0;
-            // Only print newline if we're not in heredoc
-            if (!in_heredoc) 
-			{
-                write(STDOUT_FILENO, "\n", 1);
-            }
+			//so basically in the mainshell when get the signal you have to print a new prompt
+			write(STDOUT_FILENO, "\n", 1);
+			// rl_on_new_line();
+			// rl_replace_line("", 0);
+			// rl_redisplay();
+			signal_received = 0;
 		}
+
 		write(STDOUT_FILENO, "graceoutershell: ", 17);
-		char *input = mini_getline();
+	char *input = mini_getline();
 		if (!input)
 		{
 			write(STDOUT_FILENO, "exit\n", 5);
@@ -353,11 +296,7 @@ int main(void)
 		if (ft_strcmp(input, "heredoc") == 0)
 		{
 			write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
-			in_heredoc = 1;
 			int fd = ft_heredoc("EOF");
-			in_heredoc = 0;
-			
-				suppress_control_echo();  // <- THIS prevents ^\ from echoing after ctrl c in heredoc was producing this 
 			if (fd == -1)
 			{
 				write(STDOUT_FILENO, "Main: Heredoc failed", 21);
@@ -373,105 +312,8 @@ int main(void)
 				write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
 			}
 		}
+
 		free(input);
 	}
 	return 0;
 }
-
-/*
-
-// TEST MAX HERE DOC 64 KIB
-// ALSO NEED TO REMEMBER TO CLOSE READ END AFTER DUP2 in next fork
-
-
-// int	ft_heredoc(char *endoffile)
-// {
-// 	int		pipe_fd[2];
-// 	char	*line;
-
-// 	if (pipe(pipe_fd) == -1)
-// 	{
-// 		perror("heredoc:pipe cretion");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	while (1)
-// 	{
-// 		line = readline("> ");
-// 		if (!line)
-// 			break ;
-// 		if ((ft_strcmp(endoffile, line) == 0))
-// 		{
-// 			free(line);
-// 			break ;
-// 		}
-// 		write(pipe_fd[WRITE], line, ft_strlen(line));
-// 		write(pipe_fd[WRITE], "\n", 1);
-// 		free(line);
-// 	}
-// 	close(pipe_fd[WRITE]);
-// 	return (pipe_fd[READ]);
-// }
-
-◦ << should be given a delimiter,
- then read the input until a line containing the delimiter is seen.
- However, it doesn’t have to update the history!
-
-cat << EOF
-hello
-world
-EOF
-
-echo -e "hello\nworld" | cat
-
-cc heredoc.c  -lreadline
-
-
-🧠 What Is the Kernel?
-The kernel is the core part of an operating system.
- It's the bridge between your programs and your computer’s hardware.
- It runs in a privileged mode called kernel space, which has direct
-  access to memory, CPU, devices, and more.
-
-When your code does something like:
-
-Open a file
-
-Create a process
-
-Allocate memory
-
-Send network data
-
-...you’re not doing those things directly. You're asking the kernel to do them
- for you — through a system call (like open(), read(), execve()).
-
-🛠️ What About File Descriptors?
-When you open a file or run a command, the kernel assigns a file descriptor
- — a small number (like 0, 1, 2,
-	3...) — that your process can use to refer to that file, pipe, or device.
-
-For example:
-
-0 = stdin (keyboard)
-
-1 = stdout (screen)
-
-2 = stderr (errors)
-
-When you run a command with > out.txt, your shell asks the kernel to:
-
-Open out.txt (get a new file descriptor, say fd 3)
-
-Redirect stdout (fd 1) to point to fd 3
-
-The kernel manages these descriptors and makes sure each process
- gets its own isolated set.
-
-🔐 Why It Matters for Your Shell
-When you implement redirections or pipes, your shell sets up file
- descriptors and then asks the kernel to handle the actual execution.
- You’re writing the user-space logic that controls how the kernel should
- route input/output.
-
-
-*/
