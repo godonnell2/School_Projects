@@ -63,7 +63,6 @@ You're seeing readline prompts from the previous child still running, and they�
 #define READ 0
 #define WRITE 1
 #define STDIN 0
-#define INITIAL_SIZE 32
 
 
 
@@ -90,93 +89,50 @@ size_t ft_strlen(const char *str)
 	}
 	return (len);
 }
+//NEED CUSTOM IMPLEMENTATION OF MEMCPY 
 
 char *mini_getline(void)
 {
-    size_t capacity = INITIAL_SIZE;
-    size_t len = 0;
-    char *line = malloc(capacity);
-    char buf;
-    ssize_t r;
+	char *line = NULL;
+	char buf;
+	size_t len = 0;
+	ssize_t r;
 
-    if (!line) {
-        return NULL;
-    }
-
-    while ((r = read(STDIN_FILENO, &buf, 1)) > 0) {
-        if (buf == '\n') {
-            break;
-        }
-
-        // Check if we need more space
-        if (len + 1 >= capacity) {
-            capacity *= 2;
-            char *new_line = malloc(capacity);
-            if (!new_line) {
-                free(line);
-                return NULL;
-            }
+	while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
+	{
+		if (buf == '\n')
+			break;
+		char *new_line = malloc(len+2);
+		if (!new_line)
+		{
+			free(line);
+			return NULL;
+		}
+        if (line)
+        {
             memcpy(new_line, line, len);
             free(line);
-            line = new_line;
         }
+		line = new_line;
+		line[len++] = buf;
+	}
+// so ctrl c normally exits but we are saying instead
+// lets return something that is non null (so as to not trigger EOF)
+// EINTER is the error code for interrupted system call
 
-        line[len++] = buf;
-    }
+	if (r == -1 && errno == EINTR)
+	{
+		free(line);
+		return strdup(""); // Don't exit on Ctrl+C
+	}
 
-    // Handle signal interruption
-    if (r == -1 && errno == EINTR) {
-        free(line);
-		 signal_received = 1; 
-		  return NULL; 
-        //return strdup(""); // Return empty string on Ctrl+C
-    }
+	if (r <= 0 && len == 0)
+		return NULL;
 
-    // Handle EOF or error
-    if (r <= 0 && len == 0) {
-        free(line);
-        return NULL;
-    }
-
-    // Null-terminate the string
-    line[len] = '\0';
-    return line;
+	if (line)
+		line[len] = '\0';
+	return line;
 }
-
-// char *mini_getline(void)
-// {
-// 	char *line = NULL;
-// 	char buf;
-// 	size_t len = 0;
-// 	ssize_t r;
-
-// 	while ((r = read(STDIN_FILENO, &buf, 1)) > 0)
-// 	{
-// 		if (buf == '\n')
-// 			break;
-// 		char *new_line = realloc(line, len + 2);
-// 		if (!new_line)
-// 		{
-// 			free(line);
-// 			return NULL;
-// 		}
-// 		line = new_line;
-// 		line[len++] = buf;
-// 	}
-
-// 	if (r == -1 && errno == EINTR)
-// 	{
-// 		free(line);
-// 		return strdup(""); // Don't exit on Ctrl+C
-// 	}
-
-// 	if (r <= 0 && len == 0)
-// 		return NULL;
-
-// 	if (line)
-// 		line[len] = '\0';
-// 	return line;
-// }
 
 void sigint_handler(int sig)
 {
@@ -184,14 +140,14 @@ void sigint_handler(int sig)
 
 	signal_received = 1;
 }
-// USE MORE complicated prototype whcih is the SAhandler
-// sets up the conditions to be ready to receive a signal
+
 void setup_signals(void)
 {
 	struct sigaction sa_int;
-	// this is the struct to handle not quitting on ctrlbackslash
+	// this is the struct to handle not quitting on ctrl+ 
 	struct sigaction sa_quit;
-
+	//normally ctrl c exits we are saying hey listen to us instead so we can handle it 
+	// ie create a new prompt instead in outer shell 
 	sa_int.sa_handler = sigint_handler;
 	sa_int.sa_flags = 0;
 	// Clears the signal mask (no signals blocked during handler execution)
@@ -199,28 +155,72 @@ void setup_signals(void)
 	// Actually installs the handler for SIGINT (Ctrl+C)
 	sigaction(SIGINT, &sa_int, NULL);
 
+	//normally ctrl backslash quits shell ( and dumps a core file for debugging) we are saying actually 
+	// just ignore it !  SIG_IGN =A special macro meaning "ignore this signal."
 	sa_quit.sa_handler = SIG_IGN;
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;
 	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
+// termios is a structure that stores terminal attributes
+	//struct termios controls terminal I/O behavior (input, output, modes, special chars).
+	//is a data structure used in Unix-like systems to configure and control terminal (TTY) behavior. 
+	//It defines how input and output are processed by the terminal driver. 
+	// there are a million flags not going to go into all of them 
+	// tcgetattr =fn that retrieves the curr terminal attributes (like echo behavior, input modes, etc.) 
+	//into the term struct.
+	//== 0 is check for success ie we got the atts
+	// ECHOCTL is a flag that controls whether control characters are echoed
+	//the tilde (~) is the bitwise NOT operator in C. It flips all the bits of a value. 
+	//ECHOCTL is a Bitmask Flag
+	// the tilde inverts the bits effectively turning off the ECHOCTL flag
+	//The &= (bitwise AND + assignment) combines the current c_lflag with the inverted mask:
+	// c_lflag &= ~ECHOCTL
+	//This means: "Keep all the bits in c_lflag the same, except for ECHOCTL, which should be turned off."
+	//Example:
+	// c_lflag:  01010101  (Current terminal settings)
+	// ECHOCTL:  00000100  (Only the 3rd bit is set)
+	//~ECHOCTL: 11111011  (All bits flipped, 3rd bit is now 0)
+	// 	c_lflag:   01010101  
+	// & ~ECHOCTL:11111011  
+	// -------------------
+	// Result:    01010001  (3rd bit is now 0, others unchanged)
+
+//Without ~:
+//term.c_lflag &= ECHOCTL would turn off all bits except ECHOCTL (likely breaking the terminal).
+//he termios man page explicitly states that ECHOCTL is a flag in c_lflag.
+//The definition of ECHOCTL is found in termios.h under the c_lflag flags:
+// c_lflag controls local terminal behavior (how the terminal processes input/output).
+// c_iflag	Input processing (e.g., converting \r to \n, flow control).
+// c_oflag	Output processing (e.g., converting \n to \r\n).
+// c_cflag	Hardware control (baud rate, parity, stop bits, etc.).
+// c_lflag	Local behavior (echo, line buffering, signals, etc.).
 void suppress_control_echo(void)
 {
 	struct termios term;
+
 	if (tcgetattr(STDIN_FILENO, &term) == 0)
 	{
 		term.c_lflag &= ~ECHOCTL;
 		tcsetattr(STDIN_FILENO, TCSANOW, &term);
 	}
+	//ie we are not in terminal mode (ie stdin is not a terminal) we can just ignore it eg doing a pipe or redirect
+	
+	else
+	{
+		perror("tcgetattr");
+		exit(EXIT_FAILURE);
+	}
 }
 
+// Re-enable Ctrl character echo
 void restore_control_echo(void)
 {
     struct termios term;
     if (tcgetattr(STDIN_FILENO, &term) == 0)
     {
-        term.c_lflag |= ECHOCTL;  // Re-enable Ctrl character echo
+        term.c_lflag |= ECHOCTL;  
         tcsetattr(STDIN_FILENO, TCSANOW, &term);
     }
 }
@@ -231,7 +231,7 @@ void handle_signal_in_heredoc(void)
 {
     // Temporary signal ignoring for the child process during heredoc
     struct sigaction sa_int;
-   struct sigaction sa_quit;
+    struct sigaction sa_quit;
 
 	sa_int.sa_handler = SIG_DFL;  // Ctrl+C should kill heredoc input
 	sigemptyset(&sa_int.sa_mask);
@@ -247,7 +247,6 @@ void handle_signal_in_heredoc(void)
 
 int ft_heredoc(const char *delimiter)
 {
-	
     int fds[2];
     if (pipe(fds) == -1)
     {
@@ -267,6 +266,7 @@ int ft_heredoc(const char *delimiter)
         // Child process
         close(fds[0]);
         handle_signal_in_heredoc(); // Ignore signals during heredoc process
+
         suppress_control_echo();
         
         while (1)
@@ -275,17 +275,7 @@ int ft_heredoc(const char *delimiter)
             write(STDOUT_FILENO, "> ", 2);
             line = mini_getline();
             if (!line)
-			{
-				if (signal_received) 
-				{
-                // Clean exit on signal
-                	restore_control_echo();
-                	close(fds[1]);
-                	exit(EXIT_SUCCESS);  // Exit normally rather than by signal
-            	}
-				break;
-			}
-                
+                break;
             if (ft_strcmp(line, delimiter) == 0)
             {
                 free(line);
@@ -306,44 +296,45 @@ int ft_heredoc(const char *delimiter)
         close(fds[1]);
         int status;
         waitpid(pid, &status, 0); // Wait for child to exit
-        restore_control_echo();
-		
-//WIFEXITED(status) if a child exited normally
+       // restore_control_echo();
+
+        //WIFEXITED(status) if a child exited normally
         
 		//below if a child was exited using a signal
-	// if (WIFSIGNALED(status))
-	// {
-	// 	close(fds[0]);
-	// 	return -1;  // signal killed heredoc
-	// }
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
-		{
-    	return fds[0];  // child succeeded
-		}
+	if (WIFSIGNALED(status))
+	{
+	    write(STDOUT_FILENO, "\n", 1);  // Ctrl+C newline
+	    close(fds[0]);
+	    return -1;  // signal killed heredoc
 	}
-        close(fds[0]);
-        return -1;
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
+	{
+        return fds[0];  // child succeeded
+	}
+    close(fds[0]);
+    return -1;
+    }
 }
 
 
 int main(void)
 {
-	int in_heredoc= 0;
 	setup_signals();
-	suppress_control_echo();
+    suppress_control_echo();
 	while (1)
 	{
-		if (signal_received) 
+		if (signal_received)
 		{
-            signal_received = 0;
-            // Only print newline if we're not in heredoc
-            if (!in_heredoc) 
-			{
-                write(STDOUT_FILENO, "\n", 1);
-            }
+			//so basically in the mainshell when get the signal you have to print a new prompt
+			write(STDOUT_FILENO, "\n", 1);
+			// rl_on_new_line();
+			// rl_replace_line("", 0);
+			// rl_redisplay();
+			signal_received = 0;
 		}
+
 		write(STDOUT_FILENO, "graceoutershell: ", 17);
-		char *input = mini_getline();
+	char *input = mini_getline();
 		if (!input)
 		{
 			write(STDOUT_FILENO, "exit\n", 5);
@@ -353,11 +344,7 @@ int main(void)
 		if (ft_strcmp(input, "heredoc") == 0)
 		{
 			write(STDOUT_FILENO, "Main: Calling ft_heredoc\n", 26);
-			in_heredoc = 1;
 			int fd = ft_heredoc("EOF");
-			in_heredoc = 0;
-			
-				suppress_control_echo();  // <- THIS prevents ^\ from echoing after ctrl c in heredoc was producing this 
 			if (fd == -1)
 			{
 				write(STDOUT_FILENO, "Main: Heredoc failed", 21);
@@ -373,105 +360,8 @@ int main(void)
 				write(STDOUT_FILENO, "Main: heredoc_fd closed\n", 25);
 			}
 		}
+
 		free(input);
 	}
 	return 0;
 }
-
-/*
-
-// TEST MAX HERE DOC 64 KIB
-// ALSO NEED TO REMEMBER TO CLOSE READ END AFTER DUP2 in next fork
-
-
-// int	ft_heredoc(char *endoffile)
-// {
-// 	int		pipe_fd[2];
-// 	char	*line;
-
-// 	if (pipe(pipe_fd) == -1)
-// 	{
-// 		perror("heredoc:pipe cretion");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	while (1)
-// 	{
-// 		line = readline("> ");
-// 		if (!line)
-// 			break ;
-// 		if ((ft_strcmp(endoffile, line) == 0))
-// 		{
-// 			free(line);
-// 			break ;
-// 		}
-// 		write(pipe_fd[WRITE], line, ft_strlen(line));
-// 		write(pipe_fd[WRITE], "\n", 1);
-// 		free(line);
-// 	}
-// 	close(pipe_fd[WRITE]);
-// 	return (pipe_fd[READ]);
-// }
-
-◦ << should be given a delimiter,
- then read the input until a line containing the delimiter is seen.
- However, it doesn’t have to update the history!
-
-cat << EOF
-hello
-world
-EOF
-
-echo -e "hello\nworld" | cat
-
-cc heredoc.c  -lreadline
-
-
-🧠 What Is the Kernel?
-The kernel is the core part of an operating system.
- It's the bridge between your programs and your computer’s hardware.
- It runs in a privileged mode called kernel space, which has direct
-  access to memory, CPU, devices, and more.
-
-When your code does something like:
-
-Open a file
-
-Create a process
-
-Allocate memory
-
-Send network data
-
-...you’re not doing those things directly. You're asking the kernel to do them
- for you — through a system call (like open(), read(), execve()).
-
-🛠️ What About File Descriptors?
-When you open a file or run a command, the kernel assigns a file descriptor
- — a small number (like 0, 1, 2,
-	3...) — that your process can use to refer to that file, pipe, or device.
-
-For example:
-
-0 = stdin (keyboard)
-
-1 = stdout (screen)
-
-2 = stderr (errors)
-
-When you run a command with > out.txt, your shell asks the kernel to:
-
-Open out.txt (get a new file descriptor, say fd 3)
-
-Redirect stdout (fd 1) to point to fd 3
-
-The kernel manages these descriptors and makes sure each process
- gets its own isolated set.
-
-🔐 Why It Matters for Your Shell
-When you implement redirections or pipes, your shell sets up file
- descriptors and then asks the kernel to handle the actual execution.
- You’re writing the user-space logic that controls how the kernel should
- route input/output.
-
-
-*/
