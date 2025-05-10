@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// NEED TO BE ABLE TO PRINT VARS?? NEED TO COPLETELY REDO THIS
+
 /*
 Who handles $VAR?
 The shell/parser, not echo.

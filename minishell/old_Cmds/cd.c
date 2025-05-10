@@ -100,7 +100,6 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 	}
 }
 
-// ptr to head of list hence double ptr
 // if (input[i] == '\0' || input[i] == '~' || input[i] == '-')
 // chdir interprets it relative to the curr dir so works for both rel/abs
 int	get_current_directory(char *buffer, size_t size)
