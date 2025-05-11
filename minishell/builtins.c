@@ -79,6 +79,26 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
+void initialize_env_list(t_env_vars **env_list)
+{
+    extern char **environ;
+    int i = 0;
+    char *env_var;
+    char *equal_sign;
+
+    while ((env_var = environ[i]))
+    {
+        equal_sign = strchr(env_var, '=');
+        if (equal_sign)
+        {
+            *equal_sign = '\0';
+            set_env_var(env_list, env_var, equal_sign + 1);
+            *equal_sign = '=';
+        }
+        i++;
+    }
+}
+
 void	set_env_var(t_env_vars **head, const char *key, const char *value)
 {
 	t_env_vars	*node;
@@ -100,19 +120,7 @@ void	set_env_var(t_env_vars **head, const char *key, const char *value)
 	}
 }
 
-void	free_env_list(t_env_vars **head)
-{
-	t_env_vars	*next;
 
-	while (*head)
-	{
-		next = (*head)->next;
-		free((*head)->key);
-		free((*head)->value);
-		free((*head));
-		*head = next;
-	}
-}
 // if (input[i] == '\0' || input[i] == '~' || input[i] == '-')
 // chdir interprets it relative to the curr dir so works for both rel/abs
 int	get_current_directory(char *buffer, size_t size)
@@ -217,7 +225,7 @@ int	env(t_env_vars *head)
 int	exit_shell(t_env_vars **env_list)
 {
 	printf("exit\n");
-	free_env_list(env_list);
+	free_env_vars(*env_list);
 	return (0);
 }
 // so if we have a signal we want to return 1 or some other number
@@ -244,25 +252,31 @@ nheritance: When a process creates a child process (using fork),
  // NEED TO REMEMBER TO FREE
 */
 
-// int ft_export(t_env_vars **env_list, char **args)
-// {
-//     (void)env_list;
-//     if (!args[1]) {
-//         // Print all exported variables
-//         return (0);
-//     }
+int ft_export(t_env_vars **env_list, char **args)
+{
+    int i;
+    char *equal_sign;
 
-//     for (int i = 1; args[i]; i++) {
-//         char *equal_sign = strchr(args[i], '=');
-//         if (equal_sign) {
-//             *equal_sign = '\0';
-//             char *key = args[i];
-//             char *value = equal_sign + 1;
-//             // Add to environment
-//         }
-//     }
-//     return (0);
-// }
+    if (!args[1]) 
+    {
+        // Print all exported variables
+        return (0);
+    }
+
+    i = 1;
+    while (args[i])
+    {
+        equal_sign = strchr(args[i], '=');
+        if (equal_sign)
+        {
+            *equal_sign = '\0';
+            set_env_var(env_list, args[i], equal_sign + 1);
+            *equal_sign = '='; // Restore original string
+        }
+        i++;
+    }
+    return (0);
+}
 // print working directory
 int	ft_pwd(void)
 {

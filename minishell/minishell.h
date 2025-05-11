@@ -139,6 +139,7 @@ void    clear_table_buffer(t_command *commands, int *last_index);
 void        free_env_vars(t_env_vars *env_vars);
 t_env_lst*  env_var_new_tail_node(t_env_lst *list);
 t_env_lst*  add_env_var(char *envp_str, t_env_lst *list);
+void initialize_env_list(t_env_vars **env_list);
 t_env_vars* get_env_vars(char **envp);
 
 //HELPER//
@@ -153,6 +154,6 @@ int ft_unset(t_env_vars **head, char *key);
 int ft_export(t_env_vars **env_list, char **args);
 int env(t_env_vars *head);
 int exit_shell(t_env_vars **env_list);
-void free_env_vars(t_env_vars *env_vars);
+//void free_env_list(t_env_vars **env_vars);
 t_env_vars *create_endnode(const char *key, const char *value);
 #endif

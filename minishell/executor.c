@@ -187,7 +187,6 @@ char	**ft_split_buff(char const *s, char sep, void *buff)
 	return (curr.arr);
 }
 
-
 static char	*create_env_string(char *key, char *value)
 {
 	int		len_key;
@@ -218,14 +217,15 @@ static int	count_env_nodes(t_env_vars *env_vars)
 	return (count);
 }
 
-// TOO LONG
+// IS FREEING CORECT ???
+// printf("ENV: %s=%s\n", curr->key, curr->value);
 char	**convert_env_to_array(t_env_vars *env_vars)
 {
 	int			count;
 	t_env_vars	*curr;
 	char		**env_arr;
 	int			i;
-	
+
 	count = count_env_nodes(env_vars);
 	env_arr = malloc(sizeof(char *) * (count + 1));
 	if (!env_arr)
@@ -237,9 +237,7 @@ char	**convert_env_to_array(t_env_vars *env_vars)
 		env_arr[i] = create_env_string(curr->key, curr->value);
 		if (!env_arr[i])
 		{
-			while (i-- > 0)
-				free(env_arr[i]);
-			free(env_arr);
+			free_env_vars(env_vars);
 			return (NULL);
 		}
 		curr = curr->next;
@@ -249,8 +247,22 @@ char	**convert_env_to_array(t_env_vars *env_vars)
 	return (env_arr);
 }
 
-// printf("ENV: %s=%s\n", curr->key, curr->value);
-// TOO LONG
+void free_env_array(char **env_array)
+{
+    char **tmp;
+
+    if (!env_array)
+        return;
+    
+    tmp = env_array;
+    while (*tmp)
+    {
+        free(*tmp);
+        tmp++;
+    }
+    free(env_array);
+}
+
 static int	execute_builtin(t_command *command, t_env_vars *env_vars)
 {
 	(void)env_vars;
@@ -328,45 +340,55 @@ void	resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 	check_command_in_path(path_arr, cmd, full_path);
 }
 
-static void	setup_redirections(t_command *cmd)
-{
-	int	fd;
-	int	flags;
 
-	if (cmd->infile)
-	{
-		fd = open(cmd->infile, O_RDONLY);
-		if (fd < 0)
-		{
-			perror(cmd->infile);
-			exit(EXIT_FAILURE);
-		}
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	flags = 0;
-	if (cmd->outfile)
-	{
-		if (cmd->append_out)
-		{
-			flags = O_APPEND | O_CREAT | O_WRONLY;
-		}
-		else
-		{
-			flags = O_TRUNC | O_CREAT | O_WRONLY;
-		}
-		fd = open(cmd->outfile, flags, 0644);
-		if (fd < 0)
-		{
-			perror(cmd->outfile);
-			exit(EXIT_FAILURE);
-		}
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
+static void setup_input_redirection(t_command *cmd)
+{
+    int fd;
+
+    if (!cmd->infile)
+        return;
+    
+    fd = open(cmd->infile, O_RDONLY);
+    if (fd < 0)
+    {
+        perror(cmd->infile);
+        exit(EXIT_FAILURE);
+    }
+    dup2(fd, STDIN_FILENO);
+    close(fd);
 }
 
-// TOO LONHG
+static void setup_output_redirection(t_command *cmd)
+{
+    int fd;
+    int flags;
+
+    if (!cmd->outfile)
+        return;
+
+    flags = O_WRONLY | O_CREAT;
+    if (cmd->append_out)
+        flags |= O_APPEND;
+    else
+        flags |= O_TRUNC;
+
+    fd = open(cmd->outfile, flags, 0644);
+    if (fd < 0)
+    {
+        perror(cmd->outfile);
+        exit(EXIT_FAILURE);
+    }
+    dup2(fd, STDOUT_FILENO);
+    close(fd);
+}
+
+static void	setup_redirections(t_command *cmd)
+{
+	setup_input_redirection(cmd);
+    setup_output_redirection(cmd);
+}
+
+// TOO LONG
 void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 {
 	t_executor	exec;
@@ -430,18 +452,19 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 		}
 	}
 	// Wait for all children and capture exit codes
-	 i = 0;
-    while (i < num_commands)
-    {
-        waitpid(exec.pids[i], &status, 0);
-        if (WIFEXITED(status))
-            exec.last_exit_code = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            exec.last_exit_code = 128 + WTERMSIG(status);
-        i++;
-    }
-    free(exec.pids);
-} // TOO LONG
+	i = 0;
+	while (i < num_commands)
+	{
+		waitpid(exec.pids[i], &status, 0);
+		if (WIFEXITED(status))
+			exec.last_exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			exec.last_exit_code = 128 + WTERMSIG(status);
+		i++;
+	}
+	free(exec.pids);
+}
+
 // void setup_commands(t_command *commands)
 // {
 //     commands[0].args = malloc(sizeof(char *) * 3);
@@ -464,10 +487,22 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 //     commands[0].append_out = 0;
 //     commands[0].full_path = NULL;
 // }
+// void	setup_commands(t_command *commands)
+// {
+// 	commands[0].args = malloc(sizeof(char *) * 3);
+// 	commands[0].args[0] = strdup("cd");
+// 	commands[0].args[1] = NULL;
+// 	commands[0].args[2] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// 	commands[0].full_path = NULL;
+// }
+
 void	setup_commands(t_command *commands)
 {
 	commands[0].args = malloc(sizeof(char *) * 3);
-	commands[0].args[0] = strdup("cd");
+	commands[0].args[0] = strdup("env");
 	commands[0].args[1] = NULL;
 	commands[0].args[2] = NULL;
 	commands[0].infile = NULL;
@@ -476,67 +511,107 @@ void	setup_commands(t_command *commands)
 	commands[0].full_path = NULL;
 }
 
-int	main(void)
+int main(void)
 {
-	t_env_vars	*home_var;
-	t_env_vars	*env_vars;
-	int			num_commands;
-	t_command	*commands;
-	char		full_path[PATH_MAX];
-	char		current_dir[PATH_MAX];
-	int			exit_code;
-	char		**env_array;
+    t_env_vars *env_vars = NULL;  // Start with empty environment
+    char **env_array;
+    int exit_code;
+    t_command *commands;
+    int num_commands = 1;
+    char full_path[PATH_MAX];
 
-	// 1. Create a mock envir lst
-	home_var = malloc(sizeof(t_env_vars));
-	home_var->key = strdup("HOME");
-	home_var->value = strdup("/Users/grace");
-	home_var->next = NULL;
-	env_vars = malloc(sizeof(t_env_vars));
-	env_vars->key = strdup("PATH");
-	env_vars->value = strdup("/bin:/usr/bin:/usr/local/bin");
-	env_vars->next = home_var;
-	num_commands = 1;
-	commands = malloc(sizeof(t_command) * num_commands);
-	setup_commands(commands);
-	if (ft_strcmp(commands[0].args[0], "pwd") != 0)
-	{ // Only resolve for non-builtins
-		resolve_command_full_path(env_vars, commands[0].args[0], full_path);
-		if (full_path[0] != '\0')
-		{
-			commands[0].full_path = strdup(full_path);
-		}
-	}
-	// 4. Exec builitins
-	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
-	{
-		printf("Current Directory (Before cd): %s\n", current_dir);
-	}
-	else
-	{
-		perror("getcwd");
-	}
-	exit_code = execute_builtin(&commands[0], env_vars);
-	printf("--- After execute_builtin ---\n");
-	printf("Exit code from execute_builtin: %d\n", exit_code);
-	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
-	{
-		printf("Current Directory (After cd): %s\n", current_dir);
-	}
-	else
-	{
-		perror("getcwd");
-	}
-	// exec pipes
-	if (exit_code == 2)
-	{ // Not a builtin, use execve
-		env_array = convert_env_to_array(env_vars);
-		exit_code = execute_builtin(commands, env_vars);
-		// NEED TO CAPTURE EXIT CODE FROM BELOW TOO!!
-		execute_pipes(commands, num_commands, env_array);
-		free(env_array);
-	}
-	printf("exit_code: %i", exit_code);
-	// free everythihg in reality
-	return (exit_code);
+    // 1. Initialize environment from actual environment variables
+    initialize_env_list(&env_vars);
+
+    // 2. Setup command(s)
+    commands = malloc(sizeof(t_command) * num_commands);
+    setup_commands(commands);  // Your existing command setup
+
+    // 3. Resolve command path if needed
+    if (ft_strcmp(commands[0].args[0], "pwd") != 0)
+    {
+        resolve_command_full_path(env_vars, commands[0].args[0], full_path);
+        if (full_path[0] != '\0')
+            commands[0].full_path = strdup(full_path);
+    }
+
+
+    // 5. Execute command
+    exit_code = execute_builtin(&commands[0], env_vars);
+    if (exit_code == 2)  // Not a builtin
+    {
+        env_array = convert_env_to_array(env_vars);
+        execute_pipes(commands, num_commands, env_array);
+        free_env_array(env_array);
+    }
+
+    // 7. Cleanup
+    free_env_vars(env_vars);
+    return exit_code;
 }
+
+//TEST FOR CD NEED TO PRINT BEFORE AND AFTER PATH TO PROVE
+// int	main(void)
+// {
+// 	t_env_vars	*home_var;
+// 	t_env_vars	*env_vars;
+// 	int			num_commands;
+// 	t_command	*commands;
+// 	char		full_path[PATH_MAX];
+// 	char		current_dir[PATH_MAX];
+// 	int			exit_code;
+// 	char		**env_array;
+
+// 	// 1. Create a mock envir lst
+// 	home_var = malloc(sizeof(t_env_vars));
+// 	home_var->key = strdup("HOME");
+// 	home_var->value = strdup("/Users/grace");
+// 	home_var->next = NULL;
+// 	env_vars = malloc(sizeof(t_env_vars));
+// 	env_vars->key = strdup("PATH");
+// 	env_vars->value = strdup("/bin:/usr/bin:/usr/local/bin");
+// 	env_vars->next = home_var;
+// 	num_commands = 1;
+// 	commands = malloc(sizeof(t_command) * num_commands);
+// 	setup_commands(commands);
+// 	if (ft_strcmp(commands[0].args[0], "pwd") != 0)
+// 	{ // Only resolve for non-builtins
+// 		resolve_command_full_path(env_vars, commands[0].args[0], full_path);
+// 		if (full_path[0] != '\0')
+// 		{
+// 			commands[0].full_path = strdup(full_path);
+// 		}
+// 	}
+// 	// 4. Exec builitins
+// 	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
+// 	{
+// 		printf("Current Directory (Before cd): %s\n", current_dir);
+// 	}
+// 	else
+// 	{
+// 		perror("getcwd");
+// 	}
+// 	exit_code = execute_builtin(&commands[0], env_vars);
+// 	printf("--- After execute_builtin ---\n");
+// 	printf("Exit code from execute_builtin: %d\n", exit_code);
+// 	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
+// 	{
+// 		printf("Current Directory (After cd): %s\n", current_dir);
+// 	}
+// 	else
+// 	{
+// 		perror("getcwd");
+// 	}
+// 	// exec pipes
+// 	if (exit_code == 2)
+// 	{ // Not a builtin, use execve
+// 		env_array = convert_env_to_array(env_vars);
+// 		exit_code = execute_builtin(commands, env_vars);
+// 		// NEED TO CAPTURE EXIT CODE FROM BELOW TOO!!
+// 		execute_pipes(commands, num_commands, env_array);
+// 		free(env_array);
+// 	}
+// 	printf("exit_code: %i", exit_code);
+// 	// free everythihg in reality
+// 	return (exit_code);
+// }
