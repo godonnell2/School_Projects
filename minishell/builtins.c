@@ -22,35 +22,6 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
 
-// do we need all space chars??
-int	skip_cd_cmd(const char *input)
-{
-	int	i;
-
-	i = 0;
-	while (input[i] == ' ' || input[i] == '\t')
-		i++;
-	if (input[i] == 'c' && input[i + 1] == 'd' && (input[i + 2] == '\0'
-			|| input[i + 2] == ' ' || input[i + 2] == '\t'))
-	{
-		i += 2;
-		while (input[i] == ' ' || input[i] == '\t')
-			i++;
-	}
-	return (i);
-}
-
-t_env_vars	*get_env_node(t_env_vars *head, const char *key)
-{
-	while (head)
-	{
-		if (ft_strcmp(head->key, key) == 0)
-			return (head);
-		head = head->next;
-	}
-	return (NULL);
-}
-
 char	*ft_strdup(const char *s)
 {
 	size_t		len;
@@ -79,97 +50,57 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
-void initialize_env_list(t_env_vars **env_list)
+void	initialize_env_list(t_env_vars **env_list)
 {
-    extern char **environ;
-    int i = 0;
-    char *env_var;
-    char *equal_sign;
+	extern char	**env;
+	int			i;
+	char		*env_var;
+	char		*equal_sign;
 
-    while ((env_var = environ[i]))
-    {
-        equal_sign = strchr(env_var, '=');
-        if (equal_sign)
-        {
-            *equal_sign = '\0';
-            set_env_var(env_list, env_var, equal_sign + 1);
-            *equal_sign = '=';
-        }
-        i++;
-    }
-}
-
-void	set_env_var(t_env_vars **head, const char *key, const char *value)
-{
-	t_env_vars	*node;
-
-	node = get_env_node(*head, key);
-	if (node)
+	i = 0;
+	while (env[i] != NULL)
 	{
-		free(node->value);
-		node->value = ft_strdup(value);
-	}
-	else
-	{
-		node = malloc(sizeof(t_env_vars));
-        //ERROR CHECK???
-		node->key = ft_strdup(key);
-		node->value = ft_strdup(value);
-		node->next = *head;
-		*head = node;
+		env_var = env[i];
+		equal_sign = strchr(env_var, '=');
+		if (equal_sign)
+		{
+			*equal_sign = '\0';
+			set_env_var(env_list, env_var, equal_sign + 1);
+			*equal_sign = '=';
+		}
+		i++;
 	}
 }
-
-
 // if (input[i] == '\0' || input[i] == '~' || input[i] == '-')
 // chdir interprets it relative to the curr dir so works for both rel/abs
-int	get_current_directory(char *buffer, size_t size)
+
+// do we need all space chars??
+
+static int	get_current_directory(char *buf, size_t size)
 {
-	if (!getcwd(buffer, size))
+	if (!getcwd(buf, size))
 	{
-		perror("cd: getcwd failed");
+		perror("cd: get cwd");
 		return (0);
 	}
 	return (1);
 }
 
-char	*get_target_path(char *input, t_env_vars **env_list)
-{
-	int			i;
-	char		*target_path;
-	t_env_vars	*home;
-
-	i = skip_cd_cmd(input);
-	target_path = input + i;
-	while (*target_path == ' ' || *target_path == '\t')
-	{
-		target_path++;
-	}
-	if (*target_path == '\0')
-	{
-		home = get_env_node(*env_list, "HOME");
-		if (!home || !home->value)
-		{
-			perror("cd: HOME not set");
-			return (NULL);
-		}
-		target_path = home->value;
-	}
-	return (target_path);
-}
-
-int	ft_cd(char *input, t_env_vars **env_list)
+int	ft_cd(char **input, t_env_vars **env_list)
 {
 	char	old_pwd[10000];
 	char	new_pwd[10000];
-	char	*target_path;
 
-	target_path = get_target_path(input, env_list);
+	if (!input[1])
+	{
+		perror("cd: missing argument");
+		return (1);
+	}
 	if (!get_current_directory(old_pwd, sizeof(old_pwd)))
 		return (1);
-	if (chdir(target_path) == -1)
+	if (chdir(input[1]) != 0)
 	{
-		perror("cd: did not find target path ie no such dir");
+		perror("failure to chdir in cd");
 		return (1);
 	}
 	if (!get_current_directory(new_pwd, sizeof(new_pwd)))
@@ -251,32 +182,82 @@ nheritance: When a process creates a child process (using fork),
  Only the variables that have been explicitly "exported" are included.
  // NEED TO REMEMBER TO FREE
 */
-
-int ft_export(t_env_vars **env_list, char **args)
+// TOO LONG
+void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 {
-    int i;
-    char *equal_sign;
+	t_env_vars	*current;
+	t_env_vars	*new_node;
 
-    if (!args[1]) 
-    {
-        // Print all exported variables
-        return (0);
-    }
-
-    i = 1;
-    while (args[i])
-    {
-        equal_sign = strchr(args[i], '=');
-        if (equal_sign)
-        {
-            *equal_sign = '\0';
-            set_env_var(env_list, args[i], equal_sign + 1);
-            *equal_sign = '='; // Restore original string
-        }
-        i++;
-    }
-    return (0);
+	current = *env_list;
+	while (current)
+	{
+		if (ft_strcmp(current->key, key) == 0)
+		{
+			free(current->value);
+			current->value = ft_strdup(value);
+			return ;
+		}
+		current = current->next;
+	}
+	new_node = malloc(sizeof(t_env_vars));
+	if (!new_node)
+	{
+		perror("malloc failed in set_env_var");
+		return ;
+	}
+	new_node->key = ft_strdup(key);
+	new_node->value = ft_strdup(value);
+	new_node->next = *env_list;
+	*env_list = new_node;
 }
+
+// when no equal sign is found we set the key with empty value
+// is this what bash does
+// kk no bash returns empty so need to add empty string still stores value
+static int	handle_export_arg(t_env_vars **env_list, char *arg)
+{
+	char	*equal_sign;
+	char	*temp;
+	int		result;
+
+	temp = ft_strdup(arg);
+	if (!temp)
+	{
+		perror("export: ft_strdup");
+		return (1);
+	}
+	equal_sign = ft_strchr(temp, '=');
+	result = 0;
+	if (equal_sign)
+	{
+		*equal_sign = '\0';
+		set_env_var(env_list, temp, equal_sign + 1);
+	}
+	else
+	{
+		set_env_var(env_list, temp, "");
+	}
+	free(temp);
+	return (result);
+}
+
+int	ft_export(t_env_vars **env_list, char **args)
+{
+	int	i;
+	int	status;
+
+	if (!args[1])
+		return (0);
+	status = 0;
+	i = 1;
+	while (args[i] && status == 0)
+	{
+		status = handle_export_arg(env_list, args[i]);
+		i++;
+	}
+	return (status);
+}
+
 // print working directory
 int	ft_pwd(void)
 {
@@ -326,6 +307,7 @@ int	ft_unset(t_env_vars **head, char *key)
 	{
 		return (1);
 	}
+	printf("Attempting to unset key: %s\n", key);
 	node_to_remove = extract_node(head, key);
 	if (node_to_remove)
 	{

@@ -139,15 +139,16 @@ void    clear_table_buffer(t_command *commands, int *last_index);
 void        free_env_vars(t_env_vars *env_vars);
 t_env_lst*  env_var_new_tail_node(t_env_lst *list);
 t_env_lst*  add_env_var(char *envp_str, t_env_lst *list);
-void initialize_env_list(t_env_vars **env_list);
+void initialize_env_list(t_env_vars **env_list); //CAN WE ADD
 t_env_vars* get_env_vars(char **envp);
-
+void print_env_vars(t_env_vars *env_vars);
+t_env_vars *get_env_node(t_env_vars *env_vars, const char *key);//OK TO ADD ??? 
+void set_env_var(t_env_vars **env_list, const char *key, const char *value); // OK TO ADD doesnt update unconfidiotnally
 //HELPER//
 int ft_strcmp(const char *s1, const char *s2);
 
 // BUILTINS
-void set_env_var(t_env_vars **head, const char *key, const char *value);
-int ft_cd(char *input, t_env_vars **env_list);
+int ft_cd(char **input, t_env_vars **env_list);
 int ft_echo(char **args);
 int ft_pwd(void);
 int ft_unset(t_env_vars **head, char *key);
@@ -156,4 +157,8 @@ int env(t_env_vars *head);
 int exit_shell(t_env_vars **env_list);
 //void free_env_list(t_env_vars **env_vars);
 t_env_vars *create_endnode(const char *key, const char *value);
+
+//HELPER
+
+char    *ft_strchr(const char *s, int c);
 #endif

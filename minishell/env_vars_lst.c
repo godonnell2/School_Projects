@@ -105,6 +105,23 @@ t_env_lst*  add_env_var(char *envp_str, t_env_lst *list)
     return (list);
 }
 
+//NOT SURE THIS IS CORRECT
+t_env_vars *get_env_node(t_env_vars *env_vars, const char *key) 
+{
+
+    while (env_vars) {
+       
+        if (ft_strcmp(env_vars->key, key) == 0) {
+           
+            return env_vars;
+        }
+        env_vars = env_vars->next;
+    }
+    printf("Variable %s not found\n", key);
+    return NULL;
+}
+
+
 t_env_vars* get_env_vars(char **envp)
 {
     t_env_lst      *list_setup;

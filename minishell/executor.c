@@ -247,40 +247,56 @@ char	**convert_env_to_array(t_env_vars *env_vars)
 	return (env_arr);
 }
 
-void free_env_array(char **env_array)
+void	free_env_array(char **env_array)
 {
-    char **tmp;
+	char	**tmp;
 
-    if (!env_array)
-        return;
-    
-    tmp = env_array;
-    while (*tmp)
-    {
-        free(*tmp);
-        tmp++;
-    }
-    free(env_array);
+	if (!env_array)
+		return ;
+	tmp = env_array;
+	while (*tmp)
+	{
+		free(*tmp);
+		tmp++;
+	}
+	free(env_array);
 }
 
-static int	execute_builtin(t_command *command, t_env_vars *env_vars)
+//TOO LONG
+static int	execute_builtin(t_command *command, t_env_vars **env_vars)
 {
-	(void)env_vars;
-	if (ft_strcmp(command->args[0], "cd") == 0)
-		return (ft_cd(command->args[0], &env_vars));
-	else if (ft_strcmp(command->args[0], "echo") == 0)
+	const char	*cmd = command->args[0];
+	int			i;
+
+	if (!command || !command->args || !command->args[0])
+	{
+		printf("Error: Invalid command structure\n");
+		return (1);
+	}
+	if (ft_strcmp(cmd, "cd") == 0)
+		return (ft_cd(command->args, env_vars));
+	else if (ft_strcmp(cmd, "echo") == 0)
 		return (ft_echo(command->args));
-	else if (ft_strcmp(command->args[0], "pwd") == 0)
+	else if (ft_strcmp(cmd, "pwd") == 0)
 		return (ft_pwd());
-	// else if (ft_strcmp(command->args[0], "export") == 0)
-	//    return (export_env_var(env_vars, command->args, command->args));
-	// else if (ft_strcmp(command->args[0], "unset") == 0)
-	//   return (ft_unset(&env_vars, command->args));
-	else if (ft_strcmp(command->args[0], "env") == 0)
-		return (env(env_vars));
-	else if (ft_strcmp(command->args[0], "exit") == 0)
-		return (exit_shell(&env_vars));
-	return (2);
+	else if (ft_strcmp(cmd, "export") == 0)
+		return (ft_export(env_vars, command->args));
+	else if (ft_strcmp(cmd, "unset") == 0)
+	{
+		i = 1;
+		while (command->args[i])
+		{
+			if (ft_unset(env_vars, command->args[i]) != 0)
+				return (1);
+			i++;
+		}
+		return (0);
+	}
+	else if (ft_strcmp(cmd, "env") == 0)
+		return (env(*env_vars));
+	else if (ft_strcmp(cmd, "exit") == 0)
+		return (exit_shell(env_vars));
+	return (2); 
 }
 
 char	*get_path_variable(t_env_vars *env_vars)
@@ -340,52 +356,48 @@ void	resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 	check_command_in_path(path_arr, cmd, full_path);
 }
 
-
-static void setup_input_redirection(t_command *cmd)
+static void	setup_input_redirection(t_command *cmd)
 {
-    int fd;
+	int	fd;
 
-    if (!cmd->infile)
-        return;
-    
-    fd = open(cmd->infile, O_RDONLY);
-    if (fd < 0)
-    {
-        perror(cmd->infile);
-        exit(EXIT_FAILURE);
-    }
-    dup2(fd, STDIN_FILENO);
-    close(fd);
+	if (!cmd->infile)
+		return ;
+	fd = open(cmd->infile, O_RDONLY);
+	if (fd < 0)
+	{
+		perror(cmd->infile);
+		exit(EXIT_FAILURE);
+	}
+	dup2(fd, STDIN_FILENO);
+	close(fd);
 }
 
-static void setup_output_redirection(t_command *cmd)
+static void	setup_output_redirection(t_command *cmd)
 {
-    int fd;
-    int flags;
+	int	fd;
+	int	flags;
 
-    if (!cmd->outfile)
-        return;
-
-    flags = O_WRONLY | O_CREAT;
-    if (cmd->append_out)
-        flags |= O_APPEND;
-    else
-        flags |= O_TRUNC;
-
-    fd = open(cmd->outfile, flags, 0644);
-    if (fd < 0)
-    {
-        perror(cmd->outfile);
-        exit(EXIT_FAILURE);
-    }
-    dup2(fd, STDOUT_FILENO);
-    close(fd);
+	if (!cmd->outfile)
+		return ;
+	flags = O_WRONLY | O_CREAT;
+	if (cmd->append_out)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+	fd = open(cmd->outfile, flags, 0644);
+	if (fd < 0)
+	{
+		perror(cmd->outfile);
+		exit(EXIT_FAILURE);
+	}
+	dup2(fd, STDOUT_FILENO);
+	close(fd);
 }
 
 static void	setup_redirections(t_command *cmd)
 {
 	setup_input_redirection(cmd);
-    setup_output_redirection(cmd);
+	setup_output_redirection(cmd);
 }
 
 // TOO LONG
@@ -415,8 +427,7 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 			exit(EXIT_FAILURE);
 		}
 		if (exec.pids[i] == 0)
-		{ // Child process
-			// Set up input from previous pipe (if not first command)
+		{ // Set up input from previous pipe (if not first command)
 			if (i > 0)
 			{
 				dup2(exec.prev_pipe_fd, STDIN_FILENO);
@@ -431,6 +442,11 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 			// Handle redirections (infile/outfile)
 			setup_redirections(&commands[i]);
 			// Execute command
+			if (commands[i].full_path == NULL)
+			{
+				perror("Command not found");
+				exit(EXIT_FAILURE);
+			}
 			execve(commands[i].full_path, commands[i].args, env_array);
 			perror("execve");
 			exit(EXIT_FAILURE);
@@ -465,6 +481,44 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 	free(exec.pids);
 }
 
+void	resolve_all_command_paths(t_env_vars *env_vars, t_command *commands,
+		int num_commands)
+{
+	char		full_path[PATH_MAX];
+	const char	*builtins[] = {"echo", "cd", "pwd", "export", "unset", "env",
+			"exit", NULL};
+	int			i;
+	int			is_builtin;
+	const char	**builtin_ptr = builtins;
+
+	i = 0;
+	while (i < num_commands)
+	{
+		is_builtin = 0;
+		while (*builtin_ptr)
+		{
+			if (ft_strcmp(commands[i].args[0], *builtin_ptr) == 0)
+			{
+				is_builtin = 1;
+				break ;
+			}
+			builtin_ptr++;
+		}
+		if (!is_builtin)
+		{
+			resolve_command_full_path(env_vars, commands[i].args[0], full_path);
+			if (full_path[0] != '\0')
+			{
+				commands[i].full_path = strdup(full_path);
+			}
+		}
+		else
+		{
+			commands[i].full_path = NULL;
+		}
+		i++;
+	}
+}
 // void setup_commands(t_command *commands)
 // {
 //     commands[0].args = malloc(sizeof(char *) * 3);
@@ -499,58 +553,106 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 // 	commands[0].full_path = NULL;
 // }
 
+// void	setup_commands(t_command *commands)
+// {
+// 	commands[0].args = malloc(sizeof(char *) * 3);
+// 	commands[0].args[0] = strdup("export");
+// 	commands[0].args[1] =  strdup("MYVAR=test_value");
+// 	commands[0].args[2] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// 	commands[0].full_path = NULL;
+// }
+
+// TWO PIPES
+// void	setup_commands(t_command *commands)
+// {
+// 	// ls -l | grep "d" | wc -l
+// 	commands[0].args = malloc(sizeof(char *) * 3);
+// 	commands[0].args[0] = strdup("ls");
+// 	commands[0].args[1] = strdup("-l");
+// 	commands[0].args[2] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// 	commands[1].args = malloc(sizeof(char *) * 3);
+// 	commands[1].args[0] = strdup("grep");
+// 	commands[1].args[1] = strdup("d");
+// 	commands[1].args[2] = NULL;
+// 	commands[1].infile = NULL;
+// 	commands[1].outfile = NULL;
+// 	commands[1].append_out = 0;
+// 	commands[2].args = malloc(sizeof(char *) * 3);
+// 	commands[2].args[0] = strdup("wc");
+// 	commands[2].args[1] = strdup("-l");
+// 	commands[2].args[2] = NULL;
+// 	commands[2].infile = NULL;
+// 	commands[2].outfile = NULL;
+// 	commands[2].append_out = 0;
+// }
 void	setup_commands(t_command *commands)
 {
-	commands[0].args = malloc(sizeof(char *) * 3);
-	commands[0].args[0] = strdup("env");
-	commands[0].args[1] = NULL;
-	commands[0].args[2] = NULL;
+	commands[0].args = malloc(sizeof(char *) * 4);
+	commands[0].args[0] = strdup("unset");
+	commands[0].args[1] = strdup("VAR1");
+	commands[0].args[2] = strdup("VAR2");
+	commands[0].args[3] = NULL;
 	commands[0].infile = NULL;
 	commands[0].outfile = NULL;
 	commands[0].append_out = 0;
-	commands[0].full_path = NULL;
 }
 
-int main(void)
+// NEED TO REPLACE FOR LOPP
+
+// check export main
+int	main(void)
 {
-    t_env_vars *env_vars = NULL;  // Start with empty environment
-    char **env_array;
-    int exit_code;
-    t_command *commands;
-    int num_commands = 1;
-    char full_path[PATH_MAX];
+	char		**env_array;
+	int			exit_code;
+	t_command	*commands;
+	int			num_commands;
+	char		*args1[] = {"export", "VAR1=value1", NULL};
+	char		*args2[] = {"export", "VAR2=value2", NULL};
 
-    // 1. Initialize environment from actual environment variables
-    initialize_env_list(&env_vars);
-
-    // 2. Setup command(s)
-    commands = malloc(sizeof(t_command) * num_commands);
-    setup_commands(commands);  // Your existing command setup
-
-    // 3. Resolve command path if needed
-    if (ft_strcmp(commands[0].args[0], "pwd") != 0)
-    {
-        resolve_command_full_path(env_vars, commands[0].args[0], full_path);
-        if (full_path[0] != '\0')
-            commands[0].full_path = strdup(full_path);
-    }
-
-
-    // 5. Execute command
-    exit_code = execute_builtin(&commands[0], env_vars);
-    if (exit_code == 2)  // Not a builtin
-    {
-        env_array = convert_env_to_array(env_vars);
-        execute_pipes(commands, num_commands, env_array);
-        free_env_array(env_array);
-    }
-
-    // 7. Cleanup
-    free_env_vars(env_vars);
-    return exit_code;
+	t_env_vars *env_vars = NULL; // Start with empty environment
+	num_commands = 1;
+	// 1. Initialize environment from actual environment variables
+	initialize_env_list(&env_vars);
+	// 2. Setup command(s)
+	// 3. Resolve command path if needed
+	ft_export(&env_vars, args1);
+	ft_export(&env_vars, args2);
+	printf("Before unset:\n");
+	print_env_vars(env_vars);
+	commands = malloc(sizeof(t_command) * num_commands);
+	setup_commands(commands); // Your existing command setup
+	resolve_all_command_paths(env_vars, commands, num_commands);
+	// 5. Execute command
+	printf("Running unset builtin for key: %s\n", commands[0].args[1]);
+	exit_code = execute_builtin(&commands[0], &env_vars);
+	if (exit_code == 2) // Not a builtin
+	{
+		env_array = convert_env_to_array(env_vars);
+		execute_pipes(commands, num_commands, env_array);
+		free_env_array(env_array);
+	}
+	printf("after unset:\n");
+	print_env_vars(env_vars);
+	// CHECK EXPORT DONT KNOW WHY THIS ISNT WORKING CAN SEE IN ENV
+	// t_env_vars *node = get_env_node(env_vars, "MYVAR");
+	//     if (node && strcmp(node->value, "test_value") == 0) {
+	//     printf("✅ Export worked!\n");
+	// }
+	// else {
+	//     printf("❌ Export failed\n");
+	// }
+	// 7. Cleanup
+	free_env_vars(env_vars);
+	return (exit_code);
 }
 
-//TEST FOR CD NEED TO PRINT BEFORE AND AFTER PATH TO PROVE
+// TEST FOR CD NEED TO PRINT BEFORE AND AFTER PATH TO PROVE
 // int	main(void)
 // {
 // 	t_env_vars	*home_var;

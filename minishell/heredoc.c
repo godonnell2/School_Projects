@@ -1,3 +1,5 @@
+// changed to proper strdup now that minishell.h but need to check again 
+
 // cc -lreadline  REMEMBER DUH
 /*
  cc -Wall -Wextra -g -I$(brew --prefix readline)/include -L$(brew --prefix readline)/lib -lreadline heredoc.c
@@ -49,7 +51,7 @@ Parent sees child exit, but that's likely from an earlier child, or it didn't ac
 
 You're seeing readline prompts from the previous child still running, and they’re interfering with the next shell session.
 */
-// #include "minishell.h"
+#include "minishell.h"
 #include <stdio.h> //has to come before readline 
 #include <readline/readline.h>
 #include <readline/history.h> //rl_replace_line
@@ -123,7 +125,7 @@ char *mini_getline(void)
 	if (r == -1 && errno == EINTR)
 	{
 		free(line);
-		return strdup(""); // Don't exit on Ctrl+C
+		return ft_strdup(""); // Don't exit on Ctrl+C
 	}
 
 	if (r <= 0 && len == 0)
