@@ -52,15 +52,15 @@ char	*ft_strdup(const char *s)
 
 void	initialize_env_list(t_env_vars **env_list)
 {
-	extern char	**env;
+	extern char	**environ;
 	int			i;
 	char		*env_var;
 	char		*equal_sign;
 
 	i = 0;
-	while (env[i] != NULL)
+	while (environ[i] != NULL)
 	{
-		env_var = env[i];
+		env_var = environ[i];
 		equal_sign = strchr(env_var, '=');
 		if (equal_sign)
 		{
@@ -214,6 +214,7 @@ void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 // when no equal sign is found we set the key with empty value
 // is this what bash does
 // kk no bash returns empty so need to add empty string still stores value
+// NOT USING MY STRCHR I DONT KNOW WHY 
 static int	handle_export_arg(t_env_vars **env_list, char *arg)
 {
 	char	*equal_sign;
@@ -226,7 +227,7 @@ static int	handle_export_arg(t_env_vars **env_list, char *arg)
 		perror("export: ft_strdup");
 		return (1);
 	}
-	equal_sign = ft_strchr(temp, '=');
+	equal_sign = strchr(temp, '=');
 	result = 0;
 	if (equal_sign)
 	{

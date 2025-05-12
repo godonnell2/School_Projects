@@ -8,13 +8,17 @@
 #define STDIN 0
 #define SPLIT_BUFF_SIZE 102400
 
+// AsK BETH IF WE CAN ADD TO HEAD THIS EXEC STRUCT
 typedef struct s_executor
 {
 	int			pipe_fd[2];
 	int			prev_pipe_fd;
-	int			last_exit_code;
 	pid_t		*pids;
-
+	int			last_exit_code;
+	int cmd_count;       // Total commands in pipeline
+	int cmd_i;           // Current command index (renamed)
+	char **env_array;    // Environment variables
+	t_command *commands; // Commands array
 }				t_executor;
 
 typedef struct s_split_state
@@ -262,7 +266,7 @@ void	free_env_array(char **env_array)
 	free(env_array);
 }
 
-//TOO LONG
+// TOO LONG
 static int	execute_builtin(t_command *command, t_env_vars **env_vars)
 {
 	const char	*cmd = command->args[0];
@@ -296,7 +300,7 @@ static int	execute_builtin(t_command *command, t_env_vars **env_vars)
 		return (env(*env_vars));
 	else if (ft_strcmp(cmd, "exit") == 0)
 		return (exit_shell(env_vars));
-	return (2); 
+	return (2);
 }
 
 char	*get_path_variable(t_env_vars *env_vars)
@@ -400,87 +404,107 @@ static void	setup_redirections(t_command *cmd)
 	setup_output_redirection(cmd);
 }
 
-// TOO LONG
-void	execute_pipes(t_command *commands, int num_commands, char **env_array)
+static void	execute_child(t_executor *ex)
 {
-	t_executor	exec;
-	int			i;
-	int			status;
+	t_command	*cmd;
 
-	i = 0;
-	exec.prev_pipe_fd = -1;
-	exec.pids = malloc(sizeof(pid_t) * num_commands);
-	while (i < num_commands)
+	cmd = &ex->commands[ex->cmd_i];
+	if (ex->cmd_i > 0)
 	{
-		if (i < num_commands - 1)
-		{
-			if (pipe(exec.pipe_fd) < 0)
-			{
-				perror("pipe");
-				exit(EXIT_FAILURE);
-			}
-		}
-		exec.pids[i] = fork();
-		if (exec.pids[i] < 0)
-		{
-			perror("fork");
-			exit(EXIT_FAILURE);
-		}
-		if (exec.pids[i] == 0)
-		{ // Set up input from previous pipe (if not first command)
-			if (i > 0)
-			{
-				dup2(exec.prev_pipe_fd, STDIN_FILENO);
-				close(exec.prev_pipe_fd);
-			}
-			// Set up output to next pipe (if not last command)
-			if (i < num_commands - 1)
-			{
-				dup2(exec.pipe_fd[WRITE], STDOUT_FILENO);
-				close(exec.pipe_fd[WRITE]);
-			}
-			// Handle redirections (infile/outfile)
-			setup_redirections(&commands[i]);
-			// Execute command
-			if (commands[i].full_path == NULL)
-			{
-				perror("Command not found");
-				exit(EXIT_FAILURE);
-			}
-			execve(commands[i].full_path, commands[i].args, env_array);
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
-		else
-		{ // Parent process
-			// Close previous pipe (if any)
-			if (i > 0)
-			{
-				close(exec.prev_pipe_fd);
-			}
-			// Save current pipe's read end for next command
-			if (i < num_commands - 1)
-			{
-				close(exec.pipe_fd[WRITE]);
-				exec.prev_pipe_fd = exec.pipe_fd[READ];
-			}
-			i++;
-		}
+		dup2(ex->prev_pipe_fd, STDIN_FILENO);
+		close(ex->prev_pipe_fd);
 	}
-	// Wait for all children and capture exit codes
-	i = 0;
-	while (i < num_commands)
+	if (ex->cmd_i < ex->cmd_count - 1)
 	{
-		waitpid(exec.pids[i], &status, 0);
-		if (WIFEXITED(status))
-			exec.last_exit_code = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			exec.last_exit_code = 128 + WTERMSIG(status);
-		i++;
+		dup2(ex->pipe_fd[WRITE], STDOUT_FILENO);
+		close(ex->pipe_fd[WRITE]);
 	}
-	free(exec.pids);
+	setup_redirections(cmd);
+	if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
+	{
+		execve(cmd->full_path, cmd->args, ex->env_array);
+	}
+	perror("execve");
+	exit(EXIT_FAILURE);
 }
 
+static void	handle_parent(t_executor *ex)
+{
+	if (ex->cmd_i > 0)
+	{
+		close(ex->prev_pipe_fd);
+	}
+	if (ex->cmd_i < ex->cmd_count - 1)
+	{
+		close(ex->pipe_fd[WRITE]);
+		ex->prev_pipe_fd = ex->pipe_fd[READ];
+	}
+}
+
+static void	create_pipe_if_needed(t_executor *ex)
+{
+	if (ex->cmd_i < ex->cmd_count - 1)
+	{
+		if (pipe(ex->pipe_fd) < 0)
+		{
+			perror("pipe");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+static void	fork_process(t_executor *ex)
+{
+	pid_t	pid;
+
+	pid = fork();
+	ex->pids[ex->cmd_i] = pid;
+	if (pid < 0)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void	wait_for_children(t_executor *ex)
+{
+	int	status;
+	int	i;
+
+	i = 0;
+	while (i < ex->cmd_count)
+	{
+		waitpid(ex->pids[i], &status, 0);
+		if (WIFEXITED(status))
+			ex->last_exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			ex->last_exit_code = 128 + WTERMSIG(status);
+		i++;
+	}
+}
+
+void	execute_pipes(t_command *commands, int num_commands, char **env_array)
+{
+	t_executor	ex;
+
+	ex = (t_executor){.prev_pipe_fd = -1, .pids = malloc(sizeof(pid_t)
+			* num_commands), .cmd_count = num_commands, .env_array = env_array,
+		.commands = commands, .cmd_i = 0};
+	while (ex.cmd_i < num_commands)
+	{
+		create_pipe_if_needed(&ex);
+		fork_process(&ex);
+		if (ex.pids[ex.cmd_i] == 0)
+			execute_child(&ex);
+		else
+			handle_parent(&ex);
+		ex.cmd_i++;
+	}
+	wait_for_children(&ex);
+	free(ex.pids);
+}
+
+// TOO LONG
 void	resolve_all_command_paths(t_env_vars *env_vars, t_command *commands,
 		int num_commands)
 {
@@ -508,14 +532,10 @@ void	resolve_all_command_paths(t_env_vars *env_vars, t_command *commands,
 		{
 			resolve_command_full_path(env_vars, commands[i].args[0], full_path);
 			if (full_path[0] != '\0')
-			{
 				commands[i].full_path = strdup(full_path);
-			}
 		}
 		else
-		{
 			commands[i].full_path = NULL;
-		}
 		i++;
 	}
 }
@@ -566,91 +586,146 @@ void	resolve_all_command_paths(t_env_vars *env_vars, t_command *commands,
 // }
 
 // TWO PIPES
-// void	setup_commands(t_command *commands)
-// {
-// 	// ls -l | grep "d" | wc -l
-// 	commands[0].args = malloc(sizeof(char *) * 3);
-// 	commands[0].args[0] = strdup("ls");
-// 	commands[0].args[1] = strdup("-l");
-// 	commands[0].args[2] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[1].args = malloc(sizeof(char *) * 3);
-// 	commands[1].args[0] = strdup("grep");
-// 	commands[1].args[1] = strdup("d");
-// 	commands[1].args[2] = NULL;
-// 	commands[1].infile = NULL;
-// 	commands[1].outfile = NULL;
-// 	commands[1].append_out = 0;
-// 	commands[2].args = malloc(sizeof(char *) * 3);
-// 	commands[2].args[0] = strdup("wc");
-// 	commands[2].args[1] = strdup("-l");
-// 	commands[2].args[2] = NULL;
-// 	commands[2].infile = NULL;
-// 	commands[2].outfile = NULL;
-// 	commands[2].append_out = 0;
-// }
 void	setup_commands(t_command *commands)
 {
-	commands[0].args = malloc(sizeof(char *) * 4);
-	commands[0].args[0] = strdup("unset");
-	commands[0].args[1] = strdup("VAR1");
-	commands[0].args[2] = strdup("VAR2");
-	commands[0].args[3] = NULL;
+	// ls -l | grep "d" | wc -l
+	commands[0].args = malloc(sizeof(char *) * 3);
+	commands[0].args[0] = strdup("ls");
+	commands[0].args[1] = strdup("-l");
+	commands[0].args[2] = NULL;
 	commands[0].infile = NULL;
 	commands[0].outfile = NULL;
 	commands[0].append_out = 0;
+	commands[1].args = malloc(sizeof(char *) * 3);
+	commands[1].args[0] = strdup("grep");
+	commands[1].args[1] = strdup("d");
+	commands[1].args[2] = NULL;
+	commands[1].infile = NULL;
+	commands[1].outfile = NULL;
+	commands[1].append_out = 0;
+	commands[2].args = malloc(sizeof(char *) * 3);
+	commands[2].args[0] = strdup("wc");
+	commands[2].args[1] = strdup("-l");
+	commands[2].args[2] = NULL;
+	commands[2].infile = NULL;
+	commands[2].outfile = NULL;
+	commands[2].append_out = 0;
 }
+// void	setup_commands(t_command *commands)
+// {
+// 	commands[0].args = malloc(sizeof(char *) * 4);
+// 	commands[0].args[0] = strdup("unset");
+// 	commands[0].args[1] = strdup("VAR1");
+// 	commands[0].args[2] = strdup("VAR2");
+// 	commands[0].args[3] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// }
 
-// NEED TO REPLACE FOR LOPP
+// multiple pipes
 
-// check export main
 int	main(void)
 {
-	char		**env_array;
-	int			exit_code;
+	t_env_vars	*env_vars;
 	t_command	*commands;
-	int			num_commands;
-	char		*args1[] = {"export", "VAR1=value1", NULL};
-	char		*args2[] = {"export", "VAR2=value2", NULL};
+	char		**env_array;
+	t_env_vars	*path_var;
+	t_env_vars	*home_var;
+	char		full_path[PATH_MAX];
 
-	t_env_vars *env_vars = NULL; // Start with empty environment
-	num_commands = 1;
-	// 1. Initialize environment from actual environment variables
-	initialize_env_list(&env_vars);
-	// 2. Setup command(s)
-	// 3. Resolve command path if needed
-	ft_export(&env_vars, args1);
-	ft_export(&env_vars, args2);
-	printf("Before unset:\n");
-	print_env_vars(env_vars);
+	env_vars = NULL;
+	int num_commands = 3; // For ls | grep | wc
+	// 1. Create minimal environment
+	path_var = malloc(sizeof(t_env_vars));
+	path_var->key = strdup("PATH");
+	path_var->value = strdup("/bin:/usr/bin:/usr/local/bin");
+	path_var->next = NULL;
+	home_var = malloc(sizeof(t_env_vars));
+	home_var->key = strdup("HOME");
+	home_var->value = strdup("/Users/grace");
+	home_var->next = path_var;
+	env_vars = home_var;
+	// 2. Setup pipeline commands
 	commands = malloc(sizeof(t_command) * num_commands);
-	setup_commands(commands); // Your existing command setup
-	resolve_all_command_paths(env_vars, commands, num_commands);
-	// 5. Execute command
-	printf("Running unset builtin for key: %s\n", commands[0].args[1]);
-	exit_code = execute_builtin(&commands[0], &env_vars);
-	if (exit_code == 2) // Not a builtin
+	setup_commands(commands);
+	// 3. Resolve command paths
+	for (int i = 0; i < num_commands; i++)
 	{
-		env_array = convert_env_to_array(env_vars);
-		execute_pipes(commands, num_commands, env_array);
-		free_env_array(env_array);
+		if (!commands[i].full_path)
+		{ // Only resolve if not builtin
+			resolve_command_full_path(env_vars, commands[i].args[0], full_path);
+			if (full_path[0] != '\0')
+			{
+				commands[i].full_path = strdup(full_path);
+			}
+		}
 	}
-	printf("after unset:\n");
-	print_env_vars(env_vars);
-	// CHECK EXPORT DONT KNOW WHY THIS ISNT WORKING CAN SEE IN ENV
-	// t_env_vars *node = get_env_node(env_vars, "MYVAR");
-	//     if (node && strcmp(node->value, "test_value") == 0) {
-	//     printf("✅ Export worked!\n");
-	// }
-	// else {
-	//     printf("❌ Export failed\n");
-	// }
-	// 7. Cleanup
+	// 4. Convert environment to array
+	env_array = convert_env_to_array(env_vars);
+	// 5. Execute the pipeline
+	execute_pipes(commands, num_commands, env_array);
+	// 6. Cleanup
+	for (int i = 0; i < num_commands; i++)
+	{
+		for (int j = 0; commands[i].args[j]; j++)
+			free(commands[i].args[j]);
+		free(commands[i].args);
+		if (commands[i].full_path)
+			free(commands[i].full_path);
+	}
+	free(commands);
 	free_env_vars(env_vars);
-	return (exit_code);
+	free(env_array);
+	return (0);
 }
+
+// check export main
+// int	main(void)
+// {
+// 	char		**env_array;
+// 	int			exit_code;
+// 	t_command	*commands;
+// 	int			num_commands;
+// 	char		*args1[] = {"export", "VAR1=value1", NULL};
+// 	char		*args2[] = {"export", "VAR2=value2", NULL};
+
+// 	t_env_vars *env_vars = NULL; // Start with empty environment
+// 	num_commands = 1;
+// 	// 1. Initialize environment from actual environment variables
+// 	initialize_env_list(&env_vars);
+// 	// 2. Setup command(s)
+// 	// 3. Resolve command path if needed
+// 	ft_export(&env_vars, args1);
+// 	ft_export(&env_vars, args2);
+// 	printf("Before unset:\n");
+// 	print_env_vars(env_vars);
+// 	commands = malloc(sizeof(t_command) * num_commands);
+// 	setup_commands(commands); // Your existing command setup
+// 	resolve_all_command_paths(env_vars, commands, num_commands);
+// 	// 5. Execute command
+// 	printf("Running unset builtin for key: %s\n", commands[0].args[1]);
+// 	exit_code = execute_builtin(&commands[0], &env_vars);
+// 	if (exit_code == 2) // Not a builtin
+// 	{
+// 		env_array = convert_env_to_array(env_vars);
+// 		execute_pipes(commands, num_commands, env_array);
+// 		free_env_array(env_array);
+// 	}
+// 	printf("after unset:\n");
+// 	print_env_vars(env_vars);
+// 	// CHECK EXPORT DONT KNOW WHY THIS ISNT WORKING CAN SEE IN ENV
+// 	// t_env_vars *node = get_env_node(env_vars, "MYVAR");
+// 	//     if (node && strcmp(node->value, "test_value") == 0) {
+// 	//     printf("✅ Export worked!\n");
+// 	// }
+// 	// else {
+// 	//     printf("❌ Export failed\n");
+// 	// }
+// 	// 7. Cleanup
+// 	free_env_vars(env_vars);
+// 	return (exit_code);
+// }
 
 // TEST FOR CD NEED TO PRINT BEFORE AND AFTER PATH TO PROVE
 // int	main(void)
