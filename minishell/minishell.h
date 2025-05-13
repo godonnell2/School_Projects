@@ -80,6 +80,7 @@ typedef struct s_command
     char *outfile;
     int append_out;
     char *heredoc_eof;
+     int  heredoc_fd;  // Ask beth could we add this??
     struct s_command *next;
     char *full_path; //ask beth can we add this to the struct
 } t_command;
@@ -139,13 +140,21 @@ void    clear_table_buffer(t_command *commands, int *last_index);
 void        free_env_vars(t_env_vars *env_vars);
 t_env_lst*  env_var_new_tail_node(t_env_lst *list);
 t_env_lst*  add_env_var(char *envp_str, t_env_lst *list);
-void initialize_env_list(t_env_vars **env_list); //CAN WE ADD
+void initialize_env_list(t_env_vars **env_list); //CAN WE ADD BETH?
 t_env_vars* get_env_vars(char **envp);
 void print_env_vars(t_env_vars *env_vars);
-t_env_vars *get_env_node(t_env_vars *env_vars, const char *key);//OK TO ADD ??? 
+t_env_vars *get_env_node(t_env_vars *env_vars, const char *key);//OK TO ADD BETH??? 
 void set_env_var(t_env_vars **env_list, const char *key, const char *value); // OK TO ADD doesnt update unconfidiotnally
+
+
+
 //HELPER//
 int ft_strcmp(const char *s1, const char *s2);
+char	*ft_strdup(const char *s);
+int ft_strlen(const char *str);
+void    *ft_memcpy(void *dest, const void *src, size_t n);
+char    *ft_strchr(const char *s, int c);
+
 
 // BUILTINS
 int ft_cd(char **input, t_env_vars **env_list);
@@ -155,10 +164,11 @@ int ft_unset(t_env_vars **head, char *key);
 int ft_export(t_env_vars **env_list, char **args);
 int env(t_env_vars *head);
 int exit_shell(t_env_vars **env_list);
-//void free_env_list(t_env_vars **env_vars);
+void clean_env_lst(t_env_vars **env_vars); //ASK BETH
 t_env_vars *create_endnode(const char *key, const char *value);
 
-//HELPER
 
-char    *ft_strchr(const char *s, int c);
+int ft_heredoc(const char *delimiter);
+
+
 #endif

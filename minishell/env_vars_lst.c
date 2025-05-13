@@ -162,3 +162,4 @@ void print_env_vars(t_env_vars *env_vars)
         current = current->next;
     }
 }
+

@@ -50,6 +50,11 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
+/*
+enviro vars are key-value pairs that a process inherits from its parent. 
+These are used to pass configuration information.
+extern means it's held in an external file or lib  <unistd.h> 
+*/
 void	initialize_env_list(t_env_vars **env_list)
 {
 	extern char	**environ;
@@ -74,7 +79,7 @@ void	initialize_env_list(t_env_vars **env_list)
 // if (input[i] == '\0' || input[i] == '~' || input[i] == '-')
 // chdir interprets it relative to the curr dir so works for both rel/abs
 
-// do we need all space chars??
+// do we need all space chars no that's ºarser job??
 
 static int	get_current_directory(char *buf, size_t size)
 {
@@ -136,12 +141,13 @@ int	ft_echo(char **args)
 }
 
 // ENV
-
+//empty list is not an error 
+// only read only so just did single ptr
 int	env(t_env_vars *head)
 {
 	if (!head)
 	{
-		return (1);
+		return (0);
 	}
 	while (head)
 	{
@@ -156,8 +162,21 @@ int	env(t_env_vars *head)
 int	exit_shell(t_env_vars **env_list)
 {
 	printf("exit\n");
-	free_env_vars(*env_list);
+	clean_env_lst(env_list);
 	return (0);
+}
+
+void clean_env_lst(t_env_vars **env_vars)
+{
+    // Clean environment linked list
+    t_env_vars *current = *env_vars;
+    while (current != NULL) {
+        t_env_vars *next = current->next;
+        free(current->key);
+        free(current->value);
+        free(current);
+        current = next;
+    }
 }
 // so if we have a signal we want to return 1 or some other number
 
@@ -182,7 +201,6 @@ nheritance: When a process creates a child process (using fork),
  Only the variables that have been explicitly "exported" are included.
  // NEED TO REMEMBER TO FREE
 */
-// TOO LONG
 void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 {
 	t_env_vars	*current;

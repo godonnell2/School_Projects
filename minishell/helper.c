@@ -1,13 +1,12 @@
 #include "minishell.h"
 
-int ft_strlen(const char *s);
 void *ft_memset(void *b, int c, size_t len);
 char *ft_strrchr(const char *s, int c);
 char *ft_strjoin(char const *s1, char const *s2);
 char *ft_substr(char const *s, unsigned int start, size_t len);
 void *ft_calloc(size_t count, size_t size);
 void ft_bzero(void *s, size_t n);
-int	ft_strlen(const char *s);
+
 
 int ft_strlen(const char *s)
 {
@@ -129,3 +128,30 @@ void	ft_bzero(void *s, size_t n)
 	}
 }
 
+
+void	*ft_memcpy(void *dest, const void *src, size_t n)
+{
+	unsigned char		*d;
+	const unsigned char	*s = (const unsigned char *)src;
+
+	d = (unsigned char *)dest;
+	while (n--)
+	{
+		*d++ = *s++;
+	}
+	return (dest);
+}
+
+char    *ft_strchr(const char *s, int c)
+{
+    while (*s != '\0')
+    {
+        if (*s == (char)c)
+            return ((char *)s);
+        s++;
+    }
+  
+    if ((char)c == '\0')
+        return ((char *)s);
+    return (NULL);
+}
