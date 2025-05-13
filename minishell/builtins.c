@@ -13,7 +13,7 @@ t’s similar to a shortcut in Windows, but at the filesystem level.
 
 */
 
-
+/*
 char	*ft_strdup(const char *s)
 {
 	size_t		len;
@@ -41,6 +41,7 @@ char	*ft_strdup(const char *s)
 	}
 	return (dup);
 }
+*/
 
 /*
 enviro vars are key-value pairs that a process inherits from its parent. 
