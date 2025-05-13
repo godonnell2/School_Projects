@@ -80,7 +80,7 @@ typedef struct s_command
     char *outfile;
     int append_out;
     char *heredoc_eof; // we have it!!
-     int  heredoc_fd;  // Ask beth could we add this?? actally not sure we ned this 
+     int  heredoc_fd;  // Ask beth could we add this??  and init to -1
     struct s_command *next;
     char *full_path; //ask beth can we add this to the struct
 } t_command;

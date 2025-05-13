@@ -395,8 +395,13 @@ static void	setup_redirections(t_command *cmd)
 static void	execute_child(t_executor *ex)
 {
 	t_command	*cmd;
-
+    
 	cmd = &ex->commands[ex->cmd_i];
+    if(cmd->heredoc_fd != -1)
+    {
+        dup2(cmd->heredoc_fd, STDIN_FILENO);
+    }
+    
 	if (ex->cmd_i > 0)
 	{
 		dup2(ex->prev_pipe_fd, STDIN_FILENO);
@@ -427,6 +432,8 @@ static void	handle_parent(t_executor *ex)
 		close(ex->pipe_fd[WRITE]);
 		ex->prev_pipe_fd = ex->pipe_fd[READ];
 	}
+    if (ex->commands[ex->cmd_i].heredoc_fd != -1)
+		close(ex->commands[ex->cmd_i].heredoc_fd);
 }
 
 static void	create_pipe_if_needed(t_executor *ex)
@@ -492,21 +499,21 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 	free(ex.pids);
 }
 
-// TOO LONG
 // CAN SEPARATE IT INTO IS BUILTIN 
-int is_built_in(t_command *cmds, int num_cmds)
+static int is_built_in(t_command *cmd)
 {
 	const char	*builtins[] = {"echo", "cd", "pwd", "export", "unset", "env",
 			"exit", NULL};
 	
 	const char **builtin_ptr = builtins;
-	
-	int i = 0;
+	if (!cmd || !cmd->args || !cmd->args[0])
+        return 0;
 
+	int i = 0;
 		
 		while (*builtin_ptr)
 		{
-			if (ft_strcmp(cmds[i].args[0], *builtin_ptr) == 0)
+			if (ft_strcmp(cmd[i].args[0], *builtin_ptr) == 0)
 			{
 				return 1;
 				break ;
@@ -523,11 +530,12 @@ void	resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 	int			i;
 	int			builtin;
 	
-	builtin = is_built_in(cmds, num_cmds);
+	
 	
 	i=0;
 	while(i < num_cmds)
 	{
+        builtin = is_built_in(&cmds[i]);
 		if (!builtin)
 		{
 			resolve_command_full_path(env_vars, cmds[i].args[0], full_path);
@@ -585,32 +593,52 @@ void	resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 // 	commands[0].full_path = NULL;
 // }
 
-// TWO PIPES
+//  PIPES & HEREDOC
 void	setup_commands(t_command *commands)
 {
-	// ls -l | grep "d" | wc -l
-	commands[0].args = malloc(sizeof(char *) * 3);
-	commands[0].args[0] = strdup("ls");
-	commands[0].args[1] = strdup("-l");
-	commands[0].args[2] = NULL;
+	//cat << EOF | grep hello
+	commands[0].args = malloc(sizeof(char *) * 2);
+	commands[0].args[0] = strdup("cat");
+	commands[0].args[1] = NULL;
 	commands[0].infile = NULL;
 	commands[0].outfile = NULL;
 	commands[0].append_out = 0;
+    commands[0].heredoc_eof  = strdup("EOF");
+   commands[0].heredoc_fd = ft_heredoc(commands[0].heredoc_eof);
 	commands[1].args = malloc(sizeof(char *) * 3);
 	commands[1].args[0] = strdup("grep");
-	commands[1].args[1] = strdup("d");
+	commands[1].args[1] = strdup("hello");
 	commands[1].args[2] = NULL;
 	commands[1].infile = NULL;
 	commands[1].outfile = NULL;
 	commands[1].append_out = 0;
-	commands[2].args = malloc(sizeof(char *) * 3);
-	commands[2].args[0] = strdup("wc");
-	commands[2].args[1] = strdup("-l");
-	commands[2].args[2] = NULL;
-	commands[2].infile = NULL;
-	commands[2].outfile = NULL;
-	commands[2].append_out = 0;
+	
 }
+// void	setup_commands(t_command *commands)
+// {
+// 	// ls -l | grep "d" | wc -l
+// 	commands[0].args = malloc(sizeof(char *) * 3);
+// 	commands[0].args[0] = strdup("ls");
+// 	commands[0].args[1] = strdup("-l");
+// 	commands[0].args[2] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// 	commands[1].args = malloc(sizeof(char *) * 3);
+// 	commands[1].args[0] = strdup("grep");
+// 	commands[1].args[1] = strdup("d");
+// 	commands[1].args[2] = NULL;
+// 	commands[1].infile = NULL;
+// 	commands[1].outfile = NULL;
+// 	commands[1].append_out = 0;
+// 	commands[2].args = malloc(sizeof(char *) * 3);
+// 	commands[2].args[0] = strdup("wc");
+// 	commands[2].args[1] = strdup("-l");
+// 	commands[2].args[2] = NULL;
+// 	commands[2].infile = NULL;
+// 	commands[2].outfile = NULL;
+// 	commands[2].append_out = 0;
+// }
 // void	setup_commands(t_command *commands)
 // {
 // 	commands[0].args = malloc(sizeof(char *) * 4);
@@ -635,7 +663,7 @@ int	main(void)
 	char		full_path[PATH_MAX];
 
 	env_vars = NULL;
-	int num_commands = 3; // For ls | grep | wc
+	int num_commands = 2; 
 	// 1. Create minimal environment
 	path_var = malloc(sizeof(t_env_vars));
 	path_var->key = strdup("PATH");
