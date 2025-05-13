@@ -79,8 +79,8 @@ typedef struct s_command
     char *infile;
     char *outfile;
     int append_out;
-    char *heredoc_eof;
-     int  heredoc_fd;  // Ask beth could we add this??
+    char *heredoc_eof; // we have it!!
+     int  heredoc_fd;  // Ask beth could we add this?? actally not sure we ned this 
     struct s_command *next;
     char *full_path; //ask beth can we add this to the struct
 } t_command;

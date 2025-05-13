@@ -7,6 +7,24 @@ char *ft_substr(char const *s, unsigned int start, size_t len);
 void *ft_calloc(size_t count, size_t size);
 void ft_bzero(void *s, size_t n);
 
+int my_strcmp(const char *s1, const char *s2) 
+{
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	while (*s1 && (*s1 == *s2))
+	{
+		s1++;
+		s2++;
+	}
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+}
 
 int ft_strlen(const char *s)
 {
@@ -154,4 +172,32 @@ char    *ft_strchr(const char *s, int c)
     if ((char)c == '\0')
         return ((char *)s);
     return (NULL);
+}
+
+char	*ft_strdup(const char *s)
+{
+	size_t		len;
+	const char	*p = s;
+	char		*dup;
+	size_t		i;
+
+	i = 0;
+	len = 0;
+	if (!s)
+		return (NULL);
+	while (*p++)
+	{
+		len++;
+	}
+	dup = malloc(len + 1);
+	if (!dup)
+	{
+		return (NULL);
+	}
+	while (i <= len)
+	{
+		dup[i] = s[i];
+		i++;
+	}
+	return (dup);
 }

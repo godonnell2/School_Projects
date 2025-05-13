@@ -12,15 +12,7 @@ directory.
 t’s similar to a shortcut in Windows, but at the filesystem level.
 
 */
-int	ft_strcmp(const char *s1, const char *s2)
-{
-	while (*s1 && (*s1 == *s2))
-	{
-		s1++;
-		s2++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
-}
+
 
 char	*ft_strdup(const char *s)
 {
@@ -158,19 +150,12 @@ int	env(t_env_vars *head)
 	return (0);
 }
 
-// EXIT
-int	exit_shell(t_env_vars **env_list)
-{
-	printf("exit\n");
-	clean_env_lst(env_list);
-	return (0);
-}
 
 void clean_env_lst(t_env_vars **env_vars)
 {
-    // Clean environment linked list
     t_env_vars *current = *env_vars;
-    while (current != NULL) {
+    while (current != NULL) 
+	{
         t_env_vars *next = current->next;
         free(current->key);
         free(current->value);
@@ -178,6 +163,15 @@ void clean_env_lst(t_env_vars **env_vars)
         current = next;
     }
 }
+// EXIT we are feeding a double ptr so hence no addrss
+int	exit_shell(t_env_vars **env_list)
+{
+	printf("exit\n");
+	clean_env_lst(env_list);
+	return (0);
+}
+
+
 // so if we have a signal we want to return 1 or some other number
 
 // EXPORT

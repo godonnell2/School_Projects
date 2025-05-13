@@ -1,5 +1,6 @@
 #include "minishell.h"
 #include <fcntl.h>
+#include <sys/wait.h> // NEED ADD TO HEADER FILE ASK BEATH
 #include <stdio.h> //has to come before readline
 #include <stdlib.h>
 #include <unistd.h>
@@ -492,29 +493,42 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 }
 
 // TOO LONG
-void	resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cmds)
+// CAN SEPARATE IT INTO IS BUILTIN 
+int is_built_in(t_command *cmds, int num_cmds)
 {
-	char		full_path[PATH_MAX];
 	const char	*builtins[] = {"echo", "cd", "pwd", "export", "unset", "env",
 			"exit", NULL};
-	int			i;
-	int			is_builtin;
-	const char	**builtin_ptr = builtins;
+	
+	const char **builtin_ptr = builtins;
+	
+	int i = 0;
 
-	i = 0;
-	while (i < num_cmds)
-	{
-		is_builtin = 0;
+		
 		while (*builtin_ptr)
 		{
 			if (ft_strcmp(cmds[i].args[0], *builtin_ptr) == 0)
 			{
-				is_builtin = 1;
+				return 1;
 				break ;
 			}
 			builtin_ptr++;
-		}
-		if (!is_builtin)
+		}	
+
+	return 0;
+}
+
+void	resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cmds)
+{
+	char		full_path[PATH_MAX];
+	int			i;
+	int			builtin;
+	
+	builtin = is_built_in(cmds, num_cmds);
+	
+	i=0;
+	while(i < num_cmds)
+	{
+		if (!builtin)
 		{
 			resolve_command_full_path(env_vars, cmds[i].args[0], full_path);
 			if (full_path[0] != '\0')
