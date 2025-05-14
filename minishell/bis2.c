@@ -133,21 +133,36 @@ int	ft_echo(char **args)
 // ENV
 //empty list is not an error 
 // only read only so just did single ptr
-int	env(t_env_vars *head)
+int env(t_env_vars *head)
 {
-	if (!head)
-	{
-		return (0);
-	}
-	while (head)
-	{
-		if (head->key && head->value)
-			printf("%s=%s\n", head->key, head->value);
-		head = head->next;
-	}
-	return (0);
-}
+    if (!head)
+    {
+        perror("env: no envir vars set");
+        return (1);  
+    }
+    
+    int printed = 0;
+    while (head)
+    {
+        if (head->key && head->value)
+        {
+            if (printf("%s=%s\n", head->key, head->value) < 0)
+            {
+                perror("env: print error");
+                return (2);  
+            }
+            printed = 1;
+        }
+        head = head->next;
+    }
 
+    if (!printed)
+    {
+        perror("env: no valid environment variables");
+        return (1);  
+    }
+    return (0);  
+}
 
 void clean_env_lst(t_env_vars **env_vars)
 {
