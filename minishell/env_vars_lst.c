@@ -140,7 +140,6 @@ t_env_vars* get_env_vars(char **envp)
         list_setup = add_env_var(*envp, list_setup);
         if (list_setup == NULL)
         {
-            //free all nodes in list_setup
             free(list_setup);
             return (NULL);
         }

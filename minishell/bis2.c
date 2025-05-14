@@ -193,6 +193,8 @@ nheritance: When a process creates a child process (using fork),
  Only the variables that have been explicitly "exported" are included.
  // NEED TO REMEMBER TO FREE
 */
+
+
 void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 {
 	t_env_vars	*current;
@@ -278,13 +280,17 @@ int	ft_pwd(void)
 	if (!getcwd(pwd, sizeof(pwd)))
 	{
 		perror("pwd:get cwd failed");
-		return (exit_code = 1);
+		return 1;
 	}
 	else
 	{
-		printf("%s\n", pwd);
-		return (exit_code = 0);
-	}
+		if (printf("%s\n", pwd) < 0)
+        {
+        perror("pwd: write error");
+        return 2;
+        }
+    }
+		return 0;
 }
 
 static t_env_vars	*extract_node(t_env_vars **head, char *key)
@@ -310,27 +316,37 @@ static t_env_vars	*extract_node(t_env_vars **head, char *key)
 	return (NULL);
 }
 
-int	ft_unset(t_env_vars **head, char *key)
+// new_var->is_read_only = is_read_only;  // add to env var node struct ASK BETH
+int ft_unset(t_env_vars **head, char *key)
 {
-	t_env_vars	*node_to_remove;
+    t_env_vars *node_to_remove;
 
-	if (!head || !key)
-	{
-		return (1);
-	}
-	printf("Attempting to unset key: %s\n", key);
-	node_to_remove = extract_node(head, key);
-	if (node_to_remove)
-	{
-		free(node_to_remove->key);
-		free(node_to_remove->value);
-		free(node_to_remove);
-		return (0);
-	}
-	else
-	{
-		return (0);
-	}
+    if (!head || !key || *key == '\0')  // Handle empty key
+    {
+        return (1);  // Invalid key
+    }
+
+    // Find the environment variable to unset
+    node_to_remove = extract_node(head, key);
+
+    // Check if the variable exists
+    if (node_to_remove)
+    {
+        // If the variable is read-only, prevent unsetting it
+        if (node_to_remove->is_read_only)
+        {
+            perror("cannot unset: read-only variable\n");
+            return (2);  
+        }
+        free(node_to_remove->key);
+        free(node_to_remove->value);
+        free(node_to_remove);
+        return (0);  
+    }
+    else
+    {
+        return (0); 
+    }
 }
 // Note: Typically unset returns success even if var didn't exist
 // hence the else
