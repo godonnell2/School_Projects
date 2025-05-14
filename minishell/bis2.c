@@ -10,7 +10,15 @@ to another file or directory. When you access the symlink,
 the operating system automatically redirects you to the target file or
 directory.
 t’s similar to a shortcut in Windows, but at the filesystem level.
-
+Exit_status depands of multiple things,
+If the commande work, 0
+If a commande exist and fail cause of the arg, 1
+If a commande exist and you dont have the permission 126
+If a commande doesn't exist 127
+If a signal Kill or interrupte the commande 127 + signal
+If error parsing 2
+Exit status come with Error message in your terminal, don't forget that the error fd is 2
+(putstr_fd)
 */
 
 
@@ -63,7 +71,7 @@ int	ft_cd(char **input, t_env_vars **env_list)
 
 	if (input[1] && input[2])
 	{
-		fprintf(stderr, "cd: too many arguments\n");
+		write(2, "cd: too many arguments\n", 24);
 		return (1);
 	}
 	if (!input[1])
@@ -120,13 +128,22 @@ int	ft_echo(char **args)
 	while (args[i])
 	{
 		if (printf("%s", args[i]) < 0)
+		{
+			perror("echo: write error");
 			return (2); 
-		if (args[i + 1])
-			printf(" ");
+		}
+		if (args[i + 1] && printf(" ") < 0)
+		{
+			perror("echo: write error");
+			return (2);
+		}
 		i++;
 	}
-	if (newline)
-		printf("\n");
+	if (newline && printf("\n") < 0)
+	{
+		perror("echo: write error");
+		return (2);
+	}
 	return (0);
 }
 
@@ -137,29 +154,21 @@ int env(t_env_vars *head)
 {
     if (!head)
     {
-        perror("env: no envir vars set");
+        perror("env: no environment list");
         return (1);  
     }
-    
-    int printed = 0;
+
     while (head)
     {
         if (head->key && head->value)
         {
             if (printf("%s=%s\n", head->key, head->value) < 0)
             {
-                perror("env: print error");
+                perror("env: write error");
                 return (2);  
             }
-            printed = 1;
         }
         head = head->next;
-    }
-
-    if (!printed)
-    {
-        perror("env: no valid environment variables");
-        return (1);  
     }
     return (0);  
 }
@@ -176,14 +185,47 @@ void clean_env_lst(t_env_vars **env_vars)
         current = next;
     }
 }
-// EXIT we are feeding a double ptr so hence no addrss
-int	exit_shell(t_env_vars **env_list)
+
+void	print_arg_error(const char *prefix, const char *arg, const char *suffix)
 {
-	printf("exit\n");
-	clean_env_lst(env_list);
-	return (0);
+	write(STDERR_FILENO, prefix, strlen(prefix));
+	write(STDERR_FILENO, arg, strlen(arg));
+	write(STDERR_FILENO, suffix, strlen(suffix));
 }
 
+void	print_error(const char *prefix, const char *msg)
+{
+	write(STDERR_FILENO, prefix, strlen(prefix));
+	write(STDERR_FILENO, msg, strlen(msg));
+}
+
+// EXIT we are feeding a double ptr so hence no addrss
+int	ft_exit(char **args, t_env_vars **env_list)
+{
+	int	exit_code = 0;
+
+	printf("exit\n");
+
+	if (!args[1])
+	{
+		clean_env_lst(env_list);
+		exit(0);
+	}
+	if (!is_numeric(args[1]))
+	{
+		print_arg_error(args[1]);
+		clean_env_lst(env_list);
+		exit(2);
+	}
+	if (args[2])
+	{
+		print_too_many_args();
+		return (1);
+	}
+	exit_code = atoi(args[1]) % 256;
+	clean_env_lst(env_list);
+	exit(exit_code);
+}
 
 // so if we have a signal we want to return 1 or some other number
 
@@ -238,24 +280,46 @@ void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 	*env_list = new_node;
 }
 
-// when no equal sign is found we set the key with empty value
-// is this what bash does
+
 // kk no bash returns empty so need to add empty string still stores value
-// NOT USING MY STRCHR I DONT KNOW WHY 
+//Start with a digit
+//Contain invalid characters (like !, @, -, etc.)
+// Are empty
+static int is_valid_identifier(const char *name)
+{
+    int i;
+    if (!name || (!ft_isalpha(name[0]) && name[0] != '_'))
+        return 0;
+    i = 1;
+    while (name[i] && name[i] != '=')
+    {
+        if (!ft_isalnum(name[i]) && name[i] != '_')
+            return 0;
+        i++;
+    }
+    return 1;
+}
+
 static int	handle_export_arg(t_env_vars **env_list, char *arg)
 {
 	char	*equal_sign;
 	char	*temp;
-	int		result;
 
 	temp = ft_strdup(arg);
 	if (!temp)
 	{
-		perror("export: ft_strdup");
+		perror("export: strdup");
 		return (1);
 	}
 	equal_sign = strchr(temp, '=');
-	result = 0;
+	if (!is_valid_identifier(temp))
+	{
+		write(2, "export: `", 9);
+		write(2, arg, ft_strlen(arg));
+		write(2, "`: not a valid identifier\n", 27);
+		free(temp);
+		return (1);
+	}
 	if (equal_sign)
 	{
 		*equal_sign = '\0';
@@ -266,9 +330,34 @@ static int	handle_export_arg(t_env_vars **env_list, char *arg)
 		set_env_var(env_list, temp, "");
 	}
 	free(temp);
-	return (result);
+	return (0);
 }
 
+int	ft_export(t_env_vars **env_list, char **args)
+{
+	int	i;
+	int	status = 0;
+
+	if (!args[1])
+	{
+		return (0);
+	}
+	i = 1;
+	while (args[i])
+	{
+		if (handle_export_arg(env_list, args[i]) != 0)
+			status = 1;
+		i++;
+	}
+	return (status);
+}
+
+/*
+reject variable names that:
+Start with a digit
+Contain invalid characters (like !, @, -, etc.)
+Are empty
+*/
 int	ft_export(t_env_vars **env_list, char **args)
 {
 	int	i;
@@ -336,18 +425,12 @@ int ft_unset(t_env_vars **head, char *key)
 {
     t_env_vars *node_to_remove;
 
-    if (!head || !key || *key == '\0')  // Handle empty key
-    {
-        return (1);  // Invalid key
-    }
+    if (!head || !key || *key == '\0')  
+        return (1);  
 
-    // Find the environment variable to unset
     node_to_remove = extract_node(head, key);
-
-    // Check if the variable exists
     if (node_to_remove)
     {
-        // If the variable is read-only, prevent unsetting it
         if (node_to_remove->is_read_only)
         {
             perror("cannot unset: read-only variable\n");
@@ -359,9 +442,7 @@ int ft_unset(t_env_vars **head, char *key)
         return (0);  
     }
     else
-    {
         return (0); 
-    }
 }
 // Note: Typically unset returns success even if var didn't exist
 // hence the else

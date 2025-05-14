@@ -174,6 +174,33 @@ char    *ft_strchr(const char *s, int c)
     return (NULL);
 }
 
+int ft_isalpha(int c)
+{
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+        return 1;
+    else
+        return 0;
+}
+
+static int is_numeric(const char *str)
+{
+	int i = 0;
+
+	if (!str || str[0] == '\0')
+		return (0);
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!isdigit(str[i]))
+		return (0);
+	while (str[i])
+	{
+		if (!isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 char	*ft_strdup(const char *s)
 {
 	size_t		len;
