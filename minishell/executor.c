@@ -364,6 +364,14 @@ static void	setup_input_redirection(t_command *cmd)
 	close(fd);
 }
 
+//bitwise ops
+// write only for curr process 
+// TRUNC does not append it overwrites, 
+// needs to clear it otherwise when writing could have left over bits
+// 0 means its in octal form (base 8)
+// 6 owner Read (4) + Write (2) = 6
+//4 group Read (4) = 4
+// 4 others Read (4) = 4
 static void	setup_output_redirection(t_command *cmd)
 {
 	int	fd;
