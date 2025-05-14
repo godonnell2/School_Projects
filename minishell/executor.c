@@ -486,14 +486,14 @@ static void	wait_for_children(t_executor *ex)
 	}
 }
 
-void	execute_pipes(t_command *commands, int num_commands, char **env_array)
+void	execute_pipes(t_command *cmds, int num_cmds, char **env_array)
 {
 	t_executor	ex;
 
 	ex = (t_executor){.prev_pipe_fd = -1, .pids = malloc(sizeof(pid_t)
-			* num_commands), .cmd_count = num_commands, .env_array = env_array,
-		.commands = commands, .cmd_i = 0};
-	while (ex.cmd_i < num_commands)
+			* num_cmds), .cmd_count = num_cmds, .env_array = env_array,
+		.commands = cmds, .cmd_i = 0};
+	while (ex.cmd_i < num_cmds)
 	{
 		create_pipe_if_needed(&ex);
 		fork_process(&ex);
@@ -507,21 +507,19 @@ void	execute_pipes(t_command *commands, int num_commands, char **env_array)
 	free(ex.pids);
 }
 
-// CAN SEPARATE IT INTO IS BUILTIN 
+
 static int is_built_in(t_command *cmd)
 {
 	const char	*builtins[] = {"echo", "cd", "pwd", "export", "unset", "env",
 			"exit", NULL};
 	
 	const char **builtin_ptr = builtins;
-	if (!cmd || !cmd->args || !cmd->args[0])
+	if (!cmd || !cmd->args[0])
         return 0;
-
-	int i = 0;
 		
 		while (*builtin_ptr)
 		{
-			if (ft_strcmp(cmd[i].args[0], *builtin_ptr) == 0)
+			if (ft_strcmp(cmd->args[0], *builtin_ptr) == 0)
 			{
 				return 1;
 				break ;
@@ -548,10 +546,14 @@ void	resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 		{
 			resolve_command_full_path(env_vars, cmds[i].args[0], full_path);
 			if (full_path[0] != '\0')
+            {
 				cmds[i].full_path = ft_strdup(full_path);
+            }
 		}
 		else
+        {
 			cmds[i].full_path = NULL;
+        }
 		i++;
 	}
 }
