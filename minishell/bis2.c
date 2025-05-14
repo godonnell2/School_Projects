@@ -57,19 +57,44 @@ static int	get_current_directory(char *buf, size_t size)
 
 int	ft_cd(char **input, t_env_vars **env_list)
 {
-	char	old_pwd[10000];
-	char	new_pwd[10000];
+	char	old_pwd[PATH_MAX];
+	char	new_pwd[PATH_MAX];
+	char	*target;
 
-	if (!input[1])
+	if (input[1] && input[2])
 	{
-		perror("cd: missing argument");
+		fprintf(stderr, "cd: too many arguments\n");
 		return (1);
 	}
+	if (!input[1])
+	{
+		target = get_env_value(*env_list, "HOME");
+		if (!target)
+		{
+			perror("cd: HOME not set");
+			return (1);
+		}
+	}
+	else if (strcmp(input[1], "-") == 0)
+	{
+		target = get_env_value(*env_list, "OLDPWD");
+		if (!target)
+		{
+			perror("cd: OLDPWD not set");
+			return (1);
+		}
+		printf("%s\n", target); 
+	}
+	else
+	{
+		target = input[1];
+	}
+
 	if (!get_current_directory(old_pwd, sizeof(old_pwd)))
 		return (1);
-	if (chdir(input[1]) != 0)
+	if (chdir(target) != 0)
 	{
-		perror("failure to chdir in cd");
+		perror("cd");
 		return (1);
 	}
 	if (!get_current_directory(new_pwd, sizeof(new_pwd)))
