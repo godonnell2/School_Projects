@@ -266,7 +266,7 @@ static int	execute_builtin(t_command *command, t_env_vars **env_vars)
 		return (1);
 	}
 	if (ft_strcmp(cmd, "cd") == 0)
-		return (ft_cd(command->args, &env_vars));
+		return (ft_cd(command->args, env_vars));
 	else if (ft_strcmp(cmd, "echo") == 0)
 		return (ft_echo(command->args));
 	else if (ft_strcmp(cmd, "pwd") == 0)

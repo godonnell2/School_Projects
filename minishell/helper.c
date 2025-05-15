@@ -182,12 +182,12 @@ int ft_isalpha(int c)
         return 0;
 }
 
-static int ft_isdigit(int c) 
+int ft_isdigit(int c) 
 {
        return (c >= '0' && c <= '9');
 }
 
-static int	is_numeric(const char *str)
+int	is_numeric(const char *str)
 {
 	if (!str || !*str)
 		return (0);
