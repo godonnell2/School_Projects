@@ -700,6 +700,7 @@ int	main(void)
 		}
 	}
 	// 4. Convert environment to array
+	ensure_minimal_vars(&env_vars);
 	env_array = convert_env_to_array(env_vars);
 	// 5. Execute the pipeline
 	execute_pipes(commands, num_commands, env_array);

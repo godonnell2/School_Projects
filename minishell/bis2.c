@@ -75,39 +75,50 @@ static int	get_current_directory(char *buf, size_t size)
 	}
 	return (1);
 }
+
 // TOO LONG
+static char	*get_cd_target(char **input, t_env_vars *env_list)
+{
+	char	*target;
+
+	if (input[1] && input[2])
+	{
+		write(2, "cd: too many arguments\n", 24);
+		return (NULL);
+	}
+	if (!input[1])
+	{
+		target = get_env_value(env_list, "HOME");
+		if (!target)
+		{
+			perror("cd: HOME not set");
+			return (NULL);
+		}
+	}
+	else if (strcmp(input[1], "-") == 0)
+	{
+		target = get_env_value(env_list, "OLDPWD");
+		if (!target)
+		{
+			perror("cd: OLDPWD not set");
+			return (NULL);
+		}
+		printf("%s\n", target);
+	}
+	else
+		target = input[1];
+	return (target);
+}
+
 int	ft_cd(char **input, t_env_vars **env_list)
 {
 	char	old_pwd[PATH_MAX];
 	char	new_pwd[PATH_MAX];
 	char	*target;
 
-	if (input[1] && input[2])
-	{
-		write(2, "cd: too many arguments\n", 24);
+	target = get_cd_target(input, *env_list);
+	if (!target)
 		return (1);
-	}
-	if (!input[1])
-	{
-		target = get_env_value(*env_list, "HOME");
-		if (!target)
-		{
-			perror("cd: HOME not set");
-			return (1);
-		}
-	}
-	else if (strcmp(input[1], "-") == 0)
-	{
-		target = get_env_value(*env_list, "OLDPWD");
-		if (!target)
-		{
-			perror("cd: OLDPWD not set");
-			return (1);
-		}
-		printf("%s\n", target);
-	}
-	else
-		target = input[1];
 	if (!get_current_directory(old_pwd, sizeof(old_pwd)))
 		return (1);
 	if (chdir(target) != 0)
@@ -117,8 +128,8 @@ int	ft_cd(char **input, t_env_vars **env_list)
 	}
 	if (!get_current_directory(new_pwd, sizeof(new_pwd)))
 		return (1);
-	set_env_var(env_list, "OLDPWD", old_pwd);
-	set_env_var(env_list, "PWD", new_pwd);
+     update_env_var(env_list, "OLDPWD", old_pwd);
+     update_env_var(env_list, "PWD", new_pwd);
 	return (0);
 }
 
@@ -220,10 +231,10 @@ void	clean_env_lst(t_env_vars **env_vars)
 // EXIT we are feeding a double ptr so hence no addrss
 /*
 Input			Behavior	Exit Code
-exit			exits	    0
-exit 42			exits	    42
+exit			exits		 0
+exit 42			exits		 42
 exit 256    exits			0
-exit -1			exits	    255
+exit -1			exits		 255
 exit 42     abc	prints error, doesn't exit	1
 exit abc	prints error, exits	2
 */
@@ -307,6 +318,16 @@ void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 	*env_list = new_node;
 }
 
+void	update_env_var(t_env_vars **env_list, const char *key, const char *value)
+{
+    t_env_vars * var = get_env_node(*env_list, key);
+    if (var && var->value && ft_strcmp(var->value, "") != 0)
+    {
+        free(var->value);
+        var->value = ft_strdup(value);
+    }
+ 
+}
 // kk no bash returns empty so need to add empty string still stores value
 // Start with a digit
 // Contain invalid characters (like !, @, -, etc.)
@@ -426,28 +447,38 @@ static t_env_vars	*extract_node(t_env_vars **head, char *key)
 	return (NULL);
 }
 
-// new_var->is_read_only = is_read_only;  // add to env var node struct ASK BETH
+//BAD ADVICE GRRRRRR
+// void ensure_minimal_vars(t_env_vars **env)
+// {
+// 	char buf[PATH_MAX];
+
+// 	if (!get_env_value(*env, "PWD") && getcwd(buf, sizeof(buf)))
+// 		set_env_var(env, "PWD", buf);
+
+// 	if (!get_env_value(*env, "SHLVL"))
+// 		set_env_var(env, "SHLVL", "1");
+
+// 	if (!get_env_value(*env, "PATH"))
+// 		set_env_var(env, "PATH", "/usr/bin:/bin");
+
+// 	if (!get_env_value(*env, "HOME"))
+// 		set_env_var(env, "HOME", "/");  
+// }
+
 int	ft_unset(t_env_vars **head, char *key)
 {
-	t_env_vars	*node_to_remove;
+	t_env_vars	*node;
 
 	if (!head || !key || *key == '\0')
 		return (1);
-	node_to_remove = extract_node(head, key);
-	if (node_to_remove)
+	node = extract_node(head, key);
+	if (node)
 	{
-		if (node_to_remove->is_read_only)
-		{
-			perror("cannot unset: read-only variable\n");
-			return (2);
-		}
-		free(node_to_remove->key);
-		free(node_to_remove->value);
-		free(node_to_remove);
-		return (0);
+		free(node->key);
+		free(node->value);
+		free(node);
 	}
-	else
-		return (0);
+	return (0);  // even if it's PWD or HOME — allow it
 }
 // Note: Typically unset returns success even if var didn't exist
 // hence the else
