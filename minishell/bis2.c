@@ -63,7 +63,20 @@ static int	get_current_directory(char *buf, size_t size)
 	return (1);
 }
 
-int	ft_cd(char **input, t_env_vars **env_list)
+char *get_env_value(t_env_vars *env_vars, const char *key)
+{
+    while (env_vars)
+    {
+        if (ft_strcmp(env_vars->key, key) == 0)
+        {
+            return env_vars->value;
+        }
+        env_vars = env_vars->next;
+    }
+    return NULL;
+}
+
+int	ft_cd(char **input, t_env_vars *env_list)
 {
 	char	old_pwd[PATH_MAX];
 	char	new_pwd[PATH_MAX];
@@ -76,7 +89,7 @@ int	ft_cd(char **input, t_env_vars **env_list)
 	}
 	if (!input[1])
 	{
-		target = get_env_value(*env_list, "HOME");
+		target = get_env_value(env_list, "HOME");
 		if (!target)
 		{
 			perror("cd: HOME not set");
@@ -85,7 +98,7 @@ int	ft_cd(char **input, t_env_vars **env_list)
 	}
 	else if (strcmp(input[1], "-") == 0)
 	{
-		target = get_env_value(*env_list, "OLDPWD");
+		target = get_env_value(env_list, "OLDPWD");
 		if (!target)
 		{
 			perror("cd: OLDPWD not set");
@@ -107,8 +120,8 @@ int	ft_cd(char **input, t_env_vars **env_list)
 	}
 	if (!get_current_directory(new_pwd, sizeof(new_pwd)))
 		return (1);
-	set_env_var(env_list, "OLDPWD", old_pwd);
-	set_env_var(env_list, "PWD", new_pwd);
+	set_env_var(&env_list, "OLDPWD", old_pwd);
+	set_env_var(&env_list, "PWD", new_pwd);
 	return (0);
 }
 
@@ -186,11 +199,18 @@ void clean_env_lst(t_env_vars **env_vars)
     }
 }
 
-void	print_arg_error(const char *prefix, const char *arg, const char *suffix)
+
+
+void	print_arg_error(const char *arg)
 {
-	write(STDERR_FILENO, prefix, strlen(prefix));
-	write(STDERR_FILENO, arg, strlen(arg));
-	write(STDERR_FILENO, suffix, strlen(suffix));
+    write(STDERR_FILENO, "minishell: exit: ", 17);
+    write(STDERR_FILENO, arg, strlen(arg));
+    write(STDERR_FILENO, ": numeric argument required\n", 28);
+}
+
+void	print_too_many_args(void)
+{
+    write(STDERR_FILENO, "minishell: exit: too many arguments\n", 36);
 }
 
 void	print_error(const char *prefix, const char *msg)
@@ -200,6 +220,16 @@ void	print_error(const char *prefix, const char *msg)
 }
 
 // EXIT we are feeding a double ptr so hence no addrss
+/*
+Input	    Behavior	Exit Code
+exit	    exits	    0
+exit 42	    exits	    42
+exit 256    exits	    0
+exit -1	    exits	    255
+exit 42     abc	prints error, doesn't exit	1
+exit abc	prints error, exits	2
+*/
+// REPLACE ATOI WITH FT_ATOI
 int	ft_exit(char **args, t_env_vars **env_list)
 {
 	int	exit_code = 0;
@@ -213,13 +243,13 @@ int	ft_exit(char **args, t_env_vars **env_list)
 	}
 	if (!is_numeric(args[1]))
 	{
-		print_arg_error(args[1]);
+		perror("exit: numeric argument required");
 		clean_env_lst(env_list);
 		exit(2);
 	}
 	if (args[2])
 	{
-		print_too_many_args();
+		perror("exit: too many arguments");
 		return (1);
 	}
 	exit_code = atoi(args[1]) % 256;
@@ -333,31 +363,8 @@ static int	handle_export_arg(t_env_vars **env_list, char *arg)
 	return (0);
 }
 
-int	ft_export(t_env_vars **env_list, char **args)
-{
-	int	i;
-	int	status = 0;
 
-	if (!args[1])
-	{
-		return (0);
-	}
-	i = 1;
-	while (args[i])
-	{
-		if (handle_export_arg(env_list, args[i]) != 0)
-			status = 1;
-		i++;
-	}
-	return (status);
-}
 
-/*
-reject variable names that:
-Start with a digit
-Contain invalid characters (like !, @, -, etc.)
-Are empty
-*/
 int	ft_export(t_env_vars **env_list, char **args)
 {
 	int	i;
@@ -379,7 +386,6 @@ int	ft_export(t_env_vars **env_list, char **args)
 int	ft_pwd(void)
 {
 	char	pwd[100000];
-	int		exit_code;
 
 	if (!getcwd(pwd, sizeof(pwd)))
 	{

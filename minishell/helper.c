@@ -182,23 +182,29 @@ int ft_isalpha(int c)
         return 0;
 }
 
-static int is_numeric(const char *str)
+static int ft_isdigit(int c) 
 {
-	int i = 0;
+       return (c >= '0' && c <= '9');
+}
 
-	if (!str || str[0] == '\0')
+static int	is_numeric(const char *str)
+{
+	if (!str || !*str)
 		return (0);
-	if (str[i] == '+' || str[i] == '-')
-		i++;
-	if (!isdigit(str[i]))
-		return (0);
-	while (str[i])
+	if (*str == '+' || *str == '-')
+		str++;
+	while (*str)
 	{
-		if (!isdigit(str[i]))
+		if (!ft_isdigit(*str))
 			return (0);
-		i++;
+		str++;
 	}
 	return (1);
+}
+   
+int ft_isalnum(int c)
+{
+	return (ft_isalpha(c) || ft_isdigit(c));
 }
 
 char	*ft_strdup(const char *s)

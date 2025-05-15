@@ -154,11 +154,12 @@ char	*ft_strdup(const char *s);
 int ft_strlen(const char *str);
 void    *ft_memcpy(void *dest, const void *src, size_t n);
 char    *ft_strchr(const char *s, int c);
-static int is_numeric(const char *str); //AsK BETH
 int ft_isalpha(int c);
+static int ft_isdigit(int c);
+static int	is_numeric(const char *str);
 
 // BUILTINS
-int ft_cd(char **input, t_env_vars **env_list);
+int ft_cd(char **input, t_env_vars *env_list);
 int ft_echo(char **args);
 int ft_pwd(void);
 int ft_unset(t_env_vars **head, char *key);
@@ -166,8 +167,9 @@ int ft_export(t_env_vars **env_list, char **args);
 int env(t_env_vars *head);
 int	ft_exit(char **args, t_env_vars **env_list);
 void clean_env_lst(t_env_vars **env_vars); //ASK BETH
+int ft_isalnum(int c);
 t_env_vars *create_endnode(const char *key, const char *value);
-
+char *get_env_value(t_env_vars *env_vars, const char *key); //ASK BETH ADD
 
 int ft_heredoc(const char *delimiter);
 

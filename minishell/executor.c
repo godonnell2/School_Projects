@@ -266,7 +266,7 @@ void	free_env_array(char **env_array)
 // 		return (1);
 // 	}
 // 	if (ft_strcmp(cmd, "cd") == 0)
-// 		return (ft_cd(command->args, env_vars));
+// 		return (ft_cd(command->args, &env_vars));
 // 	else if (ft_strcmp(cmd, "echo") == 0)
 // 		return (ft_echo(command->args));
 // 	else if (ft_strcmp(cmd, "pwd") == 0)
@@ -287,7 +287,7 @@ void	free_env_array(char **env_array)
 // 	else if (ft_strcmp(cmd, "env") == 0)
 // 		return (env(*env_vars));
 // 	else if (ft_strcmp(cmd, "exit") == 0)
-// 		return (exit_shell(env_vars));
+// 		return (exit_shell(command->args,env_vars));
 // 	return (2);
 // }
 
