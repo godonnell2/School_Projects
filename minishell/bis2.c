@@ -27,6 +27,7 @@ enviro vars are key-value pairs that a process inherits from its parent.
 These are used to pass configuration information.
 extern means it's held in an external file or lib  <unistd.h>
 */
+
 void	initialize_env_list(t_env_vars **env_list)
 {
 	extern char	**environ;
@@ -289,7 +290,7 @@ nheritance: When a process creates a child process (using fork),
  Only the variables that have been explicitly "exported" are included.
  // NEED TO REMEMBER TO FREE
 */
-
+//ADDD REAL ONES FUNCTIONS OF STRDUP AND STRCMP
 void	set_env_var(t_env_vars **env_list, const char *key, const char *value)
 {
 	t_env_vars	*current;

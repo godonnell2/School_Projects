@@ -140,6 +140,7 @@ void    clear_table_buffer(t_command *commands, int *last_index);
 void        free_env_vars(t_env_vars *env_vars);
 t_env_lst*  env_var_new_tail_node(t_env_lst *list);
 t_env_lst*  add_env_var(char *envp_str, t_env_lst *list);
+void update_env_var(t_env_vars **env_list, const char *key, const char *value); //wont create if it doesnt arlready exist ASK BETH
 void initialize_env_list(t_env_vars **env_list); //CAN WE ADD BETH?
 t_env_vars* get_env_vars(char **envp);
 void print_env_vars(t_env_vars *env_vars);

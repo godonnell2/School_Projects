@@ -32,7 +32,11 @@ char *strdup_len(char *str, int len)
 {
     char *dst;
     int i;
-
+    if(!str)
+    {
+        printf("no str in strdup len in add env var\n"); //ASK BETH
+        return NULL; //ASK BETH
+    }
     dst = malloc(sizeof(char) * (len + 1));
     if (dst == NULL)
         return (NULL);

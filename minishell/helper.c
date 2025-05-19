@@ -207,30 +207,22 @@ int ft_isalnum(int c)
 	return (ft_isalpha(c) || ft_isdigit(c));
 }
 
-char	*ft_strdup(const char *s)
+char *ft_strdup(const char *s)
 {
-	size_t		len;
-	const char	*p = s;
-	char		*dup;
-	size_t		i;
+    if (!s)
+    {
+        fprintf(stderr, "ft_strdup received NULL\n");
+        return NULL;
+    }
 
-	i = 0;
-	len = 0;
-	if (!s)
-		return (NULL);
-	while (*p++)
-	{
-		len++;
-	}
-	dup = malloc(len + 1);
-	if (!dup)
-	{
-		return (NULL);
-	}
-	while (i <= len)
-	{
-		dup[i] = s[i];
-		i++;
-	}
-	return (dup);
+    size_t len = strlen(s);
+    char *dup = malloc(len + 1);
+    if (!dup)
+    {
+        perror("malloc failed in ft_strdup");
+        return NULL;
+    }
+
+    strcpy(dup, s);
+    return dup;
 }
