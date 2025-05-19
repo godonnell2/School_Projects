@@ -38,6 +38,8 @@ void check_command_in_path(char **path_arr, char *cmd,
 char *get_env_path_variable(char **envp);
 void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 							   char *full_path);
+static int is_built_in(t_command *cmd);
+
 
 int ft_wordlen(char *s)
 {
@@ -421,16 +423,17 @@ static void setup_redirections(t_command *cmd)
 //  	// ...
 //  }
 
-static void execute_child(t_executor *ex)
+
+static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, char **env_arr)
 {
 	t_command *cmd;
 
 	cmd = &ex->commands[ex->cmd_i];
+
 	if (cmd->heredoc_fd != -1)
 	{
 		dup2(cmd->heredoc_fd, STDIN_FILENO);
 	}
-
 	if (ex->cmd_i > 0)
 	{
 		dup2(ex->prev_pipe_fd, STDIN_FILENO);
@@ -442,13 +445,21 @@ static void execute_child(t_executor *ex)
 		close(ex->pipe_fd[WRITE]);
 	}
 	setup_redirections(cmd);
-	if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
+	if (is_built_in(cmd))
 	{
-		execve(cmd->full_path, cmd->args, ex->env_array);
+		ex->last_exit_code = execute_builtin(cmd, &env_vars);
+		exit(ex->last_exit_code);
 	}
-	perror("execve");
+	else  if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
+	{
+		execve(cmd->full_path, cmd->args, env_arr);
+		perror("execve");
+		exit(EXIT_FAILURE);
+	}
+	printf("Command not found: %s\n", cmd->args[0]);
 	exit(EXIT_FAILURE);
 }
+
 
 static void handle_parent(t_executor *ex)
 {
@@ -477,7 +488,7 @@ static void create_pipe_if_needed(t_executor *ex)
 	}
 }
 
-static void fork_process(t_executor *ex)
+static void fork_process(t_executor *ex, int num_cmds, t_env_vars *env_vars, char **env_arr)
 {
 	pid_t pid;
 
@@ -490,7 +501,7 @@ static void fork_process(t_executor *ex)
 	}
 
 	if (pid == 0)
-		execute_child(ex);
+		execute_child(ex, num_cmds, env_vars, env_arr);
 	else
 	{
 		ex->pids[ex->cmd_i] = pid;
@@ -515,20 +526,20 @@ static void wait_for_children(t_executor *ex)
 	}
 }
 
-void execute_pipes(t_command *cmds, int num_cmds, char **env_array)
+void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *env_vars)
 {
 	t_executor ex;
 
 	ex = (t_executor){.prev_pipe_fd = -1,
 					  .pids = malloc(sizeof(pid_t) * num_cmds),
 					  .cmd_count = num_cmds,
-					  .env_array = env_array,
+					  .env_array = env_arr,
 					  .commands = cmds,
 					  .cmd_i = 0};
 	while (ex.cmd_i < num_cmds)
 	{
 		create_pipe_if_needed(&ex);
-		fork_process(&ex);
+		fork_process(&ex, num_cmds, env_vars, env_arr);
 
 		ex.cmd_i++;
 	}
@@ -696,19 +707,13 @@ int main(void)
 		exit(1);
 	}
 
-	for (int i = 0; i < num_commands; i++)
-	{
-		if (is_built_in(&commands[i]))
-		{
-			ex.last_exit_code = execute_builtin(&commands[i], &env_vars);
-		}
-	}
+	
 	// printf("print env in main no longer prints before calling resolve_all_cmds\n"); // DEBUG
 	// print_env_vars(env_vars);														// DEBUG
 	resolve_all_command_paths(env_vars, commands, num_commands);
 	//  5. Execute the pipeline
 	printf("About to execute pipes:\n");
-	execute_pipes(commands, num_commands, env_array);
+	execute_pipes(commands, num_commands, env_array, env_vars);
 	//  6. Cleanup
 	// clean_env_lst(&env_vars);
 	// free(env_array);

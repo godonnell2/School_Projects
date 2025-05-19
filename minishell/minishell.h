@@ -126,7 +126,7 @@ int     count_str_in_array(char **str_array);
 char    *malloc_error(char **paths);
 char    *find_command_path(char *cmd, char **envp);
 void    execute_command(char **args, char **envp);
-void    execute_pipes(t_command *commands, int commands_count, char **envp);
+void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *env_vars);
 
 //parser_exec.c
 int     is_redirect(char c);
