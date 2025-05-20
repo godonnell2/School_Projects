@@ -216,7 +216,7 @@ static int count_env_nodes(t_env_vars *env_vars)
 char **convert_env_to_array(t_env_vars *env_vars)
 {
 	int count;
-	const t_env_vars const *curr;
+	const t_env_vars *curr;
 	char **env_arr;
 	int i;
 
@@ -415,24 +415,21 @@ static void setup_redirections(t_command *cmd)
 	setup_output_redirection(cmd);
 }
 
-// NEED TO REPLACE WITH REAL ITOA
-//  char *expand_var(const char *token, t_executor *ex)
-//  {
-//  	if (strcmp(token, "$?") == 0)
-//  		//return ft_itoa(ex->last_exit_code);
-//  	// ...
-//  }
 
-
+//we close read end of child cos its not used by curr process, instead we use write end of curr
+// and read from prev pipe fd
+// exit 127 = command not found 
+// onlu use heredoc if it's first cmd cos otherwise it's already written to pipe 
 static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, char **env_arr)
 {
 	t_command *cmd;
 
 	cmd = &ex->commands[ex->cmd_i];
 
-	if (cmd->heredoc_fd != -1)
+	if (cmd->heredoc_fd != -1 && ex->cmd_i == 0)
 	{
-		dup2(cmd->heredoc_fd, STDIN_FILENO);
+    dup2(cmd->heredoc_fd, STDIN_FILENO);
+    close(cmd->heredoc_fd);
 	}
 	if (ex->cmd_i > 0)
 	{
@@ -443,6 +440,7 @@ static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, ch
 	{
 		dup2(ex->pipe_fd[WRITE], STDOUT_FILENO);
 		close(ex->pipe_fd[WRITE]);
+		close(ex->pipe_fd[READ]); 
 	}
 	setup_redirections(cmd);
 	if (is_built_in(cmd))
@@ -453,11 +451,14 @@ static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, ch
 	else  if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
 	{
 		execve(cmd->full_path, cmd->args, env_arr);
+		
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
 	printf("Command not found: %s\n", cmd->args[0]);
-	exit(EXIT_FAILURE);
+	free_env_vars(env_vars);
+	//handle all other clean up eg ex struct etc.. 
+	exit(127);
 }
 
 
@@ -526,6 +527,9 @@ static void wait_for_children(t_executor *ex)
 	}
 }
 
+//THIS LOOP SHOULD GET EVERYTHIHNG TO START AT SAME TIME and we are passing SLEEP YAYAY
+// ONE SPECIAL CASE WHERE YOU DONT WANT TO FORK! ONLY ONE BUILTIN IN WHOLE PIPELINE and
+// then you run builtin directly in parent shell, affects env/cwd as expected
 void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *env_vars)
 {
 	t_executor ex;
@@ -536,6 +540,12 @@ void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *en
 					  .env_array = env_arr,
 					  .commands = cmds,
 					  .cmd_i = 0};
+	if (num_cmds == 1 && is_built_in(&cmds[0]))
+	{
+    
+    execute_builtin(&cmds[0], &env_vars);
+    return;
+	}
 	while (ex.cmd_i < num_cmds)
 	{
 		create_pipe_if_needed(&ex);
@@ -600,6 +610,26 @@ void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 		i++;
 	}
 }
+
+//CHECK CMDS RUN AT SAME TIME 
+void setup_commands(t_command *commands) {
+    // First command: sleep 2
+    commands[0].args = malloc(sizeof(char *) * 3);
+    commands[0].args[0] = strdup("sleep");
+    commands[0].args[1] = strdup("2");
+    commands[0].args[2] = NULL;
+    commands[0].infile = NULL;
+    commands[0].outfile = NULL;
+    commands[0].append_out = 0;
+    // Second command: sleep 2
+    commands[1].args = malloc(sizeof(char *) * 3);
+    commands[1].args[0] = strdup("sleep");
+    commands[1].args[1] = strdup("2");
+    commands[1].args[2] = NULL;
+    commands[1].infile = NULL;
+    commands[1].outfile = NULL;
+    commands[1].append_out = 0;
+}
 // void setup_commands(t_command *commands)
 // {
 //     commands[0].args = malloc(sizeof(char *) * 3);
@@ -610,18 +640,18 @@ void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 //     commands[0].outfile = NULL;
 //     commands[0].append_out = 0;
 // }
-void setup_commands(t_command *commands)
-{
-	commands[0].args = malloc(sizeof(char *) * 4);
-	commands[0].args[0] = strdup("echo");
-	commands[0].args[1] = strdup("-n");
-	commands[0].args[2] = "this is a test";
-	commands[0].args[3] = NULL;
-	commands[0].infile = NULL;
-	commands[0].outfile = NULL;
-	commands[0].append_out = 0;
-	commands[0].full_path = NULL;
-}
+// void setup_commands(t_command *commands)
+// {
+// 	commands[0].args = malloc(sizeof(char *) * 4);
+// 	commands[0].args[0] = strdup("echo");
+// 	commands[0].args[1] = strdup("-n");
+// 	commands[0].args[2] = "this is a test";
+// 	commands[0].args[3] = NULL;
+// 	commands[0].infile = NULL;
+// 	commands[0].outfile = NULL;
+// 	commands[0].append_out = 0;
+// 	commands[0].full_path = NULL;
+// }
 // void	setup_commands(t_command *commands)
 // {
 // 	commands[0].args = malloc(sizeof(char *) * 3);
@@ -682,14 +712,14 @@ int main(void)
 	// t_env_vars	*home_var;
 
 	env_vars = NULL;
-	int num_commands = 1;
+	int num_commands = 2;
 
 	commands = malloc(sizeof(t_command) * num_commands);
 	setup_commands(commands);
-	t_executor ex =
-		{
-			.last_exit_code = 0,
-		};
+	// t_executor ex =
+	// 	{
+	// 		.last_exit_code = 0,
+	// 	};
 	initialize_env_list(&env_vars);
 	printf("env_vars after init: %p\n", (void *)env_vars);
 	if (!env_vars)
