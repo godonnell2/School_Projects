@@ -20,6 +20,16 @@ If error parsing 2
 Exit status come with Error message in your terminal,
 	don't forget that the error fd is 2
 (putstr_fd)
+
+Built-in commands (e.g., cd, export, exit, source) are part of the shell's own code. They run in the current shell's process, so they directly modify the shell's state (environment variables, CWD, etc.).
+
+External commands (e.g., /bin/ls, python) spawn a subprocess (child shell). Changes they make (e.g., export VAR=value in a script) are confined to the child process and lost when it exits.
+
+No Subprocess Overhead: Built-ins avoid spawning a new process, making them faster.
+
+Persistent Changes: Their effects are visible in the parent shell after execution.
+
+Control Flow: Built-ins like exit, return, or source must run in the parent shell to terminate the session or modify its state.
 */
 
 /*

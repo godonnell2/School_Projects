@@ -351,7 +351,7 @@ void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 		return;
 	}
 	printf("in resolve command path function print env/\n"); ////DEBUG
-	print_env_vars(env_vars);								 // DEBUGGING
+	//print_env_vars(env_vars);								 // DEBUGGING
 	path_env = get_path_variable(env_vars);
 	if (!path_env)
 	{
@@ -363,20 +363,28 @@ void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 	check_command_in_path(path_arr, cmd, full_path);
 }
 
+//If heredoc_fd is set, we need to USE that and IGNORE infile.
+//otherwise we can fallback to infile
 static void setup_input_redirection(t_command *cmd)
 {
 	int fd;
 
-	if (!cmd->infile)
-		return;
-	fd = open(cmd->infile, O_RDONLY);
-	if (fd < 0)
+	if (cmd->infile)
 	{
-		perror(cmd->infile);
-		exit(EXIT_FAILURE);
+		fd = open(cmd->infile, O_RDONLY);
+		if (fd < 0)
+		{
+			perror(cmd->infile);
+			exit(EXIT_FAILURE);
+		}
+		dup2(fd, STDIN_FILENO);
+		close(fd);
 	}
-	dup2(fd, STDIN_FILENO);
-	close(fd);
+	else if (cmd->heredoc_fd != -1)
+	{
+		dup2(cmd->heredoc_fd, STDIN_FILENO);
+		close(cmd->heredoc_fd);
+	}
 }
 
 // bitwise ops
@@ -415,7 +423,19 @@ static void setup_redirections(t_command *cmd)
 	setup_output_redirection(cmd);
 }
 
+void prep_heredocs(t_command *cmds, int n_cmds)
+{
+    int i = 0; 
 
+    while (i < n_cmds) 
+    {
+       if (cmds[i].heredoc_eof != NULL) 
+	{
+    	cmds[i].heredoc_fd = ft_heredoc(cmds[i].heredoc_eof);
+	}
+        i++;
+    }
+}
 //we close read end of child cos its not used by curr process, instead we use write end of curr
 // and read from prev pipe fd
 // exit 127 = command not found 
@@ -426,11 +446,7 @@ static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, ch
 
 	cmd = &ex->commands[ex->cmd_i];
 
-	if (cmd->heredoc_fd != -1 && ex->cmd_i == 0)
-	{
-    dup2(cmd->heredoc_fd, STDIN_FILENO);
-    close(cmd->heredoc_fd);
-	}
+	
 	if (ex->cmd_i > 0)
 	{
 		dup2(ex->prev_pipe_fd, STDIN_FILENO);
@@ -534,25 +550,32 @@ void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *en
 {
 	t_executor ex;
 
-	ex = (t_executor){.prev_pipe_fd = -1,
-					  .pids = malloc(sizeof(pid_t) * num_cmds),
-					  .cmd_count = num_cmds,
-					  .env_array = env_arr,
-					  .commands = cmds,
-					  .cmd_i = 0};
+	ex.prev_pipe_fd = -1;
+	ex.pids = malloc(sizeof(pid_t) * num_cmds);
+	if (!ex.pids)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+	ex.cmd_count = num_cmds;
+	ex.env_array = env_arr;
+	ex.commands = cmds;
+	ex.cmd_i = 0;
+
 	if (num_cmds == 1 && is_built_in(&cmds[0]))
 	{
-    
-    execute_builtin(&cmds[0], &env_vars);
-    return;
+		execute_builtin(&cmds[0], &env_vars);
+		free(ex.pids); // Don’t leak
+		return;
 	}
+
 	while (ex.cmd_i < num_cmds)
 	{
 		create_pipe_if_needed(&ex);
 		fork_process(&ex, num_cmds, env_vars, env_arr);
-
 		ex.cmd_i++;
 	}
+
 	wait_for_children(&ex);
 	free(ex.pids);
 }
@@ -612,24 +635,24 @@ void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cm
 }
 
 //CHECK CMDS RUN AT SAME TIME 
-void setup_commands(t_command *commands) {
-    // First command: sleep 2
-    commands[0].args = malloc(sizeof(char *) * 3);
-    commands[0].args[0] = strdup("sleep");
-    commands[0].args[1] = strdup("2");
-    commands[0].args[2] = NULL;
-    commands[0].infile = NULL;
-    commands[0].outfile = NULL;
-    commands[0].append_out = 0;
-    // Second command: sleep 2
-    commands[1].args = malloc(sizeof(char *) * 3);
-    commands[1].args[0] = strdup("sleep");
-    commands[1].args[1] = strdup("2");
-    commands[1].args[2] = NULL;
-    commands[1].infile = NULL;
-    commands[1].outfile = NULL;
-    commands[1].append_out = 0;
-}
+// void setup_commands(t_command *commands) {
+//     // First command: sleep 2
+//     commands[0].args = malloc(sizeof(char *) * 3);
+//     commands[0].args[0] = strdup("sleep");
+//     commands[0].args[1] = strdup("2");
+//     commands[0].args[2] = NULL;
+//     commands[0].infile = NULL;
+//     commands[0].outfile = NULL;
+//     commands[0].append_out = 0;
+//     // Second command: sleep 2
+//     commands[1].args = malloc(sizeof(char *) * 3);
+//     commands[1].args[0] = strdup("sleep");
+//     commands[1].args[1] = strdup("2");
+//     commands[1].args[2] = NULL;
+//     commands[1].infile = NULL;
+//     commands[1].outfile = NULL;
+//     commands[1].append_out = 0;
+// }
 // void setup_commands(t_command *commands)
 // {
 //     commands[0].args = malloc(sizeof(char *) * 3);
@@ -676,32 +699,36 @@ void setup_commands(t_command *commands) {
 // 	commands[0].full_path = NULL;
 // }
 
-//  PIPES & HEREDOC
-// void setup_commands(t_command *commands)
-// {
-// 	commands[0].args = malloc(sizeof(char *) * 2);
-// 	commands[0].args[0] = strdup("cat");
-// 	commands[0].args[1] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[0].heredoc_eof = strdup("EOF");
-// 	commands[0].heredoc_fd = ft_heredoc(commands[0].heredoc_eof);
-// 	commands[0].full_path = malloc(4096); // ✅ Allocate space for path
-// 	if (!commands[0].full_path)
-// 		perror("malloc cmd_path 0");
+ //PIPES & HEREDOC
+void setup_commands(t_command *commands)
+{
+	commands[0].heredoc_fd = -1;
+	commands[0].args = malloc(sizeof(char *) * 2);
+	commands[0].args[0] = strdup("cat");
+	commands[0].args[1] = NULL;
+	commands[0].infile = NULL;
+	commands[0].outfile = NULL;
+	commands[0].append_out = 0;
+	commands[0].heredoc_eof = strdup("EOF");
+	commands[0].heredoc_fd = 1;
+	prep_heredocs(commands, 1); // Call to handle heredoc
+	commands[0].full_path = malloc(4096); // ✅ Allocate space for path
+	if (!commands[0].full_path)
+		perror("malloc cmd_path 0");
 
-// 	commands[1].args = malloc(sizeof(char *) * 3);
-// 	commands[1].args[0] = strdup("grep");
-// 	commands[1].args[1] = strdup("hello");
-// 	commands[1].args[2] = NULL;
-// 	commands[1].infile = NULL;
-// 	commands[1].outfile = NULL;
-// 	commands[1].append_out = 0;
-// 	commands[1].full_path = malloc(4096); // ✅ Allocate space for path
-// 	if (!commands[1].full_path)
-// 		perror("malloc cmd_path 1");
-// }
+	// commands[1].heredoc_fd = -1;
+	// commands[1].args = malloc(sizeof(char *) * 3);
+	// commands[1].args[0] = strdup("grep");
+	// commands[1].args[1] = strdup("hello");
+	// commands[1].args[2] = NULL;
+	// commands[1].infile = NULL;
+	// commands[1].heredoc_eof = NULL;
+	// commands[1].outfile = NULL;
+	// commands[1].append_out = 0;
+	// commands[1].full_path = malloc(4096); // ✅ Allocate space for path
+	// if (!commands[1].full_path)
+	// 	perror("malloc cmd_path 1");
+}
 
 int main(void)
 {
@@ -712,7 +739,7 @@ int main(void)
 	// t_env_vars	*home_var;
 
 	env_vars = NULL;
-	int num_commands = 2;
+	int num_commands = 1;
 
 	commands = malloc(sizeof(t_command) * num_commands);
 	setup_commands(commands);
@@ -721,14 +748,10 @@ int main(void)
 	// 		.last_exit_code = 0,
 	// 	};
 	initialize_env_list(&env_vars);
-	printf("env_vars after init: %p\n", (void *)env_vars);
-	if (!env_vars)
-	{
-		fprintf(stderr, "env_vars is NULL after initialize_env_list\n");
-		exit(1);
-	}
-	printf("print env in main: prints correct\n"); // DEBUG
-	print_env_vars(env_vars);					   // DEBUG
+	//printf("env_vars after init: %p\n", (void *)env_vars);
+
+	//printf("print env in main: prints correct\n"); // DEBUG
+	//print_env_vars(env_vars);					   // DEBUG
 	env_array = NULL;
 	env_array = convert_env_to_array(env_vars);
 	if (!env_array)
@@ -739,14 +762,15 @@ int main(void)
 
 	
 	// printf("print env in main no longer prints before calling resolve_all_cmds\n"); // DEBUG
-	// print_env_vars(env_vars);														// DEBUG
+	// print_env_vars(env_vars);
+	//prep_heredocs(commands, num_commands); 	i put in set cmds calling twice now													// DEBUG
 	resolve_all_command_paths(env_vars, commands, num_commands);
 	//  5. Execute the pipeline
 	printf("About to execute pipes:\n");
 	execute_pipes(commands, num_commands, env_array, env_vars);
 	//  6. Cleanup
-	// clean_env_lst(&env_vars);
-	// free(env_array);
+	 clean_env_lst(&env_vars);
+	 free(env_array);
 	return (0);
 }
 
