@@ -1,45 +1,13 @@
 #include "minishell.h"
-#include <fcntl.h>
-#include <sys/wait.h> // NEED ADD TO HEADER FILE ASK BEATH
-#include <stdio.h>	  //has to come before readline
-#include <stdlib.h>
-#include <unistd.h>
-#define READ 0
-#define WRITE 1
-#define STDIN 0
-#define SPLIT_BUFF_SIZE 102400
 
-// AsK BETH IF WE CAN ADD TO HEAD THIS EXEC STRUCT
-typedef struct s_executor
-{
-	int pipe_fd[2];
-	int prev_pipe_fd;
-	pid_t *pids;
-	int last_exit_code; //// Used for $?
-	int cmd_count;
-	int cmd_i;
-	char **env_array;
-	t_command *commands;
-} t_executor;
+#define DUMP_FDS()
 
-typedef struct s_split_state
-{
-	size_t buff_offset;
-	size_t word_count;
-	char **arr;
-	size_t word;
-	size_t word_len;
-} t_split_state;
-
-// Function prototypes
-
-void check_command_in_path(char **path_arr, char *cmd,
-						   char *full_path);
-char *get_env_path_variable(char **envp);
-void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
-							   char *full_path);
-static int is_built_in(t_command *cmd);
-
+// #define DUMP_FDS()                                        \
+	// do                                                    \
+	// {                                                     \
+		// printf("🔍 Dumping FDs for PID=%d:\n", getpid()); \
+		// system("ls -l /proc/self/fd || ls -l /dev/fd");   \
+	// } while (0)
 
 int ft_wordlen(char *s)
 {
@@ -351,7 +319,7 @@ void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 		return;
 	}
 	printf("in resolve command path function print env/\n"); ////DEBUG
-	//print_env_vars(env_vars);								 // DEBUGGING
+	// print_env_vars(env_vars);								 // DEBUGGING
 	path_env = get_path_variable(env_vars);
 	if (!path_env)
 	{
@@ -363,8 +331,8 @@ void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
 	check_command_in_path(path_arr, cmd, full_path);
 }
 
-//If heredoc_fd is set, we need to USE that and IGNORE infile.
-//otherwise we can fallback to infile
+// If heredoc_fd is set, we need to USE that and IGNORE infile.
+// otherwise we can fallback to infile
 static void setup_input_redirection(t_command *cmd)
 {
 	int fd;
@@ -423,90 +391,132 @@ static void setup_redirections(t_command *cmd)
 	setup_output_redirection(cmd);
 }
 
-void prep_heredocs(t_command *cmds, int n_cmds)
+void prep_heredocs(t_command *cmds)
 {
-    int i = 0; 
+	t_command *curr = cmds;
 
-    while (i < n_cmds) 
-    {
-       if (cmds[i].heredoc_eof != NULL) 
+	while (curr != NULL)
 	{
-    	cmds[i].heredoc_fd = ft_heredoc(cmds[i].heredoc_eof);
+		if (curr->heredoc_eof != NULL)
+		{
+			curr->heredoc_fd = ft_heredoc(curr->heredoc_eof);
+		}
+		curr = curr->next;
 	}
-        i++;
-    }
 }
-//we close read end of child cos its not used by curr process, instead we use write end of curr
-// and read from prev pipe fd
-// exit 127 = command not found 
-// onlu use heredoc if it's first cmd cos otherwise it's already written to pipe 
-static void execute_child(t_executor *ex, int num_cmds, t_env_vars *env_vars, char **env_arr)
+// we close read end of child cos its not used by curr process, instead we use write end of curr
+//  and read from prev pipe fd
+//  exit 127 = command not found
+//  onlu use heredoc if it's first cmd cos otherwise it's already written to pipe
+// If there’s a heredoc, it should feed into STDIN.
+// Else if ex->prev_pipe_fd != -1, pipe input should be fed into STDIN.
+// redirect stdout to pipe
+//  Redirect stdin from the previous pipe
+static void execute_child(t_child_process *proc, t_env_vars *env_vars, char **env_arr)
 {
-	t_command *cmd;
+	t_command *cmd = proc->cmd;
 
-	cmd = &ex->commands[ex->cmd_i];
+	fprintf(stderr, "🔧 Child PID=%d preparing redirections for command '%s'...\n", getpid(), cmd->args[0]);
 
-	
-	if (ex->cmd_i > 0)
+	if (proc->pipe_fd[READ] != STDIN_FILENO)
 	{
-		dup2(ex->prev_pipe_fd, STDIN_FILENO);
-		close(ex->prev_pipe_fd);
+		fprintf(stderr, "    [DEBUG][%d] redirecting stdin  FD=%d\n", getpid(), proc->pipe_fd[READ]);
+		dup2(proc->pipe_fd[READ], STDIN_FILENO);
+		close(proc->pipe_fd[READ]);
 	}
-	if (ex->cmd_i < ex->cmd_count - 1)
+	else
 	{
-		dup2(ex->pipe_fd[WRITE], STDOUT_FILENO);
-		close(ex->pipe_fd[WRITE]);
-		close(ex->pipe_fd[READ]); 
+		fprintf(stderr, "    [DEBUG][%d] stdin not redirected.\n", getpid());
 	}
-	setup_redirections(cmd);
+
+	// --- 2. Handle stdout: pipe ---
+	if (proc->pipe_fd[WRITE] != STDOUT_FILENO)
+	{
+		fprintf(stderr, "    [DEBUG][%d] redirecting stdout to current pipe FD=%d\n", getpid(), proc->pipe_fd[WRITE]);
+		dup2(proc->pipe_fd[WRITE], STDOUT_FILENO);
+		close(proc->pipe_fd[WRITE]);
+	}
+	else
+	{
+		fprintf(stderr, "    [DEBUG][%d] stdout not redirected.\n", getpid());
+	}
+
+	fprintf(stderr, "    [DEBUG][%d] ✅ FDs now: stdin=%d, stdout=%d\n", getpid(), proc->pipe_fd[READ], proc->pipe_fd[WRITE]);
+
 	if (is_built_in(cmd))
 	{
-		ex->last_exit_code = execute_builtin(cmd, &env_vars);
-		exit(ex->last_exit_code);
+		int exit_code = execute_builtin(cmd, &env_vars);
+		exit(exit_code);
 	}
-	else  if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
+
+	if (cmd->full_path && access(cmd->full_path, X_OK) == 0)
 	{
+		fprintf(stderr, "    [DEBUG][%d] 🟠 Executing external: %s\n", getpid(), cmd->full_path);
+		DUMP_FDS();
 		execve(cmd->full_path, cmd->args, env_arr);
-		
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
-	printf("Command not found: %s\n", cmd->args[0]);
+
+	fprintf(stderr, "   [DEBUG][%d] ❌ Command not found: %s\n", getpid(), cmd->args[0]);
 	free_env_vars(env_vars);
-	//handle all other clean up eg ex struct etc.. 
 	exit(127);
 }
-
-
-static void handle_parent(t_executor *ex)
+// close prev pipe if necss , prep for next cmds input and close heredoc if used
+// ** PARENT PIPE HANDLING - Corrected **
+static void handle_parent(t_child_process *proc)
 {
-	if (ex->cmd_i > 0)
+	// Close the write end of the pipe in the parent process
+
+	// todo close pipes in parent
+	if (proc->pipe_fd[WRITE] != STDOUT_FILENO)
 	{
-		close(ex->prev_pipe_fd);
+		fprintf(stderr, "    [DEBUG] Parent closing write end of pipe FD=%d of PID=%d\n",
+				proc->pipe_fd[WRITE],
+				proc->pid);
+		close(proc->pipe_fd[WRITE]);
 	}
-	if (ex->cmd_i < ex->cmd_count - 1)
+	else
 	{
-		close(ex->pipe_fd[WRITE]);
-		ex->prev_pipe_fd = ex->pipe_fd[READ];
+		fprintf(stderr, "    [DEBUG] Parent write end of pipe not closed of PID=%d.\n", proc->pid);
 	}
-	if (ex->commands[ex->cmd_i].heredoc_fd != -1)
-		close(ex->commands[ex->cmd_i].heredoc_fd);
+	// if (ex->curr_cmd->next != NULL)
+	// {
+	// 	close(ex->pipe_fd[WRITE]);
+	// 	ex->prev_pipe_fd = ex->pipe_fd[READ]; // Next command uses this
+	// }
+	// else
+	// {
+	// 	close(ex->pipe_fd[READ]);
+	// 	close(ex->pipe_fd[WRITE]);
+	// }
+
+	// ex->pipe_fd[READ] = -1;
+	// ex->pipe_fd[WRITE] = -1;
 }
+// oly create pipe IF there's a next cmd
+// static void create_pipe_if_needed(t_executor *ex)
+// {
+// 	if (ex->curr_cmd->next != NULL)
+// 	{
+// 		if (pipe(ex->pipe_fd) < 0)
+// 		{
+// 			perror("pipe");
+// 			exit(EXIT_FAILURE);
+// 		}
+// 	}
 
-static void create_pipe_if_needed(t_executor *ex)
-{
-	if (ex->cmd_i < ex->cmd_count - 1)
-	{
-		if (pipe(ex->pipe_fd) < 0)
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
-	}
-}
+// 	else
+// 	{
+// 		ex->pipe_fd[READ] = -1;
+// 		ex->pipe_fd[WRITE] = -1;
+// 	}
+// 	printf("Pipe created: read_fd=%d, write_fd=%d\n", ex->pipe_fd[0], ex->pipe_fd[1]);
+// }
 
-static void fork_process(t_executor *ex, int num_cmds, t_env_vars *env_vars, char **env_arr)
+static void fork_process(t_child_process *proc, t_env_vars *env_vars, char **env_arr)
 {
+	printf("🟢 fork_process: Forking for command '%s'\n", proc->cmd->args[0]); // 🟢 Debug
 	pid_t pid;
 
 	pid = fork();
@@ -518,15 +528,22 @@ static void fork_process(t_executor *ex, int num_cmds, t_env_vars *env_vars, cha
 	}
 
 	if (pid == 0)
-		execute_child(ex, num_cmds, env_vars, env_arr);
+		execute_child(proc, env_vars, env_arr);
 	else
 	{
-		ex->pids[ex->cmd_i] = pid;
-		handle_parent(ex);
+		// printf("🚨 DEBUG: FDs in child after dup2s:\n");
+		// for (int fd = 0; fd < 10; fd++)
+		// {
+		// 	if (fcntl(fd, F_GETFD) != -1)
+		// 		printf("    FD %d is open\n", fd);
+		// }
+		printf("🔵 Parent PID=%d forked child PID=%d\n", getpid(), pid); // 🔵 Debug
+		proc->pid = pid;
+		handle_parent(proc);
 	}
 }
 
-static void wait_for_children(t_executor *ex)
+static void wait_for_children(t_executor *ex, t_child_process *procs)
 {
 	int status;
 	int i;
@@ -534,7 +551,7 @@ static void wait_for_children(t_executor *ex)
 	i = 0;
 	while (i < ex->cmd_count)
 	{
-		waitpid(ex->pids[i], &status, 0);
+		waitpid(procs[i].pid, &status, 0);
 		if (WIFEXITED(status))
 			ex->last_exit_code = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
@@ -542,45 +559,91 @@ static void wait_for_children(t_executor *ex)
 		i++;
 	}
 }
-
-//THIS LOOP SHOULD GET EVERYTHIHNG TO START AT SAME TIME and we are passing SLEEP YAYAY
-// ONE SPECIAL CASE WHERE YOU DONT WANT TO FORK! ONLY ONE BUILTIN IN WHOLE PIPELINE and
-// then you run builtin directly in parent shell, affects env/cwd as expected
-void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *env_vars)
+// THIS LOOP SHOULD GET EVERYTHIHNG TO START AT SAME TIME and we are passing SLEEP YAYAY
+//  ONE SPECIAL CASE WHERE YOU DONT WANT TO FORK! ONLY ONE BUILTIN IN WHOLE PIPELINE and
+//  then you run builtin directly in parent shell, affects env/cwd as expected
+void execute_pipes(t_command *cmd_list, char **env_arr, t_env_vars *env_vars)
 {
 	t_executor ex;
+	ex.cmd_list = cmd_list;
 
-	ex.prev_pipe_fd = -1;
-	ex.pids = malloc(sizeof(pid_t) * num_cmds);
-	if (!ex.pids)
+	// Count number of commands
+	ex.cmd_count = 0;
+	t_command *tmp = cmd_list;
+	while (tmp)
 	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
+		ex.cmd_count++;
+		tmp = tmp->next;
 	}
-	ex.cmd_count = num_cmds;
-	ex.env_array = env_arr;
-	ex.commands = cmds;
-	ex.cmd_i = 0;
 
-	if (num_cmds == 1 && is_built_in(&cmds[0]))
+	if (ex.cmd_count == 0)
 	{
-		execute_builtin(&cmds[0], &env_vars);
-		free(ex.pids); // Don’t leak
+		fprintf(stderr, "No commands to execute.\n");
 		return;
 	}
 
-	while (ex.cmd_i < num_cmds)
+	// Prepare heredocs first (before forking)
+	prep_heredocs(cmd_list);
+
+	printf("Creating %d child processes...\n", ex.cmd_count); // Debugging
+	t_child_process *procs = malloc(sizeof(t_child_process) * ex.cmd_count);
+
+	// init procs
+	t_command *curr_cmd = cmd_list;
+	procs[0].cmd = curr_cmd;
+	// READ: todo handle heredoc/file
+	procs[0].pipe_fd[READ] = curr_cmd->heredoc_fd != 0 ? curr_cmd->heredoc_fd : STDIN_FILENO;
+	// WRITE: may be overwritten by next cmd
+	procs[0].pipe_fd[WRITE] = STDOUT_FILENO;
+	curr_cmd = curr_cmd->next;
+
+	for (int i = 1; i < ex.cmd_count; i++)
 	{
-		create_pipe_if_needed(&ex);
-		fork_process(&ex, num_cmds, env_vars, env_arr);
-		ex.cmd_i++;
+		procs[i].cmd = curr_cmd;
+		// WRITE may be overwritten by next cmd
+		procs[i].pipe_fd[WRITE] = STDOUT_FILENO;
+
+		curr_cmd = curr_cmd->next;
+		int pipe_fd[2];
+		if (pipe(pipe_fd) < 0)
+		{
+			perror("pipe");
+			exit(EXIT_FAILURE);
+		}
+		printf("Creating pipe proc[%d]->proc[%d] fd[%d]->fd[%d]\n", i - 1, i, pipe_fd[WRITE], pipe_fd[READ]);
+		procs[i - 1].pipe_fd[WRITE] = pipe_fd[WRITE];
+		procs[i].pipe_fd[READ] = pipe_fd[READ];
 	}
 
-	wait_for_children(&ex);
-	free(ex.pids);
+	int child_index = 0;
+	while (child_index < ex.cmd_count)
+	{
+		// Fork and execute the current command
+		fork_process(procs + child_index, env_vars, env_arr);
+
+		// Safe to close the last read end *after* the next command has forked
+		// if (last_prev_pipe_fd != -1)
+		// {
+		// 	close(last_prev_pipe_fd);
+		// 	last_prev_pipe_fd = -1;
+		// }
+
+		// Save the read end for next iteration (to be closed later)
+		// last_prev_pipe_fd = ex.prev_pipe_fd;
+
+		// Move to the next command in the pipeline
+		// ex.curr_cmd = ex.curr_cmd->next;
+		child_index++;
+	}
+
+	printf("Waiting for child processes to finish...\n");
+	wait_for_children(&ex, procs);
+	printf("Waited!\n");
+
+	free(procs);
 }
 
-static int is_built_in(t_command *cmd)
+int is_built_in(t_command *cmd)
 {
 	const char *builtins[] = {"echo", "cd", "pwd", "export", "unset", "env",
 							  "exit", NULL};
@@ -602,326 +665,39 @@ static int is_built_in(t_command *cmd)
 	return 0;
 }
 
-void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds, int num_cmds)
+void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds)
 {
 	char full_path[PATH_MAX];
-	int i;
 	int builtin;
+	t_command *curr = cmds;
 
-	i = 0;
 	printf("resolve_command_full_path: env_vars pointer = %p\n", (void *)env_vars); // DEBUG
-	while (i < num_cmds)
+	while (curr != NULL)															// cmds != NULL
 	{
-		builtin = is_built_in(&cmds[i]);
+		builtin = is_built_in(curr);
 		if (!builtin)
 		{
-			resolve_command_full_path(env_vars, cmds[i].args[0], full_path);
+			resolve_command_full_path(env_vars, curr->args[0], full_path);
 			printf("  Resolved path: '%s'\n", full_path); // DEBUG
 			if (full_path[0] != '\0')
 			{
-				cmds[i].full_path = ft_strdup(full_path);
+				curr->full_path = ft_strdup(full_path);
+				if (!curr->full_path)
+				{
+					perror("ft_strdup");
+					curr->full_path = NULL;
+				}
 			}
 			else
 			{
-				printf("  [WARNING] Empty path for command '%s'\n", cmds[i].args[0]); // DEBUG
+				printf("  [WARNING] Empty path for command '%s'\n", curr->args[0]); // DEBUG
 			}
 		}
 		else
 		{
-			cmds[i].full_path = NULL;
+			curr->full_path = NULL; // nopath for builtings
 		}
-		i++;
+		curr = curr->next;
+		// cmds = cmds->next;
 	}
 }
-
-//CHECK CMDS RUN AT SAME TIME 
-// void setup_commands(t_command *commands) {
-//     // First command: sleep 2
-//     commands[0].args = malloc(sizeof(char *) * 3);
-//     commands[0].args[0] = strdup("sleep");
-//     commands[0].args[1] = strdup("2");
-//     commands[0].args[2] = NULL;
-//     commands[0].infile = NULL;
-//     commands[0].outfile = NULL;
-//     commands[0].append_out = 0;
-//     // Second command: sleep 2
-//     commands[1].args = malloc(sizeof(char *) * 3);
-//     commands[1].args[0] = strdup("sleep");
-//     commands[1].args[1] = strdup("2");
-//     commands[1].args[2] = NULL;
-//     commands[1].infile = NULL;
-//     commands[1].outfile = NULL;
-//     commands[1].append_out = 0;
-// }
-// void setup_commands(t_command *commands)
-// {
-//     commands[0].args = malloc(sizeof(char *) * 3);
-//     commands[0].args[0] = strdup("ls");
-//     commands[0].args[1] = strdup("-l");
-//     commands[0].args[2] = NULL;
-//     commands[0].infile = NULL;
-//     commands[0].outfile = NULL;
-//     commands[0].append_out = 0;
-// }
-// void setup_commands(t_command *commands)
-// {
-// 	commands[0].args = malloc(sizeof(char *) * 4);
-// 	commands[0].args[0] = strdup("echo");
-// 	commands[0].args[1] = strdup("-n");
-// 	commands[0].args[2] = "this is a test";
-// 	commands[0].args[3] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[0].full_path = NULL;
-// }
-// void	setup_commands(t_command *commands)
-// {
-// 	commands[0].args = malloc(sizeof(char *) * 3);
-// 	commands[0].args[0] = strdup("cd");
-// 	commands[0].args[1] = NULL;
-// 	commands[0].args[2] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[0].full_path = NULL;
-// }
-
-// void	setup_commands(t_command *commands)
-// {
-// 	commands[0].args = malloc(sizeof(char *) * 3);
-// 	commands[0].args[0] = strdup("export");
-// 	commands[0].args[1] =  strdup("MYVAR=test_value");
-// 	commands[0].args[2] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[0].full_path = NULL;
-// }
-
- //PIPES & HEREDOC
-void setup_commands(t_command *commands)
-{
-	commands[0].heredoc_fd = -1;
-	commands[0].args = malloc(sizeof(char *) * 2);
-	commands[0].args[0] = strdup("cat");
-	commands[0].args[1] = NULL;
-	commands[0].infile = NULL;
-	commands[0].outfile = NULL;
-	commands[0].append_out = 0;
-	commands[0].heredoc_eof = strdup("EOF");
-	commands[0].heredoc_fd = 1;
-	prep_heredocs(commands, 1); // Call to handle heredoc
-	commands[0].full_path = malloc(4096); // ✅ Allocate space for path
-	if (!commands[0].full_path)
-		perror("malloc cmd_path 0");
-
-	// commands[1].heredoc_fd = -1;
-	// commands[1].args = malloc(sizeof(char *) * 3);
-	// commands[1].args[0] = strdup("grep");
-	// commands[1].args[1] = strdup("hello");
-	// commands[1].args[2] = NULL;
-	// commands[1].infile = NULL;
-	// commands[1].heredoc_eof = NULL;
-	// commands[1].outfile = NULL;
-	// commands[1].append_out = 0;
-	// commands[1].full_path = malloc(4096); // ✅ Allocate space for path
-	// if (!commands[1].full_path)
-	// 	perror("malloc cmd_path 1");
-}
-
-int main(void)
-{
-	t_env_vars *env_vars;
-	t_command *commands;
-	char **env_array;
-	// t_env_vars	*path_var;
-	// t_env_vars	*home_var;
-
-	env_vars = NULL;
-	int num_commands = 1;
-
-	commands = malloc(sizeof(t_command) * num_commands);
-	setup_commands(commands);
-	// t_executor ex =
-	// 	{
-	// 		.last_exit_code = 0,
-	// 	};
-	initialize_env_list(&env_vars);
-	//printf("env_vars after init: %p\n", (void *)env_vars);
-
-	//printf("print env in main: prints correct\n"); // DEBUG
-	//print_env_vars(env_vars);					   // DEBUG
-	env_array = NULL;
-	env_array = convert_env_to_array(env_vars);
-	if (!env_array)
-	{
-		fprintf(stderr, "env_array is NULL\n");
-		exit(1);
-	}
-
-	
-	// printf("print env in main no longer prints before calling resolve_all_cmds\n"); // DEBUG
-	// print_env_vars(env_vars);
-	//prep_heredocs(commands, num_commands); 	i put in set cmds calling twice now													// DEBUG
-	resolve_all_command_paths(env_vars, commands, num_commands);
-	//  5. Execute the pipeline
-	printf("About to execute pipes:\n");
-	execute_pipes(commands, num_commands, env_array, env_vars);
-	//  6. Cleanup
-	 clean_env_lst(&env_vars);
-	 free(env_array);
-	return (0);
-}
-
-// void	setup_commands(t_command *commands)
-// {
-// 	// ls -l | grep "d" | wc -l
-// 	commands[0].args = malloc(sizeof(char *) * 3);
-// 	commands[0].args[0] = strdup("ls");
-// 	commands[0].args[1] = strdup("-l");
-// 	commands[0].args[2] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// 	commands[1].args = malloc(sizeof(char *) * 3);
-// 	commands[1].args[0] = strdup("grep");
-// 	commands[1].args[1] = strdup("d");
-// 	commands[1].args[2] = NULL;
-// 	commands[1].infile = NULL;
-// 	commands[1].outfile = NULL;
-// 	commands[1].append_out = 0;
-// 	commands[2].args = malloc(sizeof(char *) * 3);
-// 	commands[2].args[0] = strdup("wc");
-// 	commands[2].args[1] = strdup("-l");
-// 	commands[2].args[2] = NULL;
-// 	commands[2].infile = NULL;
-// 	commands[2].outfile = NULL;
-// 	commands[2].append_out = 0;
-// }
-// void	setup_commands(t_command *commands)
-// {
-// 	commands[0].args = malloc(sizeof(char *) * 4);
-// 	commands[0].args[0] = strdup("unset");
-// 	commands[0].args[1] = strdup("VAR1");
-// 	commands[0].args[2] = strdup("VAR2");
-// 	commands[0].args[3] = NULL;
-// 	commands[0].infile = NULL;
-// 	commands[0].outfile = NULL;
-// 	commands[0].append_out = 0;
-// }
-
-// multiple pipes
-
-// check export main
-// int	main(void)
-// {
-// 	char		**env_array;
-// 	int			exit_code;
-// 	t_command	*commands;
-// 	int			num_commands;
-// 	char		*args1[] = {"export", "VAR1=value1", NULL};
-// 	char		*args2[] = {"export", "VAR2=value2", NULL};
-
-// 	t_env_vars *env_vars = NULL; // Start with empty environment
-// 	num_commands = 1;
-// 	// 1. Initialize environment from actual environment variables
-// 	initialize_env_list(&env_vars);
-// 	// 2. Setup command(s)
-// 	// 3. Resolve command path if needed
-// 	ft_export(&env_vars, args1);
-// 	ft_export(&env_vars, args2);
-// 	printf("Before unset:\n");
-// 	print_env_vars(env_vars);
-// 	commands = malloc(sizeof(t_command) * num_commands);
-// 	setup_commands(commands); // Your existing command setup
-// 	resolve_all_command_paths(env_vars, commands, num_commands);
-// 	// 5. Execute command
-// 	printf("Running unset builtin for key: %s\n", commands[0].args[1]);
-// 	exit_code = execute_builtin(&commands[0], &env_vars);
-// 	if (exit_code == 2) // Not a builtin
-// 	{
-// 		env_array = convert_env_to_array(env_vars);
-// 		execute_pipes(commands, num_commands, env_array);
-// 		free_env_array(env_array);
-// 	}
-// 	printf("after unset:\n");
-// 	print_env_vars(env_vars);
-// 	// CHECK EXPORT DONT KNOW WHY THIS ISNT WORKING CAN SEE IN ENV
-// 	// t_env_vars *node = get_env_node(env_vars, "MYVAR");
-// 	//     if (node && strcmp(node->value, "test_value") == 0) {
-// 	//     printf("✅ Export worked!\n");
-// 	// }
-// 	// else {
-// 	//     printf("❌ Export failed\n");
-// 	// }
-// 	// 7. Cleanup
-// 	free_env_vars(env_vars);
-// 	return (exit_code);
-// }
-
-// TEST FOR CD NEED TO PRINT BEFORE AND AFTER PATH TO PROVE
-// int	main(void)
-// {
-// 	t_env_vars	*home_var;
-// 	t_env_vars	*env_vars;
-// 	int			num_commands;
-// 	t_command	*commands;
-// 	char		full_path[PATH_MAX];
-// 	char		current_dir[PATH_MAX];
-// 	int			exit_code;
-// 	char		**env_array;
-
-// 	// 1. Create a mock envir lst
-// 	home_var = malloc(sizeof(t_env_vars));
-// 	home_var->key = strdup("HOME");
-// 	home_var->value = strdup("/Users/grace");
-// 	home_var->next = NULL;
-// 	env_vars = malloc(sizeof(t_env_vars));
-// 	env_vars->key = strdup("PATH");
-// 	env_vars->value = strdup("/bin:/usr/bin:/usr/local/bin");
-// 	env_vars->next = home_var;
-// 	num_commands = 1;
-// 	commands = malloc(sizeof(t_command) * num_commands);
-// 	setup_commands(commands);
-// 	if (ft_strcmp(commands[0].args[0], "pwd") != 0)
-// 	{ // Only resolve for non-builtins
-// 		resolve_command_full_path(env_vars, commands[0].args[0], full_path);
-// 		if (full_path[0] != '\0')
-// 		{
-// 			commands[0].full_path = strdup(full_path);
-// 		}
-// 	}
-// 	// 4. Exec builitins
-// 	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
-// 	{
-// 		printf("Current Directory (Before cd): %s\n", current_dir);
-// 	}
-// 	else
-// 	{
-// 		perror("getcwd");
-// 	}
-// 	exit_code = execute_builtin(&commands[0], env_vars);
-// 	printf("--- After execute_builtin ---\n");
-// 	printf("Exit code from execute_builtin: %d\n", exit_code);
-// 	if (getcwd(current_dir, sizeof(current_dir)) != NULL)
-// 	{
-// 		printf("Current Directory (After cd): %s\n", current_dir);
-// 	}
-// 	else
-// 	{
-// 		perror("getcwd");
-// 	}
-// 	// exec pipes
-// 	if (exit_code == 2)
-// 	{ // Not a builtin, use execve
-// 		env_array = convert_env_to_array(env_vars);
-// 		exit_code = execute_builtin(commands, env_vars);
-// 		// NEED TO CAPTURE EXIT CODE FROM BELOW TOO!!
-// 		execute_pipes(commands, num_commands, env_array);
-// 		free(env_array);
-// 	}
-// 	printf("exit_code: %i", exit_code);
-// 	// free everythihg in reality
-// 	return (exit_code);
-// }

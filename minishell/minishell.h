@@ -1,43 +1,23 @@
 #ifndef MINISHELL_H
-# define MINISHELL_H
+#define MINISHELL_H
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <readline/readline.h>
-# include <readline/history.h>
-# include <unistd.h>
-//# include "libft/libft.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <unistd.h>
+#include "../libft/libft.h"
+#include <fcntl.h>
+#include <sys/wait.h>
 
-# define PATH_MAX 4096
- //token types
- /*
-# define ARGS 0
-# define REDIR_IN 1
-# define REDIR_OUT 2
-# define APPEND_OUT 3
-# define HEREDOC 4
-# define PIPE 5
-# define D_QUOTES 6
-# define S_QUOTES 7
-# define END_OF_COMMANDS 8 
-*/
+#define PATH_MAX 4096
+#define READ 0
+#define WRITE 1
+#define STDIN 0
+#define SPLIT_BUFF_SIZE 102400
 
-//replacing with enums
-typedef enum e_tok_type 
-{
-    ARGS,
-    REDIR_IN,
-    REDIR_OUT,
-    APPEND_OUT,
-    HEREDOC,
-    PIPE,
-    D_QUOTES,
-    S_QUOTES,
-    END_OF_COMMANDS
-} t_tok_type;
-
-typedef struct s_env_vars 
+typedef struct s_env_vars
 {
     char *key;
     char *value;
@@ -51,25 +31,32 @@ typedef struct s_env_lst
     t_env_vars *current;
 } t_env_lst;
 
+// PARSER
+typedef enum e_tok_type
+{
+    ARGS,
+    REDIR_IN,
+    REDIR_OUT,
+    APPEND_OUT,
+    HEREDOC,
+    PIPE,
+    D_QUOTES,
+    S_QUOTES,
+    END,
+} t_tok_type;
+
 typedef struct s_token
 {
-    char            *token;
-    t_tok_type      type;
-    int             len;
-    int             prev_white_space;
-    struct s_token  *next;
+    char *token;
+    t_tok_type type;
+    int len;
+    int prev_white_space;
+    struct s_token *next;
 } t_token;
-
-typedef struct s_token_lst
-{
-    t_token *head;
-    t_token *tail;
-    t_token *chunk_head;
-} t_token_lst;
 
 typedef struct s_arg
 {
-    char    *arg;
+    char *arg;
     struct s_arg *next;
 } t_arg;
 
@@ -79,10 +66,10 @@ typedef struct s_command
     char *infile;
     char *outfile;
     int append_out;
-    char *heredoc_eof; // we have it!!
-     int  heredoc_fd;  // Ask beth could we add this??  and init to -1
+    char *heredoc_eof;
+    int heredoc_fd;
+    char *full_path;
     struct s_command *next;
-    char *full_path; //ask beth can we add this to the struct
 } t_command;
 
 typedef struct s_cmnd_lst
@@ -96,83 +83,130 @@ typedef struct s_parser_lst
     t_token *token_head;
     t_token *token_tail;
     t_token *chunk_head;
-    t_arg   *arg_head;
-    t_arg   *arg_tail;
-    int     args_count;
+    t_token *current_token;
+    t_arg *arg_head;
+    t_arg *arg_tail;
     t_command *command_head;
     t_command *command_tail;
     t_env_vars *env_vars;
+    char *readline_command;
 } t_parser_lst;
 
-// //ft_split.c
-// char	**ft_split(char *str, char delim);
-// void	free_array(char **str_array, int index);
+// EXECUTOR
+typedef struct s_executor
+{
+    t_command *cmd_list; // head of list!!!
+                         // t_command *curr_cmd; // the one being processed!!
+    // int pipe_fd[2];
+    // int prev_pipe_fd;
+    // pid_t *pids;
+    // int pid_index;
+    int last_exit_code; //// Used for $?
+    int cmd_count;
+    int cmd_i;
+    char **env_array; // not sure i nede this here anymore need to double chek
+    t_command *commands;
+} t_executor;
+typedef struct s_child_process
+{
+    t_command *cmd;
+    int pid; // todo move pids?
+    int pipe_fd[2];
+} t_child_process;
 
-// //ft_strjoin.c
-// char	*ft_strjoin(char const *s1, char const *s2);
-// int		ft_strlen(const char *s);
+typedef struct s_split_state
+{
+    size_t buff_offset;
+    size_t word_count;
+    char **arr;
+    size_t word;
+    size_t word_len;
+} t_split_state;
 
-// //ft_strdup.c
-// char	*ft_strdup(const char *s1);
+// FILES
+// parser_lst.c
+int is_redirect(char c);
+int is_pipe(char c);
+char *strdup_len(char *str, int len);
+t_command *parser(char *command, t_command *commands_head, t_env_vars *env_vars);
 
-// //ft_memset.c
-// void	*ft_memset(void *b, int c, size_t len);
+// env_vars_init.c
+void free_env_vars(t_env_vars *env_vars);
+t_env_lst *env_var_new_tail_node(t_env_lst *list);
+t_env_lst *add_env_var(char *envp_str, t_env_lst *list);
+t_env_vars *get_env_vars(char **envp);
 
-// //ft_strchr.c
-// char	*ft_strchr(const char *s, int c);
+// tokenizer_utils.c
+char *tokenizer(t_parser_lst *list_params, char *command);
+// static helper functions: tok_args, tok_redirect, tok_quotes, record_token_info
 
-//parser_exec_utils.c
-int     count_str_in_array(char **str_array);
-char    *malloc_error(char **paths);
-char    *find_command_path(char *cmd, char **envp);
-void    execute_command(char **args, char **envp);
-void execute_pipes(t_command *cmds, int num_cmds, char **env_arr, t_env_vars *env_vars);
+// token_utils.c
+int is_operator_tok(t_tok_type type);
+int is_arg_tok(t_tok_type type);
+int is_redirect(char c);
+int is_pipe(char c);
+char *strdup_len(char *str, int len);
 
-//parser_exec.c
-int     is_redirect(char c);
-int     is_pipe(char c);
-char    *strdup_len(char *str, int len);
-//void    add_command(t_token *token, t_command *command_table, int args_count);
-//t_command    *parse_commands(char *command, t_command *commands, int *commands_index);
-void    clear_table_buffer(t_command *commands, int *last_index);
+// expand_arg.c
+char *expand_dquotes(t_token *token, t_env_vars *env_vars);
+char *expand_arg(t_token *token, t_parser_lst *list);
+char *process_arg_tok(t_token *token, t_parser_lst *list);
 
-//env_vars_init.c
-void        free_env_vars(t_env_vars *env_vars);
-t_env_lst*  env_var_new_tail_node(t_env_lst *list);
-t_env_lst*  add_env_var(char *envp_str, t_env_lst *list);
-void update_env_var(t_env_vars **env_list, const char *key, const char *value); //wont create if it doesnt arlready exist ASK BETH
-void initialize_env_list(t_env_vars **env_list); //CAN WE ADD BETH?
-t_env_vars* get_env_vars(char **envp);
-void print_env_vars(t_env_vars *env_vars);
-t_env_vars *get_env_node(t_env_vars *env_vars, const char *key);//OK TO ADD BETH??? 
-void set_env_var(t_env_vars **env_list, const char *key, const char *value); // OK TO ADD doesnt update unconfidiotnally
+// expand_env.c
+const char *get_env_var(t_env_vars *env_vars, const char *var, int len);
+char *expand_env_var(char *ev, int *var_len, t_env_vars *env_vars);
+char *append_ev_value(char *token_str, char *old_expanded_tok, int *i, t_env_vars *env);
+char *expand_all_env_vars(char *token_str, char *expanded_tok, t_env_vars *env);
 
+// list_utils.c
+t_parser_lst *init_parser_lst(t_env_vars *env_vars, char *command);
+t_parser_lst *lst_add_empty_token_node(t_parser_lst *list_params);
+t_command *lst_add_new_command(t_parser_lst *list);
+t_parser_lst *add_arg_to_list(t_parser_lst *list_params, char *arg);
 
+// testing.c
+void print_tokens(t_token *head);
+void print_commands(t_command *commands);
 
-//HELPER//
-int ft_strcmp(const char *s1, const char *s2);
-char	*ft_strdup(const char *s);
-int ft_strlen(const char *str);
-void    *ft_memcpy(void *dest, const void *src, size_t n);
-char    *ft_strchr(const char *s, int c);
-int ft_isalpha(int c);
- int ft_isdigit(int c);
- int	is_numeric(const char *str);
+// free.c
+void free_args_list(t_parser_lst *list);
+void free_tokens_list(t_parser_lst *list);
+void free_commands_list(t_command *head);
+void error_free_parser_lst(t_parser_lst *list);
 
-// BUILTINS
-int	ft_cd(char **input, t_env_vars **env_list);
+// error.c
+void error_free_and_exit(t_parser_lst *list, const char *error_message);
+void print_syntax_error(t_tok_type type);
+
+// GRACE!!!!!!!!!!!!!
+// bis2.c
+int ft_cd(char **input, t_env_vars **env_list);
 int ft_echo(char **args);
 int ft_pwd(void);
 int ft_unset(t_env_vars **head, char *key);
 int ft_export(t_env_vars **env_list, char **args);
 int env(t_env_vars *head);
-int	exit_shell(char **args, t_env_vars **env_list);
-void clean_env_lst(t_env_vars **env_vars); //ASK BETH
+int exit_shell(char **args, t_env_vars **env_list);
+void clean_env_lst(t_env_vars **env_vars); // ASK BETH
 int ft_isalnum(int c);
 t_env_vars *create_endnode(const char *key, const char *value);
-char *get_env_value(t_env_vars *env_vars, const char *key); //ASK BETH ADD
-
+char *get_env_value(t_env_vars *env_vars, const char *key); // ASK BETH ADD DUP LATTER FIX
 int ft_heredoc(const char *delimiter);
+void update_env_var(t_env_vars **env_list, const char *key, const char *value);
+t_env_vars *extract_node(t_env_vars **head, char *key);
 
+// executor.c
+void check_command_in_path(char **path_arr, char *cmd,
+                           char *full_path);
+char *get_env_path_variable(char **envp);
+void resolve_command_full_path(t_env_vars *env_vars, char *cmd,
+                               char *full_path);
+void resolve_all_command_paths(t_env_vars *env_vars, t_command *cmds);
+int is_built_in(t_command *cmd);
+char **convert_env_to_array(t_env_vars *env_vars);
+void execute_pipes(t_command *cmds, char **env_arr, t_env_vars *env_vars);
+
+// helper.c
+int ft_strcmp(const char *s1, const char *s2);
 
 #endif
