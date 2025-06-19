@@ -37,3 +37,7 @@ int	 main(void)
     //                to refer to a different variable later.
     // So, 'stringREF' now acts as another name for 'my_var'. Any operation on 'stringREF'
     // is actually performed on 'my_var'. BASICALLY IS A PTR BUT ALWAYS HAS A VALUE, AND IMPLICITLY CONVERTIBLE
+    // CANNOT BE REASSIGNED 
+    // CANNOT BE NULL
+    // DEOS NOT TAKE UP ADDITIONAL MEMORY 
+    // IS AN ALIAS DOESNT JUST STORE THE ADDRESS
