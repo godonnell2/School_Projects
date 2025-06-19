@@ -9,16 +9,18 @@ Karen::~Karen(void)
 {
 	std::cout	<< "Karen left!\n";
 }
+typedef void (Karen::*KarenMethod)();
 
 void	Karen::complain(std::string level)
 {
 	std::string const level_switch[4] = {"DEBUG", "INFO", "WARNING", "ERROR"};
-	void	(Karen::*f[4])(void) = {&Karen::debug, &Karen::info, &Karen::warning, &Karen::error};
+    KarenMethod x[4] = {&Karen::debug, &Karen::info, 
+        &Karen::warning, &Karen::error};
 
 	for (int i = 0; i < 4; i++)
 	{
 		if (level == level_switch[i])
-			(this->*f[i])();
+			(this->*x[i])();
 	}
 }
 
@@ -79,3 +81,4 @@ void	Karen::error(void)
             //          It effectively means "call the function pointed to by 'f[i]' ON THE OBJECT pointed to by 'this'".
             // - 'f[i]': This selects the correct member function pointer from the array (e.g., if i is 0, it selects &Karen::debug).
             // - '()': This actually invokes (calls) the function.
+            //basically we need an instance for each method to call it on it
