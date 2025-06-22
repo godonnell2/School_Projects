@@ -1,5 +1,7 @@
+#include "Phonebook.hpp"
+
 int main() {
-    phoneBook book;
+    PhoneBook book;
     //create an instance of book  class's default constructor is called 
     std::string command;
     // type is string insted of char *
@@ -61,4 +63,12 @@ Redirection from a File (and the file ends):
 
 How it works: If you run your program and redirect its standard input from a file, for example:
 eg user hits ctrl d 
+
+
+using namespace std; 
+// this line sets the namespace to std
+// this means that we don't have to write std:: before 
+// using any of the functions / variables in the iostream header
+
+// this code is an example of using a namespace globally
 */
