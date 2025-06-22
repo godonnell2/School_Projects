@@ -1,17 +1,18 @@
-NAME    = harlFilter
-CXX     = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+NAME = sed
 
-SRCS    = main.cpp harl.cpp
-OBJS    = $(SRCS:.cpp=.o)
+SRC = main.cpp Sed.cpp
+OBJ = $(SRC:.cpp=.o)
+
+CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
+$(NAME): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJ)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)

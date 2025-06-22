@@ -1,7 +1,7 @@
 
 services:
   your_service_name:
-    image: ubuntu:latest
+    image: ubuntu:22.04
     build:
       context: .
       dockerfile: Dockerfile

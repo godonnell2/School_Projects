@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 18:27:24 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/05/01 20:25:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/05/06 19:35:13 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ static void create_pipes_and_forks(t_data *data, char **av, char **envp)
 		if (WIFEXITED(status))
 			last_exit_code = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
-			last_exit_code = 128 + WTERMSIG(status);
+			exit_code = 128 + WTERMSIG(status);
 	}
 	close(data->pipe_fd[READ]);
 }

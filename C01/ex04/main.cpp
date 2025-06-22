@@ -1,14 +1,20 @@
-#include "harl.hpp"
-#include <iostream>
+#include "Sed.hpp"
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        std::cout << "Usage: ./harlFilter <LEVEL>" << std::endl;
+    if (argc != 4) {
+        std::cerr << "Usage: ./sed <filename> <s1> <s2>" << std::endl;
         return 1;
     }
 
-    Harl harl;
-    harl.complain(argv[1]);
+    std::string filename = argv[1];
+    std::string s1 = argv[2];
+    std::string s2 = argv[3];
 
-    return 0;
+    if (s1.empty()) {
+        std::cerr << "Error: s1 must not be empty." << std::endl;
+        return 1;
+    }
+
+    Sed sed(filename, s1, s2);
+    return sed.replace();
 }

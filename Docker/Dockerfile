@@ -1,37 +1,35 @@
-# Use the official Ubuntu image
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
-# Update package list and install essential tools
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    gdb \
-    git \
-    vim \
-    nano \
-    curl \
-    python3 python3-venv \
-    man \
-    clang valgrind 
-    
 
-RUN apt-get install -y \
-    libx11-dev 
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      build-essential \
+      libreadline-dev \
+      libncurses-dev \
+ 	valgrind \
+ 	gcc \
+   	 gdb \
+	sudo \
+	gdb \
+  	clang \
+      git && \
+    rm -rf /var/lib/apt/lists/*
 
- #create a new user
-RUN useradd -m grace
 
-#switch to the new user
-USER grace 
 
-# Clone the francinette repository
-RUN bash -c "$(curl -fsSL https://raw.github.com/xicodomingues/francinette/master/bin/install.sh)"
+RUN apt-get update && \
+ apt-get install -y --reinstall libreadline-dev 
+   
 
-# Add francinette to PATH
-ENV PATH="/home/grace/francinette:${PATH}"
+# Create a non-root user and add to sudoers (for debugging)
+RUN useradd -m grace && \
+    echo "grace ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Switch to the non-root user
+USER grace
 
 # Set working directory
 WORKDIR /workspace
 
-# Default command to keep the container running
+# Default command
 CMD ["tail", "-f", "/dev/null"]

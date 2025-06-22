@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 23:26:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/02/01 07:57:28 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/02/05 11:00:09 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,40 +18,39 @@ The angles between the axes are equal (typically 120 degrees).
 The x, y, and z coordinates are transformed to give a sense of depth.
 */
 
-static void	initialize_context(t_mlx_context *ctx, t_data *img,
-		t_point2d window_size)
+static void initialize_context(t_mlx_context *ctx, t_data *img,
+							   t_point2d window_size)
 {
 	ctx->mlx = mlx_init();
 	if (!ctx->mlx)
 		handle_error("Error: Failed to initialize mlx");
 	ctx->mlx_win = mlx_new_window(ctx->mlx, window_size.x, window_size.y,
-			"This is my map on tv");
+								  "This is my map on tv");
 	img->img = mlx_new_image(ctx->mlx, window_size.x, window_size.y);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
-			&img->line_length, &img->endian);
+								  &img->line_length, &img->endian);
 }
 
-static void	render_edge(t_data *img, t_edge *edge, t_map *map,
-		t_point2d *iso_points)
+static void render_edge(t_data *img, t_edge *edge, t_map *map,
+						t_point2d *iso_points)
 {
-	t_point2d	start;
-	t_point2d	end;
+	t_point2d start;
+	t_point2d end;
 
-	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0
-		|| edge->end >= map->cols * map->rows)
+	if (edge->start < 0 || edge->start >= map->cols * map->rows || edge->end < 0 || edge->end >= map->cols * map->rows)
 		handle_error("invalid edges");
 	start = iso_points[edge->start];
 	end = iso_points[edge->end];
 	if (start.x == end.x && start.y == end.y)
-		return ;
+		return;
 	draw_line(img, start, end, map->values_z_color[edge->start].color);
 }
 
-static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
+static void render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 {
-	int		edges_count;
-	t_edge	*edges;
-	int		i;
+	int edges_count;
+	t_edge *edges;
+	int i;
 
 	edges_count = (map->cols - 1) * map->rows + (map->rows - 1) * map->cols;
 	edges = populate_edges(map, edges_count);
@@ -68,12 +67,12 @@ static void	render_edges(t_data *img, t_map *map, t_point2d *iso_points)
 	free(edges);
 }
 
-static t_map	read_and_init_map(int argc, char **argv, int default_colour)
+static t_map read_and_init_map(int argc, char **argv, int default_colour)
 {
-	char	*buffer;
-	t_map	map;
+	char *buffer;
+	t_map map;
 
-	if (argc < 2)
+	if (argc != 2)
 		handle_error("Usage: <program_name> <map_file>");
 	buffer = read_file_to_buffer(argv[1]);
 	if (!buffer)
@@ -85,16 +84,16 @@ static t_map	read_and_init_map(int argc, char **argv, int default_colour)
 		handle_error("There's no point, no points\n");
 	}
 	map.values_z_color = read_z_color(map.cols * map.rows, buffer,
-			default_colour);
+									  default_colour);
 	free(buffer);
 	find_min_max(&map);
 	return (map);
 }
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	t_app	app;
-	int		default_colour;
+	t_app app;
+	int default_colour;
 
 	app.window_size.x = 1100;
 	app.window_size.y = 800;

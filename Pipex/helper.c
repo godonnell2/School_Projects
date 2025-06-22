@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 07:50:59 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/01/16 09:10:38 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/05/13 09:15:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,19 @@ int	ft_wordlen(char *s)
 	while (s[i] && s[i] != ' ')
 		i++;
 	return (i);
+}
+
+int ft_strcmp(const char *s1, const char *s2)
+{
+    const unsigned char *us1 = (const unsigned char *)s1;
+    const unsigned char *us2 = (const unsigned char *)s2;
+    
+    while (*us1 && *us1 == *us2)
+    {
+        us1++;
+        us2++;
+    }
+    return (*us1 - *us2);
 }
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
@@ -62,6 +75,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
+
 void	ft_strcpy(char *src, char *dst)
 {
 	int	i;
@@ -73,4 +87,18 @@ void	ft_strcpy(char *src, char *dst)
 		i++;
 	}
 	dst[i] = '\0';
+}
+
+char    *ft_strchr(const char *s, int c)
+{
+    while (*s != '\0')
+    {
+        if (*s == (char)c)
+            return ((char *)s);
+        s++;
+    }
+  
+    if ((char)c == '\0')
+        return ((char *)s);
+    return (NULL);
 }
