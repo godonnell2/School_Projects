@@ -2,6 +2,14 @@
 #include <iostream>
 #include <iomanip>
 
+bool isDigits(const std::string& str) {
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (!isdigit(str[i]))
+            return false;
+    }
+    return !str.empty(); // Ensure it's not empty
+}
+
 void Contact::setContact() {
     std::cout << "First Name: ";
     std::getline(std::cin, firstName);
@@ -9,11 +17,24 @@ void Contact::setContact() {
     std::getline(std::cin, lastName);
     std::cout << "Nickname: ";
     std::getline(std::cin, nickname);
-    std::cout << "Phone Number: ";
-    std::getline(std::cin, phoneNumber);
+    while (true) 
+    {
+        std::cout << "Phone Number: ";
+        std::getline(std::cin, phoneNumber);
+
+        if (isDigits(phoneNumber)) 
+        {
+            break;
+        } 
+        else 
+        {
+            std::cout << "Invalid phone number. Please enter only digits.\n";
+        }
+    }
     std::cout << "Darkest Secret: ";
     std::getline(std::cin, darkestSecret);
 }
+
 
 void Contact::displayShort(int index) const 
 {
