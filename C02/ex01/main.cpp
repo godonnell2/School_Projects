@@ -20,3 +20,12 @@ int main(void) {
 
     return 0;
 }
+/*
+-- Creating b ---
+Float constructor called
+-- Creating c (copy of b) ---
+Copy constructor called
+Copy assignment operator called
+-- Assigning b to a ---
+Copy assignment operator called
+*/
