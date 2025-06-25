@@ -1,5 +1,10 @@
 #include "microshell.h"
 
+/* Custom error message writer to STDERR
+ * @param str: Base error message
+ * @param arg: Optional argument to append to message */
+#include "microshell.h"
+
 void ft_putstr_fd2(char *str, char *arg)
 {
     while(*str)
@@ -47,15 +52,15 @@ int main(int ac, char ** av, char ** env)
         i = 0;
         {
             while(av[i] && strcmp(av[i], "|") && strcmp(av[i], ";"))
-            {
-                if(strcmp(av[0], "cd")== 0)
+				i++;
+            if(strcmp(av[0], "cd")== 0)
                 {
                     if(i !=2)
                         ft_putstr_fd2("cd: incorrect number of arguments", NULL);
                     else if(chdir(av[1]) == 0)
                         ft_putstr_fd2("cd: failed system error", av[1]);
                 }
-                else if(i != 0 && ((av[i] == NULL) || (strcmp(av[i],";" )== 0)))
+             else if(i != 0 && ((av[i] == NULL) || (strcmp(av[i],";" )== 0)))
                 {
                     pid = fork();
                     ft_fatal_error(pid);
@@ -68,7 +73,7 @@ int main(int ac, char ** av, char ** env)
                     {
                         close(tmp_fd);
                         while(waitpid(-1, NULL, WUNTRACED)!= -1)
-                        {}
+                        ;
                         tmp_fd = dup(STDIN_FILENO);
                         ft_fatal_error(tmp_fd);
                     }
@@ -85,7 +90,7 @@ int main(int ac, char ** av, char ** env)
                         ft_fatal_error(dup2(fd[1], STDOUT_FILENO));
                         close(fd[0]);
                         close(fd[1]);
-                        exec_child(av, i, tmp_fd, env);
+                        exec_child(av, tmp_fd, i, env);
 
                     }
                     else
@@ -95,9 +100,7 @@ int main(int ac, char ** av, char ** env)
                         tmp_fd = fd[0];
                     }
                 }
-                
             }
-        }
     }
     close(tmp_fd);
     return 0;
