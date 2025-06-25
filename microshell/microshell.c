@@ -1,4 +1,4 @@
-#include "microshell.h"
+
 
 /* Custom error message writer to STDERR
  * @param str: Base error message
@@ -12,7 +12,8 @@ void ft_putstr_fd2(char *str, char *arg)
 
     if(arg)
     {
-        write(2, arg++, 1);
+		while(*arg)
+        	write(2, arg++, 1);
     }
     write(2, "\n", 1);
 }
@@ -21,7 +22,7 @@ void ft_fatal_error(int fd)
 {
     if(fd == -1)
     {
-        ft_putstr_fd2("error_ fatal", NULL);
+        ft_putstr_fd2("error:fatal", NULL);
         exit(1);
     }
 }
@@ -33,7 +34,7 @@ void exec_child(char **av, int tmp_fd, int i, char **env)
     close(tmp_fd); 
 
     execve(av[0], av, env);
-    ft_putstr_fd2("failed to execute", av[0]);
+    ft_putstr_fd2("error: cannot execute ", av[0]);
     exit(1);
 }
 
@@ -50,17 +51,17 @@ int main(int ac, char ** av, char ** env)
     {
         av = &av[i +1];
         i = 0;
-        {
-            while(av[i] && strcmp(av[i], "|") && strcmp(av[i], ";"))
+
+        while(av[i] && strcmp(av[i], "|") && strcmp(av[i], ";"))
 				i++;
             if(strcmp(av[0], "cd")== 0)
                 {
                     if(i !=2)
-                        ft_putstr_fd2("cd: incorrect number of arguments", NULL);
-                    else if(chdir(av[1]) == 0)
-                        ft_putstr_fd2("cd: failed system error", av[1]);
+                        ft_putstr_fd2("error cd: bad arguments", NULL);
+                    else if(chdir(av[1]) != 0)
+                        ft_putstr_fd2("error cd: cannot change directory to", av[1]);
                 }
-             else if(i != 0 && ((av[i] == NULL) || (strcmp(av[i],";" )== 0)))
+             else if(i != 0 && (av[i] == NULL || strcmp(av[i],";" )== 0))
                 {
                     pid = fork();
                     ft_fatal_error(pid);
@@ -79,7 +80,7 @@ int main(int ac, char ** av, char ** env)
                     }
 
                 }
-                else if(i !=0 && strcmp(av[i], "|"))
+                else if(i !=0 && strcmp(av[i], "|")== 0)
                 {
                     ft_fatal_error(pipe(fd));
                     pid = fork();
@@ -100,7 +101,6 @@ int main(int ac, char ** av, char ** env)
                         tmp_fd = fd[0];
                     }
                 }
-            }
     }
     close(tmp_fd);
     return 0;
