@@ -4,7 +4,7 @@ CC			:=	c++
 
 SRCS		:=	main.cpp \
 				Zombie.cpp \
-				zombieHorde.cpp
+				ZombieHorde.cpp
 
 OBJS		:=	$(SRCS:%.cpp=%.o)
 
