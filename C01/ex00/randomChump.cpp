@@ -1,4 +1,4 @@
-#include "Zombie.hpp"
+#include "zombie.hpp"
 
 void Zombie::randomChump(std :: string name)
 {
