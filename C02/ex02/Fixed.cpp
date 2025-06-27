@@ -135,3 +135,28 @@ Fixed Fixed::operator/(const Fixed &other) const {
     }
     return Fixed(this->toFloat() / other.toFloat());
 }
+
+Fixed &Fixed::operator++() {
+    ++_rawBits;
+    return *this;
+}
+
+// Postfix increment (a++)
+Fixed Fixed::operator++(int) {
+    Fixed temp = *this;
+    ++_rawBits;
+    return temp;
+}
+
+// Prefix decrement (--a)
+Fixed &Fixed::operator--() {
+    --_rawBits;
+    return *this;
+}
+
+// Postfix decrement (a--)
+Fixed Fixed::operator--(int) {
+    Fixed temp = *this;
+    --_rawBits;
+    return temp;
+}
