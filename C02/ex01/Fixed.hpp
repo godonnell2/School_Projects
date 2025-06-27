@@ -1,7 +1,8 @@
 #ifndef FIXED_HPP
 #define FIXED_HPP
 
-#include <iostream>
+#include <iostream> // For std::ostream, std::cerr
+#include <cmath>    // For roundf
 
 class Fixed {
 private:
@@ -10,8 +11,8 @@ private:
 
 public:
     Fixed();                         // Default constructor
-    Fixed(const int n);              // New: int constructor
-    Fixed(const float f);            // New: float constructor
+    Fixed(const int n);              // New: int constructor (fromint)
+    Fixed(const float f);            // New: float constructor(from float)
     Fixed(const Fixed &other);       // Copy constructor
     Fixed &operator=(const Fixed &other); // Assignment
     ~Fixed();                        // Destructor

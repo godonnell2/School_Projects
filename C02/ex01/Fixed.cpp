@@ -121,7 +121,9 @@ Fixed a;
 a.setRawBits(384);  // Represents 1.5
 std::cout << a << std::endl;
 Will output: 1.5
-If you didn’t overload operator<<, you'd have to write:
+If you didn’t overloaded operator<<, you'd have to write:
 std::cout << a.toFloat();
 But now you can just do: std::cout << a;
+An overloaded operator in C++ is a way to customize the behavior of built-in operators (like +, -, ==, <<, etc.)
+ when they’re used with objects of your own class.
 */
