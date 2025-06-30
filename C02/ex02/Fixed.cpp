@@ -129,10 +129,7 @@ Fixed Fixed::operator*(const Fixed &other) const {
 }
 
 Fixed Fixed::operator/(const Fixed &other) const {
-    if (other._rawBits == 0) {
-        std::cerr << "Error: Division by zero." << std::endl;
-        return Fixed(0);
-    }
+ 
     return Fixed(this->toFloat() / other.toFloat());
 }
 
