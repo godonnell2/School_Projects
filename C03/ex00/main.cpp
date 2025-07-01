@@ -17,9 +17,10 @@ int main() {
 }
 /*
 bot2 (Scavvy) is destroyed first (LIFO order),
+Implemented actions: attack, takeDamage, beRepaired using classes
 */
-/*
 
+/*
 Inheritance	How a subclass can reuse and extend the functionality of a parent class
 Constructor/Destructor chaining	How base and derived constructors/destructors 
 are called in order
