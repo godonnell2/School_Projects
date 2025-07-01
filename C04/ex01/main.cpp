@@ -23,3 +23,17 @@ int main() {
 
     return 0;
 }
+
+/*
+we added a brain class obvie
+every dog or cat his its own brain 
+allocatin and deallocing brain dynamically 
+Concept	Description
+🧠 Dynamic Memory	Brain object is dynamically allocated in Dog and Cat
+🧹 Rule of Three	You implement copy constructor, assignment operator, and destructor
+✅ Deep Copy	Prevents shared pointers to the same Brain (no shallow copies)
+🔁 Object Copying	You're testing object cloning and assignment
+🔒 Encapsulation	Brain is probably private and only manipulated via Dog/Cat
+
+
+*/
