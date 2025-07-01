@@ -37,3 +37,4 @@ void ClapTrap::beRepaired(unsigned int amount) {
     std::cout << "ClapTrap " << name << " repairs itself for " << amount
               << " HP! New HP: " << hitPoints << "\n";
 }
+
