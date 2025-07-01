@@ -52,7 +52,7 @@ This statement is no longer about pointers. It's an assignment between two Fixed
 Fixed &Fixed::operator=(const Fixed &other) {
     std::cout << "Copy assignment operator called" << std::endl;
     if (this != &other)
-        _rawBits = other.getRawBits();
+        _rawBits = other._rawBits;
     return *this;
 }
 /*
