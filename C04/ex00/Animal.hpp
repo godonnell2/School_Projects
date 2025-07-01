@@ -12,9 +12,9 @@ public:
     Animal();
     Animal(const Animal& other);
     Animal& operator=(const Animal& other);
-    virtual ~Animal();
+    virtual ~Animal(); //new is the virutal destructor
 
-    virtual void makeSound() const;
+    virtual void makeSound() const; //and the virt method
     std::string getType() const;
 };
 

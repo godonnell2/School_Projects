@@ -28,3 +28,24 @@ int main() {
 
     return 0;
 }
+/*
+Concept	What You're Doing
+Polymorphism	Calling overridden methods via base class pointers
+Virtual functions	Marking functions with virtual in base class
+Inheritance	Creating derived classes that override behavior
+Virtual destructors	Ensuring safe memory management in polymorphic use
+Class hierarchy	Designing clean OOP hierarchies with base and derived classes
+efine a base class with a virtual function.
+
+Then, derived classes override that function.
+
+When you call the function through a pointer/reference to the base class, the correct override gets called, depending on the actual object type.
+
+2. Proper Use of Inheritance
+You create a base class (e.g., Animal)
+
+Then derive child classes (e.g., Cat, Dog) from it.
+
+3. Why Virtual Destructors Matter
+If you delete an object through a base class pointer and the base class does not have a virtual destructor, it causes undefined behavior (memory leaks, etc.).
+*/
