@@ -37,3 +37,9 @@ void ClapTrap::beRepaired(unsigned int amount) {
     std::cout << "ClapTrap " << name << " repairs itself for " << amount
               << " HP! New HP: " << hitPoints << "\n";
 }
+
+/*
+attack - consumes one energypt (if can attack)
+take damage - hitpts removes one btu dont go below 0
+be repaired -unsigned int to ensure it never goes negative consumes one ept adds one hitpt
+*/
