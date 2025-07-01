@@ -7,4 +7,5 @@ public:
     ScavTrap(const std::string& name);
     ~ScavTrap();
     void guardGate();
+    void attack(const std::string& target);
 };

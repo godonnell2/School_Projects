@@ -1,6 +1,9 @@
 #include "DiamondTrap.hpp"
+#include "ScavTrap.hpp"
+#include "FragTrap.hpp"
+#include <iostream>
 
-DiamondTrap::DiamondTrap() {
+DiamondTrap::DiamondTrap() : ClapTrap("DefaultDiamondClap"), ScavTrap("DefaultDiamondScav"), FragTrap("DefaultDiamondFrag") {
     diamondName = "Default";
     name = diamondName + "_clap_name";
     hitPoints = FragTrap::hitPoints;
@@ -9,7 +12,7 @@ DiamondTrap::DiamondTrap() {
     std::cout << "DiamondTrap " << diamondName << " constructed\n";
 }
 
-DiamondTrap::DiamondTrap(const std::string& _name) {
+DiamondTrap::DiamondTrap(const std::string& _name) : ClapTrap(_name + "_clap_base_init"), ScavTrap(_name + "_scav_base_init"), FragTrap(_name + "_frag_base_init") {
     diamondName = _name;
     name = _name + "_clap_name";
     hitPoints = FragTrap::hitPoints;
@@ -27,5 +30,5 @@ void DiamondTrap::whoAmI() {
 }
 
 void DiamondTrap::attack(const std::string& target) {
-    ScavTrap::attack(target); // Use ScavTrap's attack version
+    ScavTrap::attack(target);
 }
