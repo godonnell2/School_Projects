@@ -16,3 +16,8 @@ int main() {
 
     return 0;
 }
+/*
+ CL4P-TP is a direct ClapTrap object, it uses its own attackDamage value, 
+ which was set to 0 during its construction. cant alter attack cos it only takes a string as arg
+ showign that scav is overriding ClapTraps
+*/
