@@ -64,26 +64,7 @@ std::ostream &operator<<(std::ostream &out, const Fixed &fixed) {
     out << fixed.toFloat();
     return out;
 }
-/*
-It's a non-member function, taking std::ostream& by reference (for the stream)
- and const Fixed& by reference (for the object to print).
-It's an overloaded operator<< function. It lets you print your Fixed objects using std::cout (or any other std::ostream) 
- as if they were built-in types like int or float.
- . std::ostream &operator<<(...)
-This defines a custom overload of the << operator for your Fixed class.
-When someone tries to << a Fixed object, convert it to a float and stream that.”
 
-out << fixed.toFloat();: It converts the Fixed object to a float using toFloat() 
-and then inserts that float into the output stream. This means when you std::cout << someFixedObject;, 
-it will print its decimal floating-point representation.
-return out;: Returns the stream itself, allowing for chaining (e.g., std::cout << f1 << f2;).
-*/
-
-// Comparison operators
-/*
-hese operators overload the standard comparison symbols (>, <, >=, <=, ==, !=) for Fixed objects. They all work by comparing the underlying _rawBits integer values, which is efficient because _rawBits
- already holds the scaled, comparable values.
-*/
 bool Fixed::operator>(const Fixed &other) const {
     return _rawBits > other._rawBits;
 }
@@ -173,4 +154,32 @@ Fixed &Fixed::max(Fixed &a, Fixed &b) {
 const Fixed &Fixed::max(const Fixed &a, const Fixed &b) {
     return (a > b) ? a : b;
 }
+/*
+This is about const correctness and API flexibility:
+Overloading on const allows your class to behave properly in both const and non-const contexts.
+It’s a common C++ pattern for getters and utility functions.
+You can use max on both const and non-const objects
+If you only had the const version, you would never get a modifiable reference back, 
+even if the inputs are non-const.
+*/
+/*
+ostream
+It's a non-member function, taking std::ostream& by reference (for the stream)
+ and const Fixed& by reference (for the object to print).
+It's an overloaded operator<< function. It lets you print your Fixed objects using std::cout (or any other std::ostream) 
+ as if they were built-in types like int or float.
+ . std::ostream &operator<<(...)
+This defines a custom overload of the << operator for your Fixed class.
+When someone tries to << a Fixed object, convert it to a float and stream that.”
 
+out << fixed.toFloat();: It converts the Fixed object to a float using toFloat() 
+and then inserts that float into the output stream. This means when you std::cout << someFixedObject;, 
+it will print its decimal floating-point representation.
+return out;: Returns the stream itself, allowing for chaining (e.g., std::cout << f1 << f2;).
+*/
+
+// Comparison operators
+/*
+hese operators overload the standard comparison symbols (>, <, >=, <=, ==, !=) for Fixed objects. They all work by comparing the underlying _rawBits integer values, which is efficient because _rawBits
+ already holds the scaled, comparable values.
+*/
