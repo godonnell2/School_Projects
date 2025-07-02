@@ -1,7 +1,7 @@
 #include "Fixed.hpp"
 #include <cmath>
 
-// Default
+
 Fixed::Fixed() : _rawBits(0) {
     std::cout << "Default constructor called" << std::endl;
 }
@@ -11,12 +11,10 @@ Fixed::Fixed(const int n) {
     std::cout << "Int constructor called" << std::endl;
     _rawBits = n << _fractionalBits; // Multiply by 256
 }
-// The operation n << x is mathematically equivalent to: n multiply by 2 to the power of x (which we already defined as 8)
+//  n << x is = n multiply by 2 to the power of x (which we already defined as 8)
 // left shift bitwise operator 2 to the power of 8 same as multiply by 256
-// 32 bits of a std int and 8 bits for  the fractional part
 // 32 bits of int into 24 bits for int and 8 bits for fractional part
 // so lets say int n is 10 = 2560
-
 
 // Float constructor
 Fixed::Fixed(const float f) {
@@ -26,19 +24,15 @@ Fixed::Fixed(const float f) {
 // f = 5.05f.
 //rawBits = roundf(5.05f * (1 << 8))
 //5.05f * 256 equals 1292.8f.
-//roundf(1292.8f)
 
 // Copy constructor
 Fixed::Fixed(const Fixed &other) {
     std::cout << "Copy constructor called" << std::endl;
-    *this = other;
+    this->_rawBits = other._rawBits;
 }
 // Copy assignment operator called *this = other;
 /*
-ou are not manipulating pointers or addresses here. 
-You are manipulating the objects themselves.
-he & symbol in a function parameter list means this is a reference. A reference is an alias, 
-or another name, for an existing variable. It's not a pointer.
+You are manipulating the objects themselves. & A reference is an alias, 
 o, inside the constructor for c, other is a direct alias for the object b that was passed in. No pointers are involved here. 
 Think of other as simply being b.
 this is a special keyword in C++. 
