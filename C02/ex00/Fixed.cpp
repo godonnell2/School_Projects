@@ -16,6 +16,11 @@ Fixed &Fixed::operator=(const Fixed &other) {
     }
     return *this;
 }
+/*
+this is a pointer. So to return the actual object (by reference), you write:
+*this dereferences the pointer to get the current object
+→ So you’re returning a reference to the actual object, like the signature expects.
+*/
 
 Fixed::~Fixed() {
     std::cout << "Destructor called" << std::endl;
