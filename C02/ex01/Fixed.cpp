@@ -30,18 +30,10 @@ Fixed::Fixed(const Fixed &other) {
     std::cout << "Copy constructor called" << std::endl;
     this->_rawBits = other._rawBits;
 }
-// Copy assignment operator called *this = other;
-/*
-You are manipulating the objects themselves. & A reference is an alias, 
-o, inside the constructor for c, other is a direct alias for the object b that was passed in. No pointers are involved here. 
-Think of other as simply being b.
-this is a special keyword in C++. 
-Inside any member function, this is a pointer to the specific object instance the function was called on.
-he * symbol here is the dereference operator. When you put it in front of a pointer, you get the actual value or object that the pointer is pointing to.
-Since this is a pointer to c, *this is the object c itself.
-This statement is no longer about pointers. It's an assignment between two Fixed objects. 
 
-*/
+//You are manipulating the objects themselves. & A reference is an alias, 
+ //It's an assignment between two Fixed objects. 
+
 // Assignment operator
 Fixed &Fixed::operator=(const Fixed &other) {
     std::cout << "Copy assignment operator called" << std::endl;
