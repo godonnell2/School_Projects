@@ -161,6 +161,8 @@ It’s a common C++ pattern for getters and utility functions.
 You can use max on both const and non-const objects
 If you only had the const version, you would never get a modifiable reference back, 
 even if the inputs are non-const.
+API flexibility means designing your functions, classes, or modules so that they can be used easily in a variety of situations,
+ without forcing unnecessary restrictions on the user.
 */
 /*
 ostream
@@ -182,4 +184,9 @@ return out;: Returns the stream itself, allowing for chaining (e.g., std::cout <
 /*
 hese operators overload the standard comparison symbols (>, <, >=, <=, ==, !=) for Fixed objects. They all work by comparing the underlying _rawBits integer values, which is efficient because _rawBits
  already holds the scaled, comparable values.
+ Your fixed-point number stores the value as an integer _rawBits, where the lower 8 bits represent the fractional part.
+
+When you do ++x or x++, you are incrementing that raw integer value by 1.
+
+But incrementing by 1 in raw bits means increasing the value by 1 / 256 (because 8 fractional bits → factor 256).
 */
