@@ -41,22 +41,7 @@ Fixed &Fixed::operator=(const Fixed &other) {
         _rawBits = other._rawBits;
     return *this;
 }
-/*
-checks if the object is being assigned to itself (e.g., c = c;).
-For simple classes like Fixed (which only contain primitive types and no dynamic memory), this check isn't strictly necessary for correctness,
- as assigning an int to itself (_rawBits = _rawBits;) is harmless.
- owever, for more complex classes that manage dynamic memory (e.g., std::string or a custom array class), self-assignment without this check
-  can lead to memory leaks or crashes. 
-  Imagine if you freed the current object's memory before copying from other, 
-  and other was the same object. You'd be trying to read from freed memory!
-  Accesses the _rawBits member of the current object (*this).
-  Calls the getRawBits() getter method on the other object to retrieve its raw bit value.
-  Returns a reference to the current object.
-  he copy assignment operator Fixed &Fixed::operator=(const Fixed &other) is responsible for correctly transferring the state 
-  from one existing Fixed object to another existing Fixed object
-  his operator, along with the copy constructor and destructor, forms the "Rule of Three/Five/Zero" in C++, 
-  ensuring proper resource management and object behavior when copying.
-*/
+
 
 // Destructor
 Fixed::~Fixed() {
@@ -78,9 +63,6 @@ That means your internal integer value of 512 actually represents the float 2.0.
 int Fixed::toInt() const {
     return _rawBits >> _fractionalBits; // Divide by 256 (int)
 }
-/*
-
-*/
 
 // Getters/Setters
 int Fixed::getRawBits() const {
@@ -112,4 +94,15 @@ std::cout << a.toFloat();
 But now you can just do: std::cout << a;
 An overloaded operator in C++ is a way to customize the behavior of built-in operators (like +, -, ==, <<, etc.)
  when they’re used with objects of your own class.
+*/
+
+/*
+checks if the object is being assigned to itself (e.g., c = c;).
+For simple classes like Fixed (which only contain primitive types and no dynamic memory), this check isn't strictly necessary for correctness,
+ as assigning an int to itself (_rawBits = _rawBits;) is harmless.
+ owever, for more complex classes that manage dynamic memory (e.g., std::string or a custom array class), self-assignment without this check
+  can lead to memory leaks or crashes. 
+  Imagine if you freed the current object's memory before copying from other, 
+  and other was the same object. You'd be trying to read from freed memory!
+ 
 */
