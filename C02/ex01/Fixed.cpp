@@ -53,11 +53,9 @@ float Fixed::toFloat() const {
     return (float)_rawBits / (1 << _fractionalBits); // Divide by 256
 }
 /*
- If _rawBits = 512:
-(float)512 / 256 = 2.0f
-_rawBits = 1.5 * 256 = 384
-(float)384 / 256 = 1.5f
-That means your internal integer value of 512 actually represents the float 2.0.
+ eg . _rawBits = 640;
+float)640 / 256;  // = 2.5f
+77	~0.30078	
 */
 
 int Fixed::toInt() const {
