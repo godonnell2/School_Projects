@@ -1,5 +1,102 @@
  NetPractice is a general practical exercise to let you discover networking.
 
+📦 Basic Concepts
+1. IP Address
+Uniquely identifies a host in a network.
+
+Format: 192.168.1.5
+
+Each IP must be unique in the whole network.
+
+2. Subnet Mask
+Defines which part of the IP is the network and which is the host.
+
+Format: 255.255.255.0 (aka /24 or CIDR notation)
+
+Masks are used to determine if two devices are in the same subnet.
+
+Common Masks:
+CIDR	Mask	# of Hosts
+/24	255.255.255.0	254
+/16	255.255.0.0	65,534
+/30	255.255.255.252	2 (used for router-to-router links)
+
+3. Gateway
+The device a host uses to talk to outside networks.
+
+Usually the IP of the router on that network.
+
+🔌 How Devices Talk
+🧍 Host-to-Host Communication
+A host can communicate directly if:
+
+They're on the same subnet (check using IP + mask).
+
+If not, they must:
+
+Use a router (gateway) to reach another network.
+
+🧰 Fixing a Level: Checklist
+Check IPs:
+
+Every device should have a unique IP.
+
+All hosts in the same LAN should have matching subnet masks.
+
+Check Masks:
+
+Two IPs can only talk directly if IP1 & MASK == IP2 & MASK.
+
+Check Gateways:
+
+Hosts need a correct gateway to reach other networks.
+
+Routers:
+
+Routers usually have 2+ interfaces, each in a different subnet.
+
+Routers must have routes to know where to send packets:
+
+Either via directly connected interface
+
+Or another router via a next-hop IP
+
+Ping Test (if available):
+
+Always test from A → B and B → A
+
+Check if traffic goes through the correct path
+
+🛠 Example Fix
+Let's say:
+
+Host A: 10.0.0.2/24, Gateway: 10.0.0.1
+
+Host B: 10.0.1.2/24, Gateway: 10.0.1.1
+
+Router has:
+
+Interface 1: 10.0.0.1/24
+
+Interface 2: 10.0.1.1/24
+
+✅ This works! Because:
+
+Host A can reach Router (10.0.0.1)
+
+Router can reach Host B (10.0.1.2) via 10.0.1.1
+
+And vice versa
+
+But if Host B had IP 10.0.1.300 (invalid!) or mask 255.255.0.0 (wrong subnet logic), it would fail.
+
+🧠 Mental Tip for Subnets
+To see if two IPs are in the same subnet:
+
+cpp
+Copy
+Edit
+IP1 & MASK == IP2 & MASK
 📷 Preview
 preview
 
@@ -63,3 +160,4 @@ HostMax:   192.168.0.254         11000000.10101000.00000000 .11111110
 Hosts/Net: 254                   (Private Internet)
 🧰 Tools
 IP Calculator - ipcalc takes an IP address and netmask and calculates the resulting broadcast, network, Cisco wildcard mask, and host range.https://jodies.de/ipcalc
+
