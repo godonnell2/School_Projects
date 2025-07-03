@@ -1,21 +1,21 @@
 #include "ClapTrap.hpp"
 
 int main() {
-    ClapTrap a("CL4P-TP");
-    ClapTrap b("Scavvy");
+ 
 
-    a.attack("Scavvy");
-    b.takeDamage(3);
+    ClapTrap clap1("CLAP-1");
+    ClapTrap grace("Grace");
 
-    b.attack("CL4P-TP");
-    a.takeDamage(5);
+    clap1.attack("Grace");
+    grace.takeDamage(5);
+    grace.beRepaired(3);
 
-    a.beRepaired(4);
-    b.beRepaired(2);
-
+    grace.takeDamage(10);
+    grace.beRepaired(5);
     return 0;
 }
 /*
+Encapsulating behavior (attack(), takeDamage(), beRepaired())
 bot2 (Scavvy) is destroyed first (LIFO order),
 Implemented actions: attack, takeDamage, beRepaired using classes
 */
