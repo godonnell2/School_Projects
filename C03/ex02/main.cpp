@@ -3,24 +3,26 @@
 #include "FragTrap.hpp"
 
 int main() {
-    ClapTrap clap("CL4P");
-    ScavTrap scav("Serena");
-    FragTrap frag("FR4G");
+     std::cout << "\n=== FragTrap Construction ===" << std::endl;
+    FragTrap frag1("FRAG-1");
 
-    clap.attack("target dummy");
-    scav.attack("intruder");
-    frag.attack("mutant");
+    std::cout << "\n=== FragTrap Actions ===" << std::endl;
+    frag1.attack("Target");
+    frag1.highFivesGuys();
+    frag1.takeDamage(40);
+    frag1.beRepaired(25);
 
-    clap.beRepaired(3);
-    scav.beRepaired(5);
-    frag.beRepaired(10);
+    std::cout << "\n=== FragTrap Copying ===" << std::endl;
+    FragTrap frag2(frag1);
+    FragTrap frag3("frag3");
+    frag3 = frag2;
 
-    clap.takeDamage(2);
-    scav.takeDamage(20);
-    frag.takeDamage(40);
+    std::cout << "\n=== ScavTrap Construction ===" << std::endl;
+    ScavTrap scav1("SCAV-1");
+    scav1.attack("Another Target");
+ 
 
-    frag.highFivesGuys();
-
+    std::cout << "\n=== Destruction ===" << std::endl;
     return 0;
 }
 /*
