@@ -28,7 +28,21 @@ int main() {
 	return 0;
 }
 /*
- CL4P-TP is a direct ClapTrap object, it uses its own attackDamage value, 
- which was set to 0 during its construction. cant alter attack cos it only takes a string as arg
- showign that scav is overriding ClapTraps
+ First, the base class (ClapTrap) constructor runs
+Then, the derived class (ScavTrap) constructor runs both to create scav 1
+attack() (probably overridden in ScavTrap)
+guardGate() (a new method only ScavTrap has)
+takeDamage() and beRepaired() (inherited from ClapTrap)
+Concept	Why It Matters
+Inheritance	ScavTrap reuses and extends ClapTrap
+Canonical Form	Ensures safe copy/assignment/destruction
+Copying part	Required — verifies your child class handles it right
+guardGate() method	A new feature unique to ScavTrap
+Line of Code	Output Line	Why It Happens
+ScavTrap scav2(scav1);	ClapTrap copy constructor called	ScavTrap calls base class copy constructor (ClapTrap(const&))
+ScavTrap copy constructor called	Then ScavTrap’s own copy constructor
+ScavTrap scav3("scav3");	ClapTrap scav3 constructed	Calls ClapTrap's string constructor
+ScavTrap scav3 constructor called	Then ScavTrap's string constructor
+scav3 = scav2;	ScavTrap copy assignment called	Assignment operator of ScavTrap runs
+(inside it...)	ClapTrap copy assignment operator called	Base class assignment operator is called from inside
 */
