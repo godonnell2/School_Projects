@@ -25,7 +25,20 @@ int main() {
 }
 
 /*
+Diamond Prob CPP
+            ClapTrap
+           /      \
+     ScavTrap     FragTrap
+           \      /
+         DiamondTrap
 eature	Evidence in Output
+ScavTrap and FragTrap both inherit from ClapTrap
+
+DiamondTrap inherits from both
+
+So… DiamondTrap now has two copies of ClapTrap, unless you're careful.
+Use virtual inheritance in real-world C++, but you’re not allowed to in this project.
+
 Multiple inheritance	DiamondTrap uses both ScavTrap and FragTrap
 Name conflicts	Resolved with _name and _clap_name 3 classes have a member called _name
 scavtrap and fragtrap inherit name from claptrap but diamond class has its own name
@@ -38,6 +51,24 @@ Giving DiamondTrap its own _name
 Passing a modified string to ClapTrap's constructor
 
 Accessing ClapTrap::_name explicitly when needed
+ou now have two inherited attack() functions:
+
+ScavTrap::attack()
+
+FragTrap::attack()
+
+In your DiamondTrap, you should explicitly choose one:
+This shows you understand method resolution in multiple inheritance.
+This method prints both:
+
+DiamondTrap's own _name
+
+ClapTrap::_name (which is hidden unless you access it directly)
+
+You know how to reference hidden inherited members explicitly
+
+You understand what name collision means
+
 Function reuse	attack(), repair(), and takeDamage() called
 ClapTrap::_name → e.g. "Shiny_clap_name" (used internally)
 Polymorphism / overrides	You call different behavior depending on inheritance
