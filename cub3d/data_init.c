@@ -6,16 +6,16 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:22:24 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/29 15:53:37 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/04 17:14:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	init_mlx(t_mlx *mlx, t_cub_elements *cub3d)
+int	init_mlx(t_mlx *mlx)
 {
-	mlx->width = cub3d->map->width * 64;
-	mlx->height = cub3d->map->height * 64;
+	mlx->width = WIDTH;
+	mlx->height = HEIGHT;
 	mlx->mlx_ptr = mlx_init();
 	if (mlx->mlx_ptr == NULL)
 	{
@@ -23,8 +23,8 @@ int	init_mlx(t_mlx *mlx, t_cub_elements *cub3d)
 		return (EXIT_FAILURE);
 	}
 	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr,
-			cub3d->map->width * 64,
-			cub3d->map->height * 64,
+			WIDTH,
+			HEIGHT,
 			"Map Display");
 	if (mlx->win_ptr == NULL)
 	{
@@ -41,8 +41,6 @@ int	init_mlx(t_mlx *mlx, t_cub_elements *cub3d)
                                    &mlx->bits_per_pixel,
                                    &mlx->line_length,
                                    &mlx->endian);
-	if (!mlx->img_data)
-    	return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -62,7 +60,7 @@ int	data_init(int argc, char **argv, t_data *data)
 		ft_putstr_fd("Error: Parsing failed\n", 2);
 		return (1);
 	}
-	if (init_mlx(data->mlx, data->elem) != 0)
+	if (init_mlx(data->mlx) != 0)
 	{
 		ft_putstr_fd("Error: MLX initialization failed\n", 2);
 		return (1);

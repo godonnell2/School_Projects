@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/30 09:41:07 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:11:52 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,21 +31,34 @@
 #define MOVE_SPEED 0.08f   // Speed of forward/backward/strafe
 #define ROTATE_SPEED 0.05f // Radians per frame (~3 degrees)
 
-#define KEY_W      13
-#define KEY_S      1
-#define KEY_A      0
-#define KEY_D      2
-#define KEY_LEFT   123
-#define KEY_RIGHT  124
-#define KEY_ESC    53
+
+# define KEY_W 119
+# define KEY_A 97
+# define KEY_S 115
+# define KEY_D 100
+# define KEY_LEFT 65361
+# define KEY_RIGHT 65363
+# define KEY_ESC 65307
+# define KEY_PRESS 2
+# define KEY_RELEASE 3
+# define KEY_PRESS_MASK 1
+# define KEY_RELEASE_MASK 2
+# define DESTROY_NOTIFY 17
+
+
+#define WIDTH 640 //we are defining a viewport to play the game so it ok to hardcode this 
+#define HEIGHT 480
+
+#define TILE_SIZE 64
+
 
 typedef struct s_map
 {
     char **map;
     int width;
     int height;
-    int player_x;
-    int player_y;
+    float player_x; //had to change these to float 
+   float player_y;
     int tile_size;
 } t_map;
 
@@ -171,6 +184,7 @@ typedef struct s_render_slice
     int line_h;
 } t_render_slice;
 
+
 void check_arguments(int argc, char **argv);
 int ft_strcmp(const char *s1, const char *s2);
 bool scan_cub_elements(const char *filename,
@@ -185,7 +199,7 @@ t_map *init_map(void);
 char **copy_map(char **map, int height);
 void free_map(t_map *map);
 void free_texture(t_texture *texture, void *mlx_ptr);
-int init_mlx(t_mlx *mlx, t_cub_elements *cub3d);
+int init_mlx(t_mlx *mlx);
 bool cub3d_parsing(int argc, char **argv, t_cub_elements *cub3d);
 bool validate_map(t_cub_elements *cub3d);
 int xpm_to_img(t_cub_elements *elem, t_mlx *mlx);
@@ -198,13 +212,15 @@ void free_all(t_data *data);
 // render
 // render.c
 int	handle_keyrelease(int keycode, t_data *data);
+int	handle_keypress(int keycode, t_data *data);
 void render_frame(t_data *app);
-void	move_player(int keycode, t_map *map, t_player *player);
-void	handle_movement(t_data *data);
+void move_player(t_map *map, t_player *player, t_keys keys);
+void handle_movement(t_data *data);
 
 // putline.c
 int get_tex_pixel(t_texture *tex, int x, int y);
 void put_pixel(int x, int y, int color, t_mlx *mlx);
+void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
 int rgb_to_hex(int rgb[3]);
 
 // collisions_hor.c
@@ -231,8 +247,7 @@ t_ray_step init_ray_step(float x_intercept, float y_intercept, float x_step,
                          float y_step);
 t_render_slice init_render_slice(int x, int texX, int start_end[2], int line_h);
 
-// put_line.c
-void fill_column(t_mlx *mlx, int x, int y_start, int y_end);
+
 
  int	handle_close(t_data *data);
 

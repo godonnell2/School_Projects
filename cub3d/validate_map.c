@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   validate_map.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pviegas- <pviegas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 17:59:25 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/13 18:48:22 by pviegas-         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:48:25 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	is_valid_tile(char c, int flag)
 		return (c == 'N' || c == 'S' || c == 'E' || c == 'W');
 	return (c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W');
 }
+
 
 int	find_player(t_cub_elements *cub3d)
 {

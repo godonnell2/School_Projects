@@ -3,22 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   element_parsing.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pviegas- <pviegas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:03:59 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/14 19:35:06 by pviegas-         ###   ########.fr       */
+/*   Updated: 2025/08/04 17:52:00 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static bool	is_texture_id(char *id)
+static bool is_texture_id(char *id)
 {
-	return (ft_strcmp(id, "NO") == 0 || ft_strcmp(id, "SO") == 0
-		|| ft_strcmp(id, "WE") == 0 || ft_strcmp(id, "EA") == 0);
+	return (ft_strcmp(id, "NO") == 0 || ft_strcmp(id, "SO") == 0 || ft_strcmp(id, "WE") == 0 || ft_strcmp(id, "EA") == 0);
 }
 
-static bool	assign_texture_path(char *id, char *val, t_cub_elements *cub3d)
+static bool assign_texture_path(char *id, char *val, t_cub_elements *cub3d)
 {
 	if (!val || val[0] != '.' || val[1] != '/')
 		return (false);
@@ -35,8 +34,8 @@ static bool	assign_texture_path(char *id, char *val, t_cub_elements *cub3d)
 	return (true);
 }
 
-static bool	process_element_value(char *id,
-			char *val, t_cub_elements *cub3d)
+static bool process_element_value(char *id,
+								  char *val, t_cub_elements *cub3d)
 {
 	if (!val)
 		return (false);
@@ -47,13 +46,13 @@ static bool	process_element_value(char *id,
 	return (false);
 }
 
-static bool	check_element(char *line, t_cub_elements *cub3d)
+static bool check_element(char *line, t_cub_elements *cub3d)
 {
-	char	*trimmed;
-	char	**sstr;
-	char	*id;
-	char	*val;
-	bool	result;
+	char *trimmed;
+	char **sstr;
+	char *id;
+	char *val;
+	bool result;
 
 	trimmed = trim_spaces(line);
 	if (ft_strlen(trimmed) == 0)
@@ -73,12 +72,12 @@ static bool	check_element(char *line, t_cub_elements *cub3d)
 	return (result);
 }
 
-bool	scan_cub_elements(const char *filename, t_cub_elements *cub3d,
-					t_color *ceil, t_color *floor)
+bool scan_cub_elements(const char *filename, t_cub_elements *cub3d,
+					   t_color *ceil, t_color *floor)
 {
-	int		fd;
-	bool	map_started;
-	char	*line;
+	int fd;
+	bool map_started;
+	char *line;
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
@@ -89,10 +88,15 @@ bool	scan_cub_elements(const char *filename, t_cub_elements *cub3d,
 	{
 		if (!map_started && is_map_line(line))
 		{
-			if (!cub3d->no_text->path || !cub3d->so_text->path
-				|| !cub3d->we_text->path || !cub3d->ea_text->path
-				|| (!floor->color_set || !ceil->color_set))
+
+			if (!cub3d->no_text || !cub3d->so_text || !cub3d->we_text || !cub3d->ea_text ||
+				!cub3d->no_text->path || !cub3d->so_text->path ||
+				!cub3d->we_text->path || !cub3d->ea_text->path ||
+				!floor->color_set || !ceil->color_set)
+			{
+				printf("Error: One or more textures or colors are missing!\n");
 				return (close_and_free(line, fd, cub3d, false));
+			}
 			return (close_and_free(line, fd, NULL, true));
 		}
 		if (!check_element(line, cub3d))

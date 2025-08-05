@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/07/30 09:56:16 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:18:41 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ float	calculate_x_intercept(t_map *map, float angle)
 // and then record where it is
 static void	trace_ray(t_map *map, t_ray_step *step, t_cast *h)
 {
+	
 	int	m_x;
 	int	m_y;
 
@@ -58,6 +59,7 @@ static void	trace_ray(t_map *map, t_ray_step *step, t_cast *h)
 			h->hit[X] = step->next_x;
 			h->hit[Y] = step->next_y;
 			h->hitted = true;
+			h->content = map->map[m_y][m_x];
 			return ;
 		}
 		step->next_x += step->x_step;

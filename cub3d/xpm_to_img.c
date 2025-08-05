@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   xpm_to_img.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pviegas- <pviegas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 17:58:40 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/13 17:58:41 by pviegas-         ###   ########.fr       */
+/*   Updated: 2025/08/04 18:09:39 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,13 @@ int	xpm_to_img(t_cub_elements *elem, t_mlx *mlx)
 		return (1);
 	if (load_texture(mlx, elem->we_text, "West") != 0)
 		return (1);
-	if (load_texture(mlx, elem->ea_text, "East") != 0)
-		return (1);
+if (load_texture(mlx, elem->ea_text, "East") != 0) {
+    printf("Failed to load East texture! Pointer: %p, Path: %s\n",
+        (void*)elem->ea_text, elem->ea_text ? elem->ea_text->path : "NULL");
+    return (1);
+}
+if (elem->ea_text && !elem->ea_text->data) {
+    printf("East texture image is NULL after loading! Path: %s\n", elem->ea_text->path);
+}
 	return (0);
 }
