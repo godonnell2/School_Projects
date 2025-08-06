@@ -1,16 +1,18 @@
 #include "../cub3d.h"
-
-
 bool is_wall(t_map *map, float x, float y)
 {
-    int map_x = (int)(x);
-    int map_y = (int)(y);
+    int map_x = (int)(x / map->tile_size);
+    int map_y = (int)(y / map->tile_size);
+
+     printf("is_wall check: x=%.2f, y=%.2f -> map_x=%d, map_y=%d\n", x, y, map_x, map_y);
+     printf("Map dimensions: width=%d, height=%d\n", map->width, map->height);
 
     if (map_x < 0 || map_y < 0 || map_x >= map->width || map_y >= map->height)
-        return true;
-    return (map->map[map_y][map_x] == '1');
+    {
+        printf("Out of bounds check: Returning true (wall)\n");
+        return true; // Treat outside map as a wall
+    }
 }
-
 
 void move_forward(t_map *map, t_player *player, float speed)
 {
