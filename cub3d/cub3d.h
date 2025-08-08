@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/05 18:11:52 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/08 16:57:01 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,13 @@
 # define KEY_LEFT 65361
 # define KEY_RIGHT 65363
 # define KEY_ESC 65307
-# define KEY_PRESS 2
-# define KEY_RELEASE 3
-# define KEY_PRESS_MASK 1
-# define KEY_RELEASE_MASK 2
-# define DESTROY_NOTIFY 17
+# define KeyPress 2
+# define KeyRelease 3
+# define DestroyNotify 17
+# define KeyPressMask (1L<<0)
+# define KeyReleaseMask (1L<<1)
+# define NoEventMask 0
+
 
 
 #define WIDTH 640 //we are defining a viewport to play the game so it ok to hardcode this 
@@ -57,8 +59,8 @@ typedef struct s_map
     char **map;
     int width;
     int height;
-    float player_x; //had to change these to float 
-   float player_y;
+  int player_x; 
+   int player_y;
     int tile_size;
 } t_map;
 
@@ -102,7 +104,8 @@ typedef struct s_keys {
 
 typedef struct s_player
 {
-
+float player_x;
+float player_y;
     float dir_x;    // dir vect X
     float dir_y;    // dir vec Y
     float plane_x;  // cam plane X
@@ -155,15 +158,17 @@ typedef struct s_cast
 
 typedef struct s_ray
 {
-    float dist;  // distance from player
-    float angle; // ray angle
-    int hit[2];  // grid cell hit (x,y)
+    float distance;       // raw distance from player
+    float correct_dist;   // distance corrected for fish-eye
+    float angle;          // ray angle
+    double hit[2];        // exact hit coords
     bool N;
     bool E;
-    bool vertical_hit; // did we hit a vertical wall?
-    char wall_content; // which wall texture to use ('N','S','E','W')
+    bool vertical_hit;    // did we hit a vertical wall?
+    char wall_content;    // which wall texture to use ('N','S','E','W')
+    int wall_top;         // pixel y for top of wall
+    int wall_bottom;      // pixel y for bottom of wall
 } t_ray;
-
 
 typedef struct s_ray_step
 {
@@ -183,6 +188,14 @@ typedef struct s_render_slice
     int end;
     int line_h;
 } t_render_slice;
+
+typedef struct s_slice
+{
+    int top_pixel;
+    int bottom_pixel;
+    int height;
+}   t_slice;
+
 
 
 void check_arguments(int argc, char **argv);
@@ -215,7 +228,7 @@ int	handle_keyrelease(int keycode, t_data *data);
 int	handle_keypress(int keycode, t_data *data);
 void render_frame(t_data *app);
 void move_player(t_map *map, t_player *player, t_keys keys);
-void handle_movement(t_data *data);
+void	handle_movement(t_data *data);
 
 // putline.c
 int get_tex_pixel(t_texture *tex, int x, int y);
@@ -224,12 +237,10 @@ void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
 int rgb_to_hex(int rgb[3]);
 
 // collisions_hor.c
-void find_horizontal_collision(t_map *map, float angle,
-                               t_cast *h);
+void	find_horizontal_collision(t_map *map, float angle, t_cast *h, t_player *player);
 t_ray_step init_ray_step(float x_intercept, float y_intercept, float x_step,
                          float y_step);
-void find_vertical_collision(t_map *map, float angle,
-                             t_cast *v);
+void	find_vertical_collision(t_map *map, float angle, t_cast *v, t_player *player);
 
 // draw_walls.c
 void draw_walls(t_mlx *mlx, t_ray *rays, t_cub_elements *elem);
