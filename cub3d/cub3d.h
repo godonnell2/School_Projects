@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/08 16:57:01 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/10 17:14:06 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@
 #define TWO_PI 6.28318530
 #define HALF_PI 1.57079632
 
+
 #define FOV (M_PI / 3) // 60 degrees in radians
 #define HALF_FOV (FOV / 2)
 
-#define MOVE_SPEED 0.08f   // Speed of forward/backward/strafe
+#define MOVE_SPEED 1.0f   // Speed of forward/backward/strafe
 #define ROTATE_SPEED 0.05f // Radians per frame (~3 degrees)
 
 
@@ -46,7 +47,7 @@
 # define KeyReleaseMask (1L<<1)
 # define NoEventMask 0
 
-
+#define COLLISION_PADDING 5.0
 
 #define WIDTH 640 //we are defining a viewport to play the game so it ok to hardcode this 
 #define HEIGHT 480
@@ -66,12 +67,15 @@ typedef struct s_map
 
 typedef struct s_texture
 {
-    char *path;
-    void *data;
-    int width;
-    int height;
-} t_texture;
-
+    void    *img_ptr;        // mlx image pointer
+    char    *data;           // pixel buffer (same as data_addr)
+    int     width;
+    int     height;
+    int     bits_per_pixel;
+    int     line_length;
+    int     endian;
+    char    *path;           // optional, for debug or filepath
+}   t_texture;
 typedef struct s_color
 {
     int rgb_color[3];
@@ -186,7 +190,8 @@ typedef struct s_render_slice
     int texX;
     int start;
     int end;
-    int line_h;
+    int     line_h;    // clamped integer height (for drawing)
+    double  line_h_d;  // original projected height (double) — for texture mapping
 } t_render_slice;
 
 typedef struct s_slice
@@ -231,7 +236,7 @@ void move_player(t_map *map, t_player *player, t_keys keys);
 void	handle_movement(t_data *data);
 
 // putline.c
-int get_tex_pixel(t_texture *tex, int x, int y);
+
 void put_pixel(int x, int y, int color, t_mlx *mlx);
 void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
 int rgb_to_hex(int rgb[3]);
@@ -258,7 +263,7 @@ t_ray_step init_ray_step(float x_intercept, float y_intercept, float x_step,
                          float y_step);
 t_render_slice init_render_slice(int x, int texX, int start_end[2], int line_h);
 
-
+int get_tex_pixel(t_texture *tex, int x, int y);
 
  int	handle_close(t_data *data);
 

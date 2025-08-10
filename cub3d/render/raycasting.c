@@ -6,28 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:21:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/08 17:06:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/10 16:13:02 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3d.h"
-
-/* Copies data from prev col if two distances tie ie same distanc */
-// static void	copy_last_ray(t_ray *rays, int col)
-// {
-// 	t_ray	*curr;
-// 	t_ray	*prev;
-
-// 	curr = &rays[col];
-// 	prev = &rays[col - 1];
-// 	*curr = *prev;
-// }
-
-/*
-The corrected distance to the wall
-The exact hit coordinates
-What type of wall you hit (e.g., '1' or texture ID)
-*/
 
 void	store_ray_data(t_ray *ray, t_cast *cast, float angle, bool vertical)
 {
@@ -82,15 +65,15 @@ static void cast_ray(t_cub_elements *elem, float angle, int col, t_ray *rays)
     else
         v.distance = hit_distance(px, py, v.hit[X], v.hit[Y]);
 
-    // Pick closer ray (before fisheye correction)
+    // Pick closer ray (raw distance, no fisheye correction here)
     if (h.distance < v.distance)
     {
-        h.distance *= cos(elem->player.angle - angle); // fisheye correction here
+        // Removed fisheye correction here
         store_ray_data(&rays[col], &h, angle, /*vertical_hit=*/false);
     }
     else
     {
-        v.distance *= cos(elem->player.angle - angle); // fisheye correction here
+        // Removed fisheye correction here
         store_ray_data(&rays[col], &v, angle, /*vertical_hit=*/true);
     }
 }
