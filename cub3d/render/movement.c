@@ -52,13 +52,11 @@ void rotate_player(t_player *player, float angle_delta)
 {
     player->angle += angle_delta;
 
-    // Wrap angle between 0 and 2*PI
     if (player->angle < 0)
         player->angle += 2 * M_PI;
     else if (player->angle >= 2 * M_PI)
         player->angle -= 2 * M_PI;
 
-    // Update direction vector
     player->dir_x = cos(player->angle);
     player->dir_y = sin(player->angle);
 }

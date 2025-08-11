@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/11 16:26:18 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 17:34:43 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,22 @@ then you find that part of the texture
 
 int get_tex_x(t_ray *ray, t_texture *tex)
 {
-    double wall_hit_pos; // fractional position along the wall
+    double wall_hit_pos; 
     int tex_x;
 
     if (ray->vertical_hit)
-        wall_hit_pos = ray->hit[Y];  // use Y position for vertical walls
+        wall_hit_pos = ray->hit[Y];  
     else
-        wall_hit_pos = ray->hit[X];  // use X position for horizontal walls
+        wall_hit_pos = ray->hit[X];  
 
-    // Get only the fractional part within the tile
     wall_hit_pos -= floor(wall_hit_pos / TILE_SIZE) * TILE_SIZE;
 
-    // Flip texture horizontally if needed
     if ((ray->vertical_hit && is_ray_facing(WEST, ray->angle)) ||
         (!ray->vertical_hit && is_ray_facing(NORTH, ray->angle)))
     {
         wall_hit_pos = TILE_SIZE - wall_hit_pos;
     }
 
-    // Map fractional position to texture X coordinate
     tex_x = (int)((wall_hit_pos / TILE_SIZE) * tex->width);
 
     if (tex_x < 0) tex_x = 0;
@@ -70,35 +67,30 @@ t_render_slice calculate_slice(t_mlx *mlx, t_ray *ray, int col, t_cub_elements *
     t_render_slice slice;
     double corrected_dist;
     double dist_proj_plane;
-    double raw_line_h;   /* double, unclamped */
-    int draw_line_h;     /* integer, clamped for drawing */
+    double raw_line_h;   
+    int draw_line_h;     
     int start, end;
     t_texture *tex;
     int texx;
 
-    /* 1) guard tiny distances to avoid div-by-zero */
+   
     corrected_dist = (double)ray->distance * cos(ray->angle - elem->player.angle);
     if (corrected_dist <= 0.00001)
         corrected_dist = 0.00001;
 
-    /* 2) projection plane distance (depends on screen width and FOV) */
     dist_proj_plane = ((double)mlx->width / 2.0) / tan(FOV / 2.0);
 
-    /* 3) calculate on-screen wall height (double, do NOT clamp yet) */
     raw_line_h = ((double)TILE_SIZE / corrected_dist) * dist_proj_plane;
 
-    /* integer line height for drawing (clamp to screen) */
     draw_line_h = (int)raw_line_h;
     if (draw_line_h < 1) draw_line_h = 1;
     if (draw_line_h > mlx->height) draw_line_h = mlx->height;
 
-    /* 4) compute top & bottom pixels (centered vertically) */
     start = (mlx->height / 2) - (draw_line_h / 2);
     if (start < 0) start = 0;
     end = start + draw_line_h;
     if (end >= mlx->height) end = mlx->height - 1;
 
-    /* 5) compute texture X coordinate */
     tex = select_texture(elem, ray);
     texx = get_tex_x(ray, tex);
 
@@ -107,27 +99,12 @@ t_render_slice calculate_slice(t_mlx *mlx, t_ray *ray, int col, t_cub_elements *
     slice.texX = texx;
     slice.start = start;
     slice.end = end;
-    slice.line_h = draw_line_h;   /* for drawing */
-    slice.line_h_d = raw_line_h;  /* original double, for accurate texture mapping */
+    slice.line_h = draw_line_h;  
+    slice.line_h_d = raw_line_h;  
 
     return slice;
 }
 
-
-/*
- It accounts for where the wall starts on the screen relative
-  to the screen's center and its own height,
-  ensuring the texture isn't awkwardly cut off or shifted.
-: The modulo operator (%) is used here to handle texture wrapping.
-The draw_wall_column fn iterates through each vertical pix that makes up a
-single column of a rendered wall segment.
-For each screen pixel, it calculates the corresponding Y-coordinat
-e on the texture using the step and texPos variables.
-This ensures that the texture is scaled and aligned correctly
- as it's drawn vertically on the screen, whether it needs to be compressed,
-	stretched, or repeated.
- Finally, it fetches the color from the texture and draws it onto the screen.
-*/
 void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
                       t_cub_elements *elem)
 {
@@ -137,18 +114,16 @@ void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
 
     int start = slice->start;
     int end = slice->end;
-    // Clamp to screen bounds
+
     if (start < 0) start = 0;
     if (end > mlx->height) end = mlx->height;
 
-    // 1) Draw ceiling
     for (y = 0; y < start; y++) 
         put_pixel(slice->x, y, elem->ceiling_color->hex_color, mlx);
-    // 2) Prepare texture mapping
+
     step = (double)tex->height / slice->line_h_d;
     tex_y = (start - (mlx->height / 2) + (slice->line_h_d / 2)) * step;
 
-    // 3) Draw wall slice
     for (y = start; y < end; y++)
     {
         int tex_y_int = (int)tex_y;
@@ -159,7 +134,6 @@ void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
         put_pixel(slice->x, y, color, mlx);
         tex_y += step;
     }
-    // 4) Draw floor
     for (y = end; y < mlx->height; y++)
         put_pixel(slice->x, y, elem->floor_color->hex_color, mlx);
 }
