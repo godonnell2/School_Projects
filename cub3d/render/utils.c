@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:23:19 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/07/19 13:26:52 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 17:05:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,47 @@ t_ray_step	init_ray_step(float x_intercept, float y_intercept, float x_step,
 	return (step);
 }
 
-t_render_slice	init_render_slice(int x, int texX, int start_end[2], int line_h)
+float get_padding(float move)
 {
-	t_render_slice	slice;
-
-	slice.x = x;
-	slice.texX = texX;
-	slice.start = start_end[0];
-	slice.end = start_end[1];
-	slice.line_h = line_h;
-	return (slice);
+    if (move > 0)
+        return COLLISION_PADDING;
+    else
+        return -COLLISION_PADDING;
 }
+
+bool is_wall(t_map *map, float x, float y)
+{
+    int map_x = (int)(x / TILE_SIZE);
+    int map_y = (int)(y / TILE_SIZE);
+
+    if (map_x < 0 || map_y < 0 || map_x >= map->width || map_y >= map->height)
+        return true;
+
+    // printf("is_wall check: x=%.2f, y=%.2f -> map_x=%d, map_y=%d\n", x, y, map_x, map_y);
+    // printf("Map content at (%d, %d): %c\n", map_y, map_x, map->map[map_y][map_x]);
+    return (map->map[map_y][map_x] == '1');
+}
+
+
+// void	init_ray_steps(t_ray_step *step, float ray_angle, t_player *player)
+// {
+// 	// Find ray directions
+// 	step->vertical_dir = (cos(ray_angle) > 0) ? EAST : WEST;
+// 	step->horizontal_dir = (sin(ray_angle) > 0) ? SOUTH : NORTH;
+
+// 	// VERTICAL STEP SETUP (checking vertical grid lines)
+// 	step->x_step = TILE_SIZE;
+// 	if (step->vertical_dir == WEST)
+// 		step->x_step *= -1;
+// 	step->y_step = step->x_step * tan(ray_angle);
+
+// 	step->next_x = floor(player->player_x / TILE_SIZE) * TILE_SIZE;
+// 	if (step->vertical_dir == EAST)
+// 		step->next_x += TILE_SIZE;
+// 	step->next_y = player->player_y + (step->next_x - player->player_x) * tan(ray_angle);
+
+// 	// If ray is facing WEST, adjust starting x slightly back to avoid precision errors
+// 	if (step->vertical_dir == WEST)
+// 		step->next_x -= 0.0001;
+// }
+

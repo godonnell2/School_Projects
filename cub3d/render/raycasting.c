@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:21:46 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/10 16:13:02 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 16:14:14 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,28 +22,8 @@ void	store_ray_data(t_ray *ray, t_cast *cast, float angle, bool vertical)
 	ray->vertical_hit = vertical;
 
 }
-
-/*
- Fires one ray at a given angle from the player's position.
- fish-eye correction to keep walls from looking warped.
-collission returns where the ray first hits a wall horizontally
-and then verticaly
-these fill out t_cast structs
-Rays farther from the center of the screen travel at an angle —
-without correction, those walls look stretched.
-cos(...) scales the distance to correct that —
-this way, walls appear vertically aligned even if the ray is at an angle.
-no hit infinity otelse we calc  distance between player
-n hit point Pythag
-
- corrected for fish-eye.
-Store the result into the ray buffer (rays[col])
-so rendering code knows what to draw.
- one ray result per screen column.
-The vertical_hit flag is important for later:
-Shade vertical walls darker Pick the right tex(e.g., N wall vs E wall)
- */
-
+// Pick closer ray 
+ //   if (h.distance < v.distance)
 static void cast_ray(t_cub_elements *elem, float angle, int col, t_ray *rays)
 {
     t_cast  h;
@@ -54,7 +34,6 @@ static void cast_ray(t_cub_elements *elem, float angle, int col, t_ray *rays)
     find_horizontal_collision(elem->map, angle, &h, &elem->player);
     find_vertical_collision(elem->map, angle, &v, &elem->player);
 
-    // Use raw distances for comparison
     if (!h.hitted)
         h.distance = INFINITY;
     else
@@ -65,23 +44,36 @@ static void cast_ray(t_cub_elements *elem, float angle, int col, t_ray *rays)
     else
         v.distance = hit_distance(px, py, v.hit[X], v.hit[Y]);
 
-    // Pick closer ray (raw distance, no fisheye correction here)
     if (h.distance < v.distance)
     {
-        // Removed fisheye correction here
         store_ray_data(&rays[col], &h, angle, /*vertical_hit=*/false);
     }
     else
     {
-        // Removed fisheye correction here
-        store_ray_data(&rays[col], &v, angle, /*vertical_hit=*/true);
+        store_ray_data(&rays[col], &v, angle, true);
+    }
+}
+
+void raycasting(t_data *app, t_ray *rays, t_cub_elements *elem)
+{
+    float angle;
+    int col;
+    float ray_step;
+
+    ray_step = FOV / (float)app->mlx->width;  
+    angle = elem->player.angle - HALF_FOV;
+    col = 0;
+    while (col < app->mlx->width)
+    {
+        angle = normalize_angle(angle);
+        cast_ray(elem, angle, col, rays);
+        angle += ray_step;  
+        col++;
     }
 }
 /* Cast a ray for each column across the screen
 If their FOV is 60 degrees, then:
-
 They can see 30 degrees to the left
-
 And 30 degrees to the right of A
 angle = π/2 - π/6 = π/3      // left-most ray
 			↑
@@ -95,28 +87,6 @@ angle = π/2 - π/6 = π/3      // left-most ray
 		\
 			↓
 		π/2 + π/6 = 2π/3        // right-most ray
-
 ach ray_step moves you a tiny bit to the right,
 	until you sweep from left to right across the whole FOV.
-
-
 */
-void raycasting(t_data *app, t_ray *rays, t_cub_elements *elem)
-{
-    float angle;
-    int col;
-    float ray_step;
-
-    ray_step = FOV / (float)app->mlx->width;  // Use app->mlx->width, not WIDTH unless WIDTH is defined
-    angle = elem->player.angle - HALF_FOV;
-    col = 0;
-    while (col < app->mlx->width)
-    {
-        angle = normalize_angle(angle);
-        cast_ray(elem, angle, col, rays);
-        angle += ray_step;  // Use local variable here
-        col++;
-    }
-
-
-}

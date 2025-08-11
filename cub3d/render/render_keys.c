@@ -6,27 +6,13 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/10 16:40:42 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 16:31:36 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3d.h"
 
 // app var means it holds everything i need at run time
-/*
-void	init_renderer(t_data *app, int screen_w, int screen_h)
-{
-	app->mlx->mlx_ptr = mlx_init();
-	app->mlx->win_ptr = mlx_new_window(app->mlx->mlx_ptr, screen_w, screen_h,
-			"cub3d");
-	app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, screen_w, screen_h);
-	app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr,
-			&app->mlx->bits_per_pixel, &app->mlx->line_length,
-			&app->mlx->endian);
-	app->mlx->width = screen_w;
-	app->mlx->height = screen_h;
-}
-*/
 //need tp include this !!!!!
 void	destroy_renderer(t_data *app)
 {
@@ -36,27 +22,24 @@ void	destroy_renderer(t_data *app)
 		mlx_destroy_window(app->mlx->mlx_ptr, app->mlx->win_ptr);
 }
 
-/*
-rays is a static ptr only allocated once teh first tiem render frame runs
-one ray per vertical column of the screen.
-so however many pixels wide is how many rays
-*/
-/* High‑level routine you call each frame */
- // Destroy the previous image to prevent a memory leak
- // Create a new image for the current frame
- // Handle error
- // Get the address of the pixel data for the new image
- void clear_image(t_mlx *mlx, int color)
+void clear_image(t_mlx *mlx, int color)
 {
-    for (int y = 0; y < mlx->height; y++)
-        for (int x = 0; x < mlx->width; x++)
+    int y = 0;
+    while (y < mlx->height)
+    {
+        int x = 0;
+        while (x < mlx->width)
+        {
             put_pixel(x, y, color, mlx);
+            x++;
+        }
+        y++;
+    }
 }
 
 void	render_frame(t_data *app)
 {
 	static t_ray	*rays = NULL;
-
    
     if (app->mlx->img_ptr)
         mlx_destroy_image(app->mlx->mlx_ptr, app->mlx->img_ptr);
@@ -64,7 +47,6 @@ void	render_frame(t_data *app)
     app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, app->mlx->width, app->mlx->height);
     if (!app->mlx->img_ptr)
         return; 
-
 
     app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr, &app->mlx->bits_per_pixel, &app->mlx->line_length, &app->mlx->endian);
 
@@ -78,7 +60,7 @@ void	render_frame(t_data *app)
  // 'w' eycode == 119)          
 int handle_keypress(int keycode, t_data *data)
 {
-    printf("Key pressed: %d\n", keycode);
+    //printf("Key pressed: %d\n", keycode);
     if (keycode == 119)           
         data->keys.w = 1;
     else if (keycode == 115)     

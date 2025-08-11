@@ -1,127 +1,94 @@
 #include "../cub3d.h"
 
-
-bool is_wall(t_map *map, float x, float y)
+void move_player_fwd_bkwd(t_map *map, t_player *player, float speed, int direction)
 {
-    int map_x = (int)(x / TILE_SIZE);
-    int map_y = (int)(y / TILE_SIZE);
-
-    if (map_x < 0 || map_y < 0 || map_x >= map->width || map_y >= map->height)
-        return true;
-
-    // printf("is_wall check: x=%.2f, y=%.2f -> map_x=%d, map_y=%d\n", x, y, map_x, map_y);
-    // printf("Map content at (%d, %d): %c\n", map_y, map_x, map->map[map_y][map_x]);
-    return (map->map[map_y][map_x] == '1');
-}
-
-
-void move_forward(t_map *map, t_player *player, float speed)
-{
-    float move_x = cos(player->angle) * speed;
-    float move_y = sin(player->angle) * speed;
-
-    // Check collision with padding
-    if (!is_wall(map, player->player_x + move_x + COLLISION_PADDING * (move_x > 0 ? 1 : -1), player->player_y))
-        player->player_x += move_x;
-    else
-        printf("[move_forward] Hit wall on X axis\n");
-
-    if (!is_wall(map, player->player_x, player->player_y + move_y + COLLISION_PADDING * (move_y > 0 ? 1 : -1)))
-        player->player_y += move_y;
-    else
-        printf("[move_forward] Hit wall on Y axis\n");
-}
-
-void move_backward(t_map *map, t_player *player, float speed)
-{
-    float move_x = -cos(player->angle) * speed;
-    float move_y = -sin(player->angle) * speed;
+    float move_x = cos(player->angle) * speed * direction;
+    float move_y = sin(player->angle) * speed * direction;
 
     if (!is_wall(map, player->player_x + move_x + COLLISION_PADDING * (move_x > 0 ? 1 : -1), player->player_y))
         player->player_x += move_x;
-    else
-        printf("[move_backward] Hit wall on X axis\n");
+    // else
+    //     printf("[move_player] Hit wall on X axis\n");
 
     if (!is_wall(map, player->player_x, player->player_y + move_y + COLLISION_PADDING * (move_y > 0 ? 1 : -1)))
         player->player_y += move_y;
-    else
-        printf("[move_backward] Hit wall on Y axis\n");
+    // else
+    //     printf("[move_player] Hit wall on Y axis\n");
 }
 
-void move_left(t_map *map, t_player *player, float speed)
+ // left  -1)
+ // right 1
+void move_strafe(t_map *map, t_player *player, float speed, int direction)
 {
-    // Left strafe is perpendicular (angle - 90 degrees)
-    float move_x = -sin(player->angle) * speed;
-    float move_y = cos(player->angle) * speed;
+    float move_x;
+    float move_y;
+    float padding_x;
+    float padding_y;
 
-    if (!is_wall(map, player->player_x + move_x + COLLISION_PADDING * (move_x > 0 ? 1 : -1), player->player_y))
+    if (direction == -1) 
+    {
+        move_x = -sin(player->angle) * speed;
+        move_y = cos(player->angle) * speed;
+    }
+    else if (direction == 1) 
+    {
+        move_x = sin(player->angle) * speed;
+        move_y = -cos(player->angle) * speed;
+    }
+    else
+        return; 
+
+    padding_x = get_padding(move_x);
+    padding_y = get_padding(move_y);
+
+    if (!is_wall(map, player->player_x + move_x + padding_x, player->player_y))
         player->player_x += move_x;
-    else
-        printf("[move_left] Hit wall on X axis\n");
 
-    if (!is_wall(map, player->player_x, player->player_y + move_y + COLLISION_PADDING * (move_y > 0 ? 1 : -1)))
+    if (!is_wall(map, player->player_x, player->player_y + move_y + padding_y))
         player->player_y += move_y;
-    else
-        printf("[move_left] Hit wall on Y axis\n");
 }
 
-void move_right(t_map *map, t_player *player, float speed)
+void rotate_player(t_player *player, float angle_delta)
 {
-    // Right strafe is perpendicular (angle + 90 degrees)
-    float move_x = sin(player->angle) * speed;
-    float move_y = -cos(player->angle) * speed;
+    player->angle += angle_delta;
 
-    if (!is_wall(map, player->player_x + move_x + COLLISION_PADDING * (move_x > 0 ? 1 : -1), player->player_y))
-        player->player_x += move_x;
-    else
-        printf("[move_right] Hit wall on X axis\n");
+    // Wrap angle between 0 and 2*PI
+    if (player->angle < 0)
+        player->angle += 2 * M_PI;
+    else if (player->angle >= 2 * M_PI)
+        player->angle -= 2 * M_PI;
 
-    if (!is_wall(map, player->player_x, player->player_y + move_y + COLLISION_PADDING * (move_y > 0 ? 1 : -1)))
-        player->player_y += move_y;
-    else
-        printf("[move_right] Hit wall on Y axis\n");
+    // Update direction vector
+    player->dir_x = cos(player->angle);
+    player->dir_y = sin(player->angle);
 }
 
-void move_player(t_map *map, t_player *player, t_keys keys) {
+// forward 1
+// backward -1
+//Handles only linear and strafing movement based on WASD keys.
+void move_player_by_keys(t_map *map, t_player *player, t_keys keys) 
+{
     if (keys.w)
-        move_forward(map, player, MOVE_SPEED);
+        move_player_fwd_bkwd(map, player, MOVE_SPEED, 1);    
     if (keys.s)
-        move_backward(map, player, MOVE_SPEED);
+        move_player_fwd_bkwd(map, player, MOVE_SPEED, -1);   
     if (keys.a)
-        move_left(map, player, MOVE_SPEED);
+        move_strafe(map, player, MOVE_SPEED, -1);         
     if (keys.d)
-        move_right(map, player, MOVE_SPEED);
+        move_strafe(map, player, MOVE_SPEED, 1);
 }
 
-void	rotate_left(t_player *player, float angle)
-{
-	player->angle -= angle;
-	if (player->angle < 0)
-		player->angle += 2 * M_PI;
-
-	// Update direction vector
-	player->dir_x = cos(player->angle);
-	player->dir_y = sin(player->angle);
-}
-
-void	rotate_right(t_player *player, float angle)
-{
-	player->angle += angle;
-	if (player->angle >= 2 * M_PI)
-		player->angle -= 2 * M_PI;
-
-	// Update direction vector
-	player->dir_x = cos(player->angle);
-	player->dir_y = sin(player->angle);
-}
-
+//handle_movement: Handles all movement and rotation,
 void handle_movement(t_data *data) {
     t_player *player = &data->elem->player;
-    
-    if (data->keys.w) move_forward(data->elem->map, player, MOVE_SPEED);
-    if (data->keys.s) move_backward(data->elem->map, player, MOVE_SPEED);
-    if (data->keys.a) move_left(data->elem->map, player, MOVE_SPEED);
-    if (data->keys.d) move_right(data->elem->map, player, MOVE_SPEED);
-    if (data->keys.left) rotate_left(player, ROTATE_SPEED);
-    if (data->keys.right) rotate_right(player, ROTATE_SPEED);
+    t_map *map = data->elem->map;
+    t_keys keys = data->keys;
+
+    if (keys.w || keys.s || keys.a || keys.d)
+        move_player_by_keys(map, player, keys);
+
+    if (keys.left)
+        rotate_player(player, -ROTATE_SPEED);
+    if (keys.right)
+        rotate_player(player, ROTATE_SPEED);
 }

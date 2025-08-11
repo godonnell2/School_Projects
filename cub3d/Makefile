@@ -37,7 +37,7 @@ SRCS = main.c \
        render/put_line.c \
        render/raycasting_utils.c \
        render/raycasting.c \
-       render/render.c \
+       render/render_keys.c \
        render/utils.c \
        render/movement.c
 

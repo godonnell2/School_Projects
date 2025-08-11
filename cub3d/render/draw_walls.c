@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/10 17:09:29 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 16:26:18 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,29 +30,16 @@ t_texture	*select_texture(t_cub_elements *app, t_ray *ray)
 	}
 }
 
-
 /*
-Calculate where exactly the ray hit the wall in world space
-If the ray hit a vertical wall, then the X coordinate is fixed
-(you hit a vertical plane), and the Y coordinate changes —
-so we calculate wallX using the y axis.
-The player's Y-coordinate.
-ray->dist: The distance from the player to the hit point on the wall.
-If the ray hit a horizontal wall,
 then wallX is computed using the x axis.
 Normalize to 0–1 ie get teh fractional part  of the width
 then you find that part of the texture
-If the wall is facing left or up, but the player hits it from the
-right or below, the visible face should be reversed.
-Scale it to the texture width
-
 */
 
-int get_tex_x(t_ray *ray, t_texture *tex, t_map *map)
+int get_tex_x(t_ray *ray, t_texture *tex)
 {
     double wall_hit_pos; // fractional position along the wall
     int tex_x;
-    (void)map;
 
     if (ray->vertical_hit)
         wall_hit_pos = ray->hit[Y];  // use Y position for vertical walls
@@ -69,7 +56,6 @@ int get_tex_x(t_ray *ray, t_texture *tex, t_map *map)
         wall_hit_pos = TILE_SIZE - wall_hit_pos;
     }
 
-    
     // Map fractional position to texture X coordinate
     tex_x = (int)((wall_hit_pos / TILE_SIZE) * tex->width);
 
@@ -82,7 +68,6 @@ int get_tex_x(t_ray *ray, t_texture *tex, t_map *map)
 t_render_slice calculate_slice(t_mlx *mlx, t_ray *ray, int col, t_cub_elements *elem)
 {
     t_render_slice slice;
-    t_map *map = elem->map;
     double corrected_dist;
     double dist_proj_plane;
     double raw_line_h;   /* double, unclamped */
@@ -115,9 +100,9 @@ t_render_slice calculate_slice(t_mlx *mlx, t_ray *ray, int col, t_cub_elements *
 
     /* 5) compute texture X coordinate */
     tex = select_texture(elem, ray);
-    texx = get_tex_x(ray, tex, map);
+    texx = get_tex_x(ray, tex);
 
-    /* 6) fill slice struct */
+   
     slice.x = col;
     slice.texX = texx;
     slice.start = start;
@@ -144,7 +129,7 @@ This ensures that the texture is scaled and aligned correctly
  Finally, it fetches the color from the texture and draws it onto the screen.
 */
 void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
-                      t_ray *ray, t_cub_elements *elem)
+                      t_cub_elements *elem)
 {
     double step;
     double tex_y;
@@ -152,24 +137,16 @@ void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
 
     int start = slice->start;
     int end = slice->end;
-(void) ray;
     // Clamp to screen bounds
     if (start < 0) start = 0;
     if (end > mlx->height) end = mlx->height;
 
     // 1) Draw ceiling
-    for (y = 0; y < start; y++) {
+    for (y = 0; y < start; y++) 
         put_pixel(slice->x, y, elem->ceiling_color->hex_color, mlx);
-    }
-
     // 2) Prepare texture mapping
     step = (double)tex->height / slice->line_h_d;
     tex_y = (start - (mlx->height / 2) + (slice->line_h_d / 2)) * step;
-    if (tex_y < 0) {
-        // Debug: clamp negative tex_y
-        printf("[DEBUG] Clamping negative tex_y start (%f) to 0\n", tex_y);
-        tex_y = 0;
-    }
 
     // 3) Draw wall slice
     for (y = start; y < end; y++)
@@ -179,34 +156,25 @@ void draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
         if (tex_y_int >= tex->height) tex_y_int = tex->height - 1;
 
         int color = get_tex_pixel(tex, slice->texX, tex_y_int);
-
-        // Optional: detect suspicious colors (like green tint)
-        if ((color & 0x00FF00) > 0x007F00 && (color & 0xFF0000) < 0x003F00) {
-            printf("[DEBUG] Possible green pixel at x=%d y=%d, color=0x%X\n", slice->x, y, color);
-        }
-
         put_pixel(slice->x, y, color, mlx);
-
         tex_y += step;
     }
-
     // 4) Draw floor
-    for (y = end; y < mlx->height; y++) {
+    for (y = end; y < mlx->height; y++)
         put_pixel(slice->x, y, elem->floor_color->hex_color, mlx);
-    }
 }
 
 void draw_walls(t_mlx *mlx, t_ray *rays, t_cub_elements *elem)
 {
-    for (int x = 0; x < mlx->width; x++)
+   int x = 0;
+    while (x < mlx->width)
     {
         t_ray *ray = &rays[x];
         t_render_slice slice = calculate_slice(mlx, ray, x, elem);
         t_texture *tex = select_texture(elem, ray);
 
-        draw_wall_column(mlx, tex, &slice, ray, elem);
+        draw_wall_column(mlx, tex, &slice, elem);
+        x++;
     }
-
-    // Push the frame to window
     mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->img_ptr, 0, 0);
 }

@@ -6,35 +6,31 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:10 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/10 15:38:54 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 16:04:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3d.h"
-// grid line below player if facing down
-// slightly above grid line if facing up
-float calculate_y_intercept(float angle, t_player *player)
+
+float calculate_intercept(float angle, t_player *player, bool is_vertical)
 {
-    int tile_y = floor(player->player_y / TILE_SIZE) * TILE_SIZE;
-
-    if (is_ray_facing(SOUTH, angle))
-        return (tile_y + TILE_SIZE);  
+    if (is_vertical)
+    {
+        int tile_x = floor(player->player_x / TILE_SIZE) * TILE_SIZE;
+        if (is_ray_facing(EAST, angle))
+            return tile_x + TILE_SIZE;
+        else
+            return tile_x - 0.0001f;
+    }
     else
-        return (tile_y - 0.0001f);   
+    {
+        int tile_y = floor(player->player_y / TILE_SIZE) * TILE_SIZE;
+        if (is_ray_facing(SOUTH, angle))
+            return tile_y + TILE_SIZE;
+        else
+            return tile_y - 0.0001f;
+    }
 }
-
-// Returns initial vertical gridline x intercept for the ray
- // slightly left if facing left
-float calculate_x_intercept(float angle, t_player *player)
-{
-    int tile_x = floor(player->player_x / TILE_SIZE) * TILE_SIZE;
-
-    if (is_ray_facing(EAST, angle))
-        return (tile_x + TILE_SIZE);  
-    else
-        return (tile_x - 0.0001f);  
-}
-
 // Adjust y coordinate for horizontal rays to check correct tile based on ray direction
 static void trace_ray(t_map *map, t_ray_step *step, t_cast *h)
 {
@@ -56,7 +52,7 @@ static void trace_ray(t_map *map, t_ray_step *step, t_cast *h)
             return;
         }
 
-        if (map->map[m_y][m_x] == '1')  // wall hit
+        if (map->map[m_y][m_x] == '1')  
         {
             h->hit[X] = step->next_x;
             h->hit[Y] = step->next_y;
@@ -76,74 +72,52 @@ static void trace_ray(t_map *map, t_ray_step *step, t_cast *h)
 	    // Calculate initial x intercept for horizontal line
 void find_horizontal_collision(t_map *map, float angle, t_cast *h, t_player *player)
 {
-    float y_intercept = calculate_y_intercept(angle, player);
+    float y_intercept = calculate_intercept(angle, player, false); 
     float x_intercept;
     float y_step;
     float x_step;
-    t_ray_step step;
 
-   
     float tan_angle = tan(angle);
     if (fabs(tan_angle) < 0.0001f)
         tan_angle = 0.0001f;
 
-    if (is_ray_facing(SOUTH, angle))
-        y_step = TILE_SIZE;
-    else
-        y_step = -TILE_SIZE;
-
- 
+    y_step = is_ray_facing(SOUTH, angle) ? TILE_SIZE : -TILE_SIZE;
     x_step = TILE_SIZE / tan_angle;
 
-   
     if ((x_step > 0 && is_ray_facing(WEST, angle)) || (x_step < 0 && is_ray_facing(EAST, angle)))
         x_step = -x_step;
 
-
     x_intercept = player->player_x + (y_intercept - player->player_y) / tan_angle;
 
-    step.next_x = x_intercept;
-    step.next_y = y_intercept;
-    step.x_step = x_step;
-    step.y_step = y_step;
+    t_ray_step step = init_ray_step(x_intercept, y_intercept, x_step, y_step);
     step.vertical_dir = is_ray_facing(SOUTH, angle) ? SOUTH : NORTH;
 
     trace_ray(map, &step, h);
 }
-
- // y_step is delta y per x step: y_step = TILE_SIZE * tan(angle)
-     // Fix sign if direction opposite
+//  // y_step is delta y per x step: y_step = TILE_SIZE * tan(angle)
+//      // Fix sign if direction opposite
 void find_vertical_collision(t_map *map, float angle, t_cast *v, t_player *player)
 {
-    float x_intercept = calculate_x_intercept(angle, player);
+    float x_intercept = calculate_intercept(angle, player, true);
     float y_intercept;
     float x_step;
     float y_step;
-    t_ray_step step;
 
     float tan_angle = tan(angle);
     if (fabs(tan_angle) < 0.0001f)
         tan_angle = 0.0001f;
 
-    if (is_ray_facing(EAST, angle))
-        x_step = TILE_SIZE;
-    else
-        x_step = -TILE_SIZE;
-
-   
+    x_step = is_ray_facing(EAST, angle) ? TILE_SIZE : -TILE_SIZE;
     y_step = TILE_SIZE * tan_angle;
-
 
     if ((y_step > 0 && is_ray_facing(NORTH, angle)) || (y_step < 0 && is_ray_facing(SOUTH, angle)))
         y_step = -y_step;
 
     y_intercept = player->player_y + (x_intercept - player->player_x) * tan_angle;
 
-    step.next_x = x_intercept;
-    step.next_y = y_intercept;
-    step.x_step = x_step;
-    step.y_step = y_step;
+    t_ray_step step = init_ray_step(x_intercept, y_intercept, x_step, y_step);
     step.vertical_dir = is_ray_facing(EAST, angle) ? EAST : WEST;
 
     trace_ray(map, &step, v);
 }
+
