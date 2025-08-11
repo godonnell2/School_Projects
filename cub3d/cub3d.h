@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/11 17:05:49 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 18:55:29 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,7 +236,8 @@ void move_player(t_map *map, t_player *player, t_keys keys);
 void	handle_movement(t_data *data);
 
 // putline.c
-
+void	fill_floor(t_mlx *mlx, t_cub_elements *elem, int x, int start);
+void	fill_ceiling(t_mlx *mlx, t_cub_elements *elem, int x, int start);
 void put_pixel(int x, int y, int color, t_mlx *mlx);
 void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
 int rgb_to_hex(int rgb[3]);
@@ -268,6 +269,8 @@ bool is_wall(t_map *map, float x, float y);
 int get_tex_pixel(t_texture *tex, int x, int y);
 
  int	handle_close(t_data *data);
+
+ 
 
 //movement.c
 bool	is_wall(t_map *map, float x, float y);

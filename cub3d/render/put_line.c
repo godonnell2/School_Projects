@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:21:56 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/11 15:44:01 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/11 18:55:35 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,30 @@ int	get_tex_pixel(t_texture *tex, int x, int y)
 	if (bpp == 3)
 		return (pixel[0] | (pixel[1] << 8) | (pixel[2] << 16));
 	return (0);
+}
+
+void	fill_ceiling(t_mlx *mlx, t_cub_elements *elem, int x, int start)
+{
+	int	y;
+
+	y = 0;
+	while (y < start)
+	{
+		put_pixel(x, y, elem->ceiling_color->hex_color, mlx);
+		y++;
+	}
+}
+
+void	fill_floor(t_mlx *mlx, t_cub_elements *elem, int x, int start)
+{
+	int	y;
+
+	y = start;
+	while (y < mlx->height)
+	{
+		put_pixel(x, y, elem->floor_color->hex_color, mlx);
+		y++;
+	}
 }
 
 void	put_pixel(int x, int y, int color, t_mlx *mlx)
