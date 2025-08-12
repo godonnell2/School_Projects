@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:21:56 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/11 18:55:35 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/12 09:18:33 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,20 @@ void	put_pixel(int x, int y, int color, t_mlx *mlx)
 	*(unsigned int *)(mlx->img_data + offset) = color;
 }
 
-void	fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color)
+t_texture	*select_texture(t_cub_elements *app, t_ray *ray)
 {
-	int	y;
-
-	y = y_start;
-	while (y < y_end)
+	if (ray->vertical_hit)
 	{
-		put_pixel(x, y, color, mlx);
-		y++;
+		if (is_ray_facing(EAST, ray->angle))
+			return (app->ea_text);
+		else
+			return (app->we_text);
+	}
+	else
+	{
+		if (is_ray_facing(NORTH, ray->angle))
+			return (app->no_text);
+		else
+			return (app->so_text);
 	}
 }

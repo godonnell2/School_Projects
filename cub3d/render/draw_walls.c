@@ -6,29 +6,11 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/11 19:02:20 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/12 09:19:50 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3d.h"
-
-t_texture	*select_texture(t_cub_elements *app, t_ray *ray)
-{
-	if (ray->vertical_hit)
-	{
-		if (is_ray_facing(EAST, ray->angle))
-			return (app->ea_text);
-		else
-			return (app->we_text);
-	}
-	else
-	{
-		if (is_ray_facing(NORTH, ray->angle))
-			return (app->no_text);
-		else
-			return (app->so_text);
-	}
-}
 
 /*
 then wallX is computed using the x axis.
@@ -57,6 +39,28 @@ int	get_tex_x(t_ray *ray, t_texture *tex)
 	return (tex_x);
 }
 
+static double	correct_distance(t_ray *ray, t_player *player)
+{
+	double	corrected;
+
+	corrected = ray->distance * cos(ray->angle - player->angle);
+	if (corrected <= 0.00001)
+		corrected = 0.00001;
+	return (corrected);
+}
+
+static int	get_line_height(double corrected_dist, double dist_proj_plane)
+{
+	double	raw_line_h;
+	int		draw_line_h;
+
+	raw_line_h = ((double)TILE_SIZE / corrected_dist) * dist_proj_plane;
+	draw_line_h = (int)raw_line_h;
+	if (draw_line_h < 1)
+		draw_line_h = 1;
+	return (draw_line_h);
+}
+
 t_render_slice	calculate_slice(t_mlx *mlx, t_ray *ray, int col,
 		t_cub_elements *elem)
 {
@@ -64,37 +68,20 @@ t_render_slice	calculate_slice(t_mlx *mlx, t_ray *ray, int col,
 	double			corrected_dist;
 	double			dist_proj_plane;
 	t_texture		*tex;
-	int				texx;
-	double			raw_line_h;
-	int				draw_line_h;
-	int				start;
-	int				end;
 
-	corrected_dist = (double)ray->distance * cos(ray->angle
-			- elem->player.angle);
-	if (corrected_dist <= 0.00001)
-		corrected_dist = 0.00001;
+	corrected_dist = correct_distance(ray, &elem->player);
 	dist_proj_plane = ((double)mlx->width / 2.0) / tan(FOV / 2.0);
-	raw_line_h = ((double)TILE_SIZE / corrected_dist) * dist_proj_plane;
-	draw_line_h = (int)raw_line_h;
-	if (draw_line_h < 1)
-		draw_line_h = 1;
-	if (draw_line_h > mlx->height)
-		draw_line_h = mlx->height;
-	start = (mlx->height / 2) - (draw_line_h / 2);
-	if (start < 0)
-		start = 0;
-	end = start + draw_line_h;
-	if (end >= mlx->height)
-		end = mlx->height - 1;
+	slice.line_h = get_line_height(corrected_dist, dist_proj_plane);
+	slice.start = (mlx->height / 2) - (slice.line_h / 2);
+	if (slice.start < 0)
+		slice.start = 0;
+	slice.end = slice.start + slice.line_h;
+	if (slice.end >= mlx->height)
+		slice.end = mlx->height - 1;
 	tex = select_texture(elem, ray);
-	texx = get_tex_x(ray, tex);
 	slice.x = col;
-	slice.texX = texx;
-	slice.start = start;
-	slice.end = end;
-	slice.line_h = draw_line_h;
-	slice.line_h_d = raw_line_h;
+	slice.texX = get_tex_x(ray, tex);
+	slice.line_h_d = ((double)TILE_SIZE / corrected_dist) * dist_proj_plane;
 	return (slice);
 }
 
