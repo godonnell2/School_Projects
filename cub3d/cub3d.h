@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/11 18:55:29 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/13 10:01:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,14 +239,17 @@ void	handle_movement(t_data *data);
 void	fill_floor(t_mlx *mlx, t_cub_elements *elem, int x, int start);
 void	fill_ceiling(t_mlx *mlx, t_cub_elements *elem, int x, int start);
 void put_pixel(int x, int y, int color, t_mlx *mlx);
-void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
-int rgb_to_hex(int rgb[3]);
+//void fill_column(t_mlx *mlx, int x, int y_start, int y_end, int color);
+//int rgb_to_hex(int rgb[3]);
+t_texture	*select_texture(t_cub_elements *app, t_ray *ray);
 
 // collisions_hor.c
 void	find_horizontal_collision(t_map *map, float angle, t_cast *h, t_player *player);
 t_ray_step init_ray_step(float x_intercept, float y_intercept, float x_step,
                          float y_step);
+                         float	calculate_intercept(float angle, t_player *player, bool is_vertical);
 void	find_vertical_collision(t_map *map, float angle, t_cast *v, t_player *player);
+int	get_map_y(t_ray_step *step);
 
 // draw_walls.c
 void draw_walls(t_mlx *mlx, t_ray *rays, t_cub_elements *elem);
@@ -256,6 +259,8 @@ void raycasting(t_data *app, t_ray *rays, t_cub_elements *elem);
 
 // raycasting utils
 bool is_ray_facing(int dir, float angle);
+t_ray_step	init_horizontal_step(t_player *player, float angle);
+t_ray_step	init_vertical_step(t_player *player, float angle);
 
 // utils.c
 float hit_distance(float x1, float y1, float x2, float y2);
