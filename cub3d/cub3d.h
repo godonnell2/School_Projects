@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/13 10:01:03 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:06:57 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ typedef struct s_data
     t_mlx *mlx;
     t_cub_elements *elem;
     t_keys	keys;
+    int closing;
 } t_data;
 typedef enum e_direction
 {
@@ -274,7 +275,7 @@ bool is_wall(t_map *map, float x, float y);
 int get_tex_pixel(t_texture *tex, int x, int y);
 
  int	handle_close(t_data *data);
-
+void free_all_safe(t_data *data);
  
 
 //movement.c

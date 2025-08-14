@@ -6,21 +6,31 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:16:59 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/07/19 15:19:33 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:47:47 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	free_texture(t_texture *texture, void *mlx_ptr)
+// had to update this to avoid double free was causing segfault just put the ptr to null
+    // Corrected: Destroy texture->img_ptr, not texture->data
+void free_texture(t_texture *texture, void *mlx_ptr)
 {
-	if (!texture)
-		return ;
-	if (texture->data && mlx_ptr)
-		mlx_destroy_image(mlx_ptr, texture->data);
-	if (texture->path)
-		free(texture->path);
-	free(texture);
+    if (!texture)
+        return;
+
+
+    if (mlx_ptr && texture->img_ptr) {
+        mlx_destroy_image(mlx_ptr, texture->img_ptr);
+        texture->img_ptr = NULL; 
+    }
+
+    if (texture->path) {
+        free(texture->path);
+        texture->path = NULL;
+    }
+
+    free(texture);
 }
 
 static t_texture	*init_text_struct(void)
@@ -34,6 +44,10 @@ static t_texture	*init_text_struct(void)
 	texture->height = 0;
 	texture->width = 0;
 	texture->path = NULL;
+	 texture->bits_per_pixel = 0;    // <-- ADD THIS: 
+    texture->line_length = 0;       // <-- ADD THIS: 
+    texture->endian = 0;            // <-- ADD THIS: 
+    texture->path = NULL;
 	return (texture);
 }
 

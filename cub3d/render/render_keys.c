@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/11 17:59:59 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:44:31 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,52 +14,113 @@
 
 // app var means it holds everything i need at run time
 // need tp include this !!!!!
-void	destroy_renderer(t_data *app)
+//Frees an existing mlx image resource (the one from the previous frame)
+//call it before creating a new image, to avoid memory leaks
+//It completely destroys the buffer — you cannot draw into it afterwards
+static void safe_destroy_image(t_mlx *m, void **img_ptr)
 {
-	if (app->mlx->img_ptr)
-		mlx_destroy_image(app->mlx->mlx_ptr, app->mlx->img_ptr);
-	if (app->mlx->win_ptr)
-		mlx_destroy_window(app->mlx->mlx_ptr, app->mlx->win_ptr);
+    if (m && m->mlx_ptr && img_ptr && *img_ptr) {
+        mlx_destroy_image(m->mlx_ptr, *img_ptr);
+        *img_ptr = NULL;
+    }
 }
 
-void	clear_image(t_mlx *mlx, int color)
-{
-	int	y;
-	int	x;
-
-	y = 0;
-	while (y < mlx->height)
-	{
-		x = 0;
-		while (x < mlx->width)
-		{
-			put_pixel(x, y, color, mlx);
-			x++;
-		}
-		y++;
+void clear_image(t_mlx *mlx, int color) 
+{ 
+	int y; 
+	int x;
+	 y = 0; 
+	while (y < mlx->height) 
+	{ 
+		x = 0; while (x < mlx->width) 
+		{ 
+			put_pixel(x, y, color, mlx); 
+			x++; 
+		} y++; 
 	}
-}
-
-void	render_frame(t_data *app)
+ }
+ 
+static void safe_destroy_window(t_mlx *m)
 {
-	static t_ray	*rays = NULL;
-
-	if (app->mlx->img_ptr)
-		mlx_destroy_image(app->mlx->mlx_ptr, app->mlx->img_ptr);
-	app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, app->mlx->width,
-			app->mlx->height);
-	if (!app->mlx->img_ptr)
-		return ;
-	app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr,
-			&app->mlx->bits_per_pixel, &app->mlx->line_length,
-			&app->mlx->endian);
-	clear_image(app->mlx, 0x000000);
-	if (!rays)
-		rays = malloc(sizeof(*rays) * app->mlx->width);
-	raycasting(app, rays, app->elem);
-	draw_walls(app->mlx, rays, app->elem);
+    if (m && m->mlx_ptr && m->win_ptr) {
+        mlx_destroy_window(m->mlx_ptr, m->win_ptr);
+        m->win_ptr = NULL;
+    }
 }
 
+static void safe_destroy_display_and_free(t_mlx *m)
+{
+
+    if (m && m->mlx_ptr) {
+        mlx_destroy_display(m->mlx_ptr);
+        free(m->mlx_ptr);
+        m->mlx_ptr = NULL;
+    }
+}
+
+void free_all_safe(t_data *data)
+{
+    if (!data)
+        return;
+
+    if (data->elem) {
+        if (data->mlx && data->mlx->mlx_ptr)
+            free_cub_elements(data->elem, data->mlx->mlx_ptr);
+        else
+            free_cub_elements(data->elem, NULL);
+
+        free(data->elem);
+        data->elem = NULL;
+    }
+
+    if (data->mlx) {
+        // Destroy current frame image safely
+        safe_destroy_image(data->mlx, (void **)&data->mlx->img_ptr);
+
+        // Destroy window safely
+        safe_destroy_window(data->mlx);
+
+        // Destroy display and free mlx_ptr safely
+        safe_destroy_display_and_free(data->mlx);
+
+        free(data->mlx);
+        data->mlx = NULL;
+    }
+
+    free(data);
+}
+
+void render_frame(t_data *app)
+{
+    // Guard: if window/ctx already gone, do nothing
+  if (!app || app->closing) return;
+    if (!app->mlx || !app->mlx->mlx_ptr || !app->mlx->win_ptr) return;
+    // Destroy previous frame image safely
+    safe_destroy_image(app->mlx, (void **)&app->mlx->img_ptr);
+
+    app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, app->mlx->width, app->mlx->height);
+    if (!app->mlx->img_ptr) return;
+
+    app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr,
+                                           &app->mlx->bits_per_pixel,
+                                           &app->mlx->line_length,
+                                           &app->mlx->endian);
+
+    clear_image(app->mlx, 0x000000);
+
+    // allocate rays once (or keep it in t_data and free in free_all)
+    static t_ray *rays = NULL;
+    static int rays_w = 0;
+    if (!rays || rays_w != app->mlx->width) {
+        free(rays);
+        rays = malloc(sizeof(*rays) * app->mlx->width);
+        rays_w = app->mlx->width;
+    }
+    if (!rays) return;
+
+    raycasting(app, rays, app->elem);
+    draw_walls(app->mlx, rays, app->elem);
+}
 // 'w' eycode == 119)
 // printf("Key pressed: %d\n", keycode);
 int	handle_keypress(int keycode, t_data *data)

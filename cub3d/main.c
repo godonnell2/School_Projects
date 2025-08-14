@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:22:01 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/12 11:30:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:42:08 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,19 @@
 
 // hrmm we might still need these fns i didnt account for this yet
 
-int	handle_close(t_data *data)
+int handle_close(t_data *data)
 {
-	free_all(data);
-	exit(0);
-	return (0);
-}
+    if (!data) return (0);
+    if (data->closing) return (0);
 
+    data->closing = 1;
+
+    // Tell MLX to stop the loop; after this returns, no more loop iterations
+    if (data->mlx && data->mlx->mlx_ptr)
+        mlx_loop_end(data->mlx->mlx_ptr);
+
+    return (0);
+}
 // i dont think we really need this one anymore
 // int handle_key(int keycode, t_data *data)
 // {
@@ -34,11 +40,14 @@ int	handle_close(t_data *data)
 // 	return (0);
 // }
 
-int	game_loop(t_data *data)
+int game_loop(t_data *data)
 {
-	handle_movement(data);
-	render_frame(data);
-	return (0);
+    if (!data || data->closing)
+        return (0);
+
+    handle_movement(data);
+    render_frame(data);
+    return (0);
 }
 
 void	init_player_from_map(t_map *map, t_player *player)
@@ -80,32 +89,33 @@ void	init_player_from_map(t_map *map, t_player *player)
 	//	player->player_y);
 }
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	t_data	*data;
+    t_data *data = malloc(sizeof(*data));
+    if (!data) return (1);
 
-	data = malloc(sizeof(t_data));
-	if (!data)
-		return (1);
-	data->elem = NULL;
-	data->mlx = NULL;
-	if (data_init(argc, argv, data) != 0)
-	{
-		free_all(data);
-		return (0);
-	}
-	init_player_from_map(data->elem->map, &data->elem->player);
-	// key press event
-	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, handle_keypress, data);
-	// key release event
-	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, handle_keyrelease, data);
-	// window close event (click X on window)
-	mlx_hook(data->mlx->win_ptr, 17, 0, handle_close, data);
-	render_frame(data);
-	// main loop hook, called every frame
-		// register your per-frame update function
-	mlx_loop_hook(data->mlx->mlx_ptr, game_loop, data);
-	// start the main event loop
-	mlx_loop(data->mlx->mlx_ptr);
-	return (0);
+    // Hard-initialize everything to 0/NULL to avoid UB later
+    memset(data, 0, sizeof(*data));
+    // (data->closing = 0; implicit from memset)
+
+    if (data_init(argc, argv, data) != 0) {
+        free_all_safe(data);   // ok to free here, loop never started
+        return (0);
+    }
+
+    init_player_from_map(data->elem->map, &data->elem->player);
+
+    mlx_hook(data->mlx->win_ptr, 2, 1L<<0, handle_keypress, data);
+    mlx_hook(data->mlx->win_ptr, 3, 1L<<1, handle_keyrelease, data);
+    mlx_hook(data->mlx->win_ptr, 17, 0, handle_close, data);
+
+    render_frame(data);
+    mlx_loop_hook(data->mlx->mlx_ptr, game_loop, data);
+
+    // This blocks until handle_close() calls mlx_loop_end()
+    mlx_loop(data->mlx->mlx_ptr);
+
+    // Now it's safe to free everything exactly once
+    free_all_safe(data);
+    return (0);
 }
