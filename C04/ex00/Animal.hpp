@@ -19,3 +19,4 @@ public:
 };
 
 #endif
+//→ the class itself and all derived classes can access it.

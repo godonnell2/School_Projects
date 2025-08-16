@@ -26,3 +26,9 @@ void Animal::makeSound() const {
 std::string Animal::getType() const {
     return type;
 }
+
+//constructor call is type 
+//Animal a("Dog"); "Dog" initializes the private _type member.
+//A getter is just a function that lets you get the value of 
+//a private (or protected) member variable in a class.
+// Virtual methods are for behavior that changes across derived classes.
