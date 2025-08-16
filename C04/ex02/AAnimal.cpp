@@ -1,4 +1,4 @@
-#include "Animal.hpp"
+#include "AAnimal.hpp"
 
 AAnimal::AAnimal() : type("AAnimal") {
 	std::cout << "AAnimal Default constructor called." << std::endl;
