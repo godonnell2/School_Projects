@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/14 14:44:31 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/16 10:41:48 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,112 +14,113 @@
 
 // app var means it holds everything i need at run time
 // need tp include this !!!!!
-//Frees an existing mlx image resource (the one from the previous frame)
-//call it before creating a new image, to avoid memory leaks
-//It completely destroys the buffer — you cannot draw into it afterwards
-static void safe_destroy_image(t_mlx *m, void **img_ptr)
+// Frees an existing mlx image resource (the one from the previous frame)
+// call it before creating a new image, to avoid memory leaks
+// It completely destroys the buffer — you cannot draw into it afterwards
+static void	safe_destroy_image(t_mlx *m, void **img_ptr)
 {
-    if (m && m->mlx_ptr && img_ptr && *img_ptr) {
-        mlx_destroy_image(m->mlx_ptr, *img_ptr);
-        *img_ptr = NULL;
-    }
-}
-
-void clear_image(t_mlx *mlx, int color) 
-{ 
-	int y; 
-	int x;
-	 y = 0; 
-	while (y < mlx->height) 
-	{ 
-		x = 0; while (x < mlx->width) 
-		{ 
-			put_pixel(x, y, color, mlx); 
-			x++; 
-		} y++; 
+	if (m && m->mlx_ptr && img_ptr && *img_ptr)
+	{
+		mlx_destroy_image(m->mlx_ptr, *img_ptr);
+		*img_ptr = NULL;
 	}
- }
- 
-static void safe_destroy_window(t_mlx *m)
-{
-    if (m && m->mlx_ptr && m->win_ptr) {
-        mlx_destroy_window(m->mlx_ptr, m->win_ptr);
-        m->win_ptr = NULL;
-    }
 }
 
-static void safe_destroy_display_and_free(t_mlx *m)
+void	clear_image(t_mlx *mlx, int color)
 {
+	int	y;
+	int	x;
 
-    if (m && m->mlx_ptr) {
-        mlx_destroy_display(m->mlx_ptr);
-        free(m->mlx_ptr);
-        m->mlx_ptr = NULL;
-    }
+	y = 0;
+	while (y < mlx->height)
+	{
+		x = 0;
+		while (x < mlx->width)
+		{
+			put_pixel(x, y, color, mlx);
+			x++;
+		}
+		y++;
+	}
 }
 
-void free_all_safe(t_data *data)
+static void	safe_destroy_window(t_mlx *m)
 {
-    if (!data)
-        return;
-
-    if (data->elem) {
-        if (data->mlx && data->mlx->mlx_ptr)
-            free_cub_elements(data->elem, data->mlx->mlx_ptr);
-        else
-            free_cub_elements(data->elem, NULL);
-
-        free(data->elem);
-        data->elem = NULL;
-    }
-
-    if (data->mlx) {
-        // Destroy current frame image safely
-        safe_destroy_image(data->mlx, (void **)&data->mlx->img_ptr);
-
-        // Destroy window safely
-        safe_destroy_window(data->mlx);
-
-        // Destroy display and free mlx_ptr safely
-        safe_destroy_display_and_free(data->mlx);
-
-        free(data->mlx);
-        data->mlx = NULL;
-    }
-
-    free(data);
+	if (m && m->mlx_ptr && m->win_ptr)
+	{
+		mlx_destroy_window(m->mlx_ptr, m->win_ptr);
+		m->win_ptr = NULL;
+	}
 }
 
-void render_frame(t_data *app)
+static void	safe_destroy_display_and_free(t_mlx *m)
 {
-    // Guard: if window/ctx already gone, do nothing
-  if (!app || app->closing) return;
-    if (!app->mlx || !app->mlx->mlx_ptr || !app->mlx->win_ptr) return;
-    // Destroy previous frame image safely
-    safe_destroy_image(app->mlx, (void **)&app->mlx->img_ptr);
+	if (m && m->mlx_ptr)
+	{
+		mlx_destroy_display(m->mlx_ptr);
+		free(m->mlx_ptr);
+		m->mlx_ptr = NULL;
+	}
+}
 
-    app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, app->mlx->width, app->mlx->height);
-    if (!app->mlx->img_ptr) return;
+void	free_all_safe(t_data *data)
+{
+	if (!data)
+		return ;
+	if (data->elem)
+	{
+		if (data->mlx && data->mlx->mlx_ptr)
+			free_cub_elements(data->elem, data->mlx->mlx_ptr);
+		else
+			free_cub_elements(data->elem, NULL);
+		free(data->elem);
+		data->elem = NULL;
+	}
+	if (data->mlx)
+	{
+		
+		safe_destroy_image(data->mlx, (void **)&data->mlx->img_ptr);
+		
+		safe_destroy_window(data->mlx);
+		
+		safe_destroy_display_and_free(data->mlx);
+		free(data->mlx);
+		data->mlx = NULL;
+	}
+	free(data);
+}
 
-    app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr,
-                                           &app->mlx->bits_per_pixel,
-                                           &app->mlx->line_length,
-                                           &app->mlx->endian);
+void	render_frame(t_data *app)
+{
+	static t_ray	*rays = NULL;
+	static int		rays_w = 0;
 
-    clear_image(app->mlx, 0x000000);
-
-    // allocate rays once (or keep it in t_data and free in free_all)
-    static t_ray *rays = NULL;
-    static int rays_w = 0;
-    if (!rays || rays_w != app->mlx->width) {
-        free(rays);
-        rays = malloc(sizeof(*rays) * app->mlx->width);
-        rays_w = app->mlx->width;
-    }
-    if (!rays) return;
-
-    raycasting(app, rays, app->elem);
-    draw_walls(app->mlx, rays, app->elem);
+	// Guard: if window/ctx already gone, do nothing
+	if (!app || app->closing)
+		return ;
+	if (!app->mlx || !app->mlx->mlx_ptr || !app->mlx->win_ptr)
+		return ;
+	// Destroy previous frame image safely
+	safe_destroy_image(app->mlx, (void **)&app->mlx->img_ptr);
+	app->mlx->img_ptr = mlx_new_image(app->mlx->mlx_ptr, app->mlx->width,
+			app->mlx->height);
+	if (!app->mlx->img_ptr)
+		return ;
+	app->mlx->img_data = mlx_get_data_addr(app->mlx->img_ptr,
+			&app->mlx->bits_per_pixel, &app->mlx->line_length,
+			&app->mlx->endian);
+	clear_image(app->mlx, 0x000000);
+	// allocate rays once (or keep it in t_data and free in free_all)
+	if (!rays || rays_w != app->mlx->width)
+	{
+		free(rays);
+		rays = malloc(sizeof(*rays) * app->mlx->width);
+		rays_w = app->mlx->width;
+	}
+	if (!rays)
+		return ;
+	raycasting(app, rays, app->elem);
+	draw_walls(app->mlx, rays, app->elem);
 }
 // 'w' eycode == 119)
 // printf("Key pressed: %d\n", keycode);
@@ -137,28 +138,25 @@ int	handle_keypress(int keycode, t_data *data)
 		data->keys.left = 1;
 	else if (keycode == 65363)
 		data->keys.right = 1;
-	else if (keycode == 65362)
-		data->keys.w = 1;
-	else if (keycode == 65364)
-		data->keys.s = 1;
 	else if (keycode == 65307)
 		handle_close(data);
 	return (0);
 }
 
-int	handle_keyrelease(int keycode, t_data *data)
+int handle_keyrelease(int keycode, t_data *data)
 {
-	if (keycode == KEY_W || keycode == 65362)
-		data->keys.w = 0;
-	else if (keycode == KEY_S || keycode == 65364)
-		data->keys.s = 0;
-	else if (keycode == KEY_A)
-		data->keys.a = 0;
-	else if (keycode == KEY_D)
-		data->keys.d = 0;
-	else if (keycode == KEY_LEFT)
-		data->keys.left = 0;
-	else if (keycode == KEY_RIGHT)
-		data->keys.right = 0;
-	return (0);
+    if (keycode == KEY_W)
+        data->keys.w = 0;
+    else if (keycode == KEY_S)
+        data->keys.s = 0;
+    else if (keycode == KEY_A)
+        data->keys.a = 0;
+    else if (keycode == KEY_D)
+        data->keys.d = 0;
+    else if (keycode == KEY_LEFT)
+        data->keys.left = 0;
+    else if (keycode == KEY_RIGHT)
+        data->keys.right = 0;
+
+    return 0;
 }

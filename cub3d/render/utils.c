@@ -60,10 +60,10 @@ bool	is_wall(t_map *map, float x, float y)
 		return (true);
 	return (map->map[map_y][map_x] == '1');
 }
-	// printf("is_wall check: x=%.2f, y=%.2f -> map_x=%d, map_y=%d\n", x, y,
-	//	map_x, map_y);
-	// printf("Map content at (%d, %d): %c\n", map_y, map_x,
-	//	map->map[map_y][map_x]);
+// printf("is_wall check: x=%.2f, y=%.2f -> map_x=%d, map_y=%d\n", x, y,
+//	map_x, map_y);
+// printf("Map content at (%d, %d): %c\n", map_y, map_x,
+//	map->map[map_y][map_x]);
 
 // void	init_ray_steps(t_ray_step *step, float ray_angle, t_player *player)
 // {
