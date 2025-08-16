@@ -39,4 +39,5 @@ This table contains pointers to the actual function implementations for each typ
 For AAnimal, the vtable contains a pointer for makeSound(), but since it’s pure virtual, it points to a “pure virtual function called” handler.
 
 For derived classes like Dog or Cat, their vtables have makeSound() pointing to their own implementations.
+animal is more a concept or category doesnt make sense to have instance of somethign that abstract
 */
