@@ -1,6 +1,9 @@
 #include "Animal.hpp"
 #include "Dog.hpp"
 #include "Cat.hpp"
+#include "WrongAnimal.hpp"
+#include "WrongCat.hpp"
+
 
 int main() {
     std::cout << "=== Creating Animals ===\n";
@@ -26,6 +29,15 @@ int main() {
     Cat cat3;
     cat3 = cat1;
 
+     std::cout << "--- Wrong Animals ---\n";
+    const WrongAnimal* wa = new WrongAnimal();
+    const WrongAnimal* wc = new WrongCat();
+
+    wa->makeSound(); // Some wrong animal sound
+    wc->makeSound(); // Still prints wrong animal sound because makeSound is NOT virtual
+
+    delete wa;
+    delete wc;
     return 0;
 }
 /* 
