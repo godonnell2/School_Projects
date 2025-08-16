@@ -44,6 +44,7 @@ you allocate a new Brain and copy the ideas over,
  Deep Copy	Prevents shared pointers to the same Brain (no shallow copies)
 bject Copying	You're testing object cloning and assignment
  Encapsulation	Brain is private and only manipulated via Dog/Cat
-
+ so that two cats dont have the same brain!!!
+ it might destory the brain that the other cat is using shallow copy bad in some cases
 
 */
