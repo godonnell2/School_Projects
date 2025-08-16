@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:39 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/16 10:41:48 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:48:19 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,38 +63,40 @@ static void	safe_destroy_display_and_free(t_mlx *m)
 	}
 }
 
-void	free_all_safe(t_data *data)
+void free_all_safe(t_data *data)
 {
-	if (!data)
-		return ;
-	if (data->elem)
-	{
-		if (data->mlx && data->mlx->mlx_ptr)
-			free_cub_elements(data->elem, data->mlx->mlx_ptr);
-		else
-			free_cub_elements(data->elem, NULL);
-		free(data->elem);
-		data->elem = NULL;
-	}
-	if (data->mlx)
-	{
-		
-		safe_destroy_image(data->mlx, (void **)&data->mlx->img_ptr);
-		
-		safe_destroy_window(data->mlx);
-		
-		safe_destroy_display_and_free(data->mlx);
-		free(data->mlx);
-		data->mlx = NULL;
-	}
-	free(data);
+    if (!data)
+        return;
+    if (data->elem)
+    {
+        if (data->mlx && data->mlx->mlx_ptr)
+            free_cub_elements(data->elem, data->mlx->mlx_ptr);
+        else
+            free_cub_elements(data->elem, NULL);
+        free(data->elem);
+        data->elem = NULL;
+    }
+
+    if (data->mlx)
+    {
+        safe_destroy_image(data->mlx, (void **)&data->mlx->img_ptr);
+        safe_destroy_window(data->mlx);
+        safe_destroy_display_and_free(data->mlx);
+        free(data->mlx);
+        data->mlx = NULL;
+    }
+
+    if (data->rays)     
+    {
+        free(data->rays);
+        data->rays = NULL;
+    }
+
+    free(data);
 }
 
 void	render_frame(t_data *app)
 {
-	static t_ray	*rays = NULL;
-	static int		rays_w = 0;
-
 	// Guard: if window/ctx already gone, do nothing
 	if (!app || app->closing)
 		return ;
@@ -111,16 +113,16 @@ void	render_frame(t_data *app)
 			&app->mlx->endian);
 	clear_image(app->mlx, 0x000000);
 	// allocate rays once (or keep it in t_data and free in free_all)
-	if (!rays || rays_w != app->mlx->width)
-	{
-		free(rays);
-		rays = malloc(sizeof(*rays) * app->mlx->width);
-		rays_w = app->mlx->width;
-	}
-	if (!rays)
+if (!app->rays || app->rays_w != app->mlx->width)
+{
+    free(app->rays);
+    app->rays = malloc(sizeof(t_ray) * app->mlx->width);
+    app->rays_w = app->mlx->width;
+}
+	if (!app->rays)
 		return ;
-	raycasting(app, rays, app->elem);
-	draw_walls(app->mlx, rays, app->elem);
+	raycasting(app, app->rays, app->elem);
+	draw_walls(app->mlx, app->rays, app->elem);
 }
 // 'w' eycode == 119)
 // printf("Key pressed: %d\n", keycode);
