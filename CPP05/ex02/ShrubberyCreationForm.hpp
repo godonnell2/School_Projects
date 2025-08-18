@@ -3,7 +3,7 @@
 #pragma once
 
 #include "AForm.hpp"
-#include "Bureucrat.hpp"
+#include "Bureaucrat.hpp"
 # include <iostream>
 # include <string>
 # include <cstring>
@@ -12,7 +12,7 @@
 # include <fstream>
 # include <exception>
 
-class Bureucrat;
+class Bureaucrat;
 
 class ShrubberyCreationForm : public AForm
 {

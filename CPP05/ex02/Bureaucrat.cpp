@@ -1,8 +1,9 @@
 #include "Bureaucrat.hpp"
+#include "AForm.hpp"
 
 Bureaucrat::Bureaucrat(): name("joe"), grade(100)
 {
-	std::cout << "bureacrat default constructor called\n";
+	std::cout << "bureaucrat default constructor called\n";
 }
 
 Bureaucrat::Bureaucrat(Bureaucrat& cpy): name(cpy.get_name()), grade(cpy.get_grade())
@@ -63,4 +64,30 @@ void	Bureaucrat::DecrementGrade(void)
 		grade++;
 	else
 		throw GradeTooLowException();
+}
+
+void	Bureaucrat::signForm(AForm& Aform)
+{
+	try
+	{
+		Aform.be_signed(*this);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cerr << this << "cant sign the Aform " << Aform  << "because " << ex.what();
+	}
+}
+
+void	Bureaucrat::executeForm(AForm const &Aform)
+{
+	try
+	{
+		Aform.execute(*this);
+		std::cout << name << " executed " << Aform.get_name() << "\n";
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 }

@@ -4,7 +4,7 @@
 int main(void)
 {
 	Form	form_28b;
-	Bureucrat	mister;
+	Bureaucrat	mister;
 
 	mister.signForm(form_28b);
 

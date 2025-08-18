@@ -4,9 +4,9 @@
 
 # include <iostream>
 # include <exception>
-# include "Bureucrat.hpp"
+# include "Bureaucrat.hpp"
 
-class Bureucrat;
+class Bureaucrat;
 
 class Form
 {
@@ -24,7 +24,7 @@ public:
 	bool		get_signed_status(void)const;
 	int			get_sign_required_grade(void)const;
 	int			get_execute_required_grade(void)const;
-	void		be_signed(Bureucrat& signer);
+	void		be_signed(Bureaucrat& signer);
 	class GradeToLowToSign : public std::exception
 	{
 		public:

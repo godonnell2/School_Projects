@@ -27,7 +27,7 @@ std::ostream &operator<<(std::ostream & os, Form const &form)
 	return (os);
 }
 
-void	Form::be_signed(Bureucrat& signer)
+void	Form::be_signed(Bureaucrat& signer)
 {
 	std::cout << signer << "is trying to sign " << this;
 	if (signer.get_grade() > sign_required_grade)
