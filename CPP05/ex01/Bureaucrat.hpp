@@ -5,7 +5,7 @@
 #include <iostream>
 #include <exception>
 
-class AForm;
+class Form;
 class Bureaucrat
 {
 private:
