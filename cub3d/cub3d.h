@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:06:57 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:47:22 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "mlx.h"
 
 // maths defines
+# define M_PI 3.14159265358979323846
 #define PI 3.14159265
 #define TWO_PI 6.28318530
 #define HALF_PI 1.57079632
@@ -76,6 +77,7 @@ typedef struct s_texture
     int     endian;
     char    *path;           // optional, for debug or filepath
 }   t_texture;
+
 typedef struct s_color
 {
     int rgb_color[3];
@@ -117,8 +119,7 @@ float player_y;
     float angle;    // curr facing angle (optional)
     float ray_step; // horizontal FOV step per column
 } t_player;
-//  float   x;           changed refs to his struct cub_elements->map->player_x
-// float   y;           // changes refs to his in another struct
+
 typedef struct s_cub_elements
 {
     t_texture *no_text;
@@ -132,13 +133,31 @@ typedef struct s_cub_elements
     t_texture texture;
 } t_cub_elements;
 
+typedef struct s_ray
+{
+    float distance;       // raw distance from player
+    float correct_dist;   // distance corrected for fish-eye
+    float angle;          // ray angle
+    double hit[2];        // exact hit coords
+    bool N;
+    bool E;
+    bool vertical_hit;    // did we hit a vertical wall?
+    char wall_content;    // which wall texture to use ('N','S','E','W')
+    int wall_top;         // pixel y for top of wall
+    int wall_bottom;      // pixel y for bottom of wall
+} t_ray;
+
+
 typedef struct s_data
 {
     t_mlx *mlx;
     t_cub_elements *elem;
     t_keys	keys;
     int closing;
+    t_ray *rays;
+	int rays_w; //store width for realloc DO I REALLLY NEED THIS ??
 } t_data;
+
 typedef enum e_direction
 {
     EAST,
@@ -160,20 +179,6 @@ typedef struct s_cast
     float distance; // perp-corrected distance
     char content;   // map cell content ('1' for wall)
 } t_cast;
-
-typedef struct s_ray
-{
-    float distance;       // raw distance from player
-    float correct_dist;   // distance corrected for fish-eye
-    float angle;          // ray angle
-    double hit[2];        // exact hit coords
-    bool N;
-    bool E;
-    bool vertical_hit;    // did we hit a vertical wall?
-    char wall_content;    // which wall texture to use ('N','S','E','W')
-    int wall_top;         // pixel y for top of wall
-    int wall_bottom;      // pixel y for bottom of wall
-} t_ray;
 
 typedef struct s_ray_step
 {
