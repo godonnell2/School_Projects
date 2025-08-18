@@ -2,11 +2,11 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 RM          = rm -f
 
-NAME        = baca
+NAME        = bureau
 
-INCLUDES    = Bureucrat.hpp
+INCLUDES    = Bureaucrat.hpp
 
-SRCS        = Bureucrat.cpp main.cpp
+SRCS        = Bureaucrat.cpp main.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 

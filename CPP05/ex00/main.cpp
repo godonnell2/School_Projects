@@ -1,8 +1,8 @@
-#include "Bureucrat.hpp"
+#include "Bureaucrat.hpp"
 
 int main(void)
 {
-	Bureucrat a;
+	Bureaucrat a;
 	std::cout << a;
 
 	for (int i = 0 ; i < 51 ; i++)

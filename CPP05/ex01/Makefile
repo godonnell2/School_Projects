@@ -2,9 +2,9 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 RM          = rm -f
 
-NAME        = baca
+NAME        = bureau
 
-INCLUDES    = Bureucrat.hpp Form.hpp
+INCLUDES    = Bureaucrat.hpp Form.hpp
 
 SRCS        = Form.cpp Form_get.cpp Form_exceptions.cpp Bureucrat.cpp main.cpp
 

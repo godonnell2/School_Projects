@@ -2,11 +2,11 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 RM          = rm -f
 
-NAME        = baca
+NAME        = bureau
 
-INCLUDES    = Bureucrat.hpp AForm.hpp PresidentialPardonForm.hpp ShrubberyCreationForm.hpp RobotomyRequestForm.hpp
+INCLUDES    = Bureaucrat.hpp AForm.hpp PresidentialPardonForm.hpp ShrubberyCreationForm.hpp RobotomyRequestForm.hpp
 
-SRCS        = AForm.cpp AForm_exceptions.cpp AForm_get.cpp PresidentialPardonForm.cpp ShrubberyCreationForm.cpp RobotomyRequestForm.cpp Bureucrat.cpp main.cpp
+SRCS        = AForm.cpp AForm_exceptions.cpp AForm_get.cpp PresidentialPardonForm.cpp ShrubberyCreationForm.cpp RobotomyRequestForm.cpp Bureaucrat.cpp main.cpp
 
 OBJS        = $(SRCS:.cpp=.o)
 

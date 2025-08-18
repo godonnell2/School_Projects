@@ -1,4 +1,4 @@
-#include "Bureucrat.hpp"
+#include "Bureaucrat.hpp"
 #include "AForm.hpp"
 #include "ShrubberyCreationForm.hpp"
 #include "PresidentialPardonForm.hpp"
@@ -7,7 +7,7 @@
 int main(void)
 {
 	ShrubberyCreationForm	form_28b;
-	Bureucrat	mister;
+	Bureaucrat	mister;
 
 	mister.signForm(form_28b);
 	mister.executeForm(form_28b);
