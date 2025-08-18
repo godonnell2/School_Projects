@@ -2,7 +2,7 @@
 
 const char *AForm::GradeToLowToSign::err() const throw()
 {
-	return ("grade to low to sign\n");
+	return ("grade too low to sign\n");
 }
 
 const char *AForm::GradeTooHighException::what() const throw()
