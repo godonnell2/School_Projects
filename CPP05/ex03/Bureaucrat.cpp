@@ -64,3 +64,29 @@ void	Bureaucrat::DecrementGrade(void)
 	else
 		throw GradeTooLowException();
 }
+
+void	Bureaucrat::signForm(AForm& Aform)
+{
+	try
+	{
+		Aform.be_signed(*this);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cerr << this << "cant sign the Aform " << Aform  << "because " << ex.what();
+	}
+}
+
+void	Bureaucrat::executeForm(AForm const &Aform)
+{
+	try
+	{
+		Aform.execute(*this);
+		std::cout << name << " executed " << Aform.get_name() << "\n";
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
+}

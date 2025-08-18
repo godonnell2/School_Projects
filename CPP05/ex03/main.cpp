@@ -7,7 +7,7 @@
 
 int main(void)
 {
-	Bureucrat	mister;
+	Bureaucrat	mister;
 	Intern		grub;
 
 	std::string target("home");

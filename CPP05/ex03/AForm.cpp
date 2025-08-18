@@ -32,7 +32,7 @@ std::ostream &operator<<(std::ostream & os, AForm const &Aform)
 	return (os);
 }
 
-void	AForm::be_signed(Bureucrat& signer)
+void	AForm::be_signed(Bureaucrat& signer)
 {
 	std::cout << signer << "is trying to sign " << this;
 	if (signer.get_grade() > sign_required_grade)
@@ -44,7 +44,7 @@ void	AForm::be_signed(Bureucrat& signer)
 	}
 }
 
-void	AForm::execute(Bureucrat const & executor)const
+void	AForm::execute(Bureaucrat const & executor)const
 {
 	if (!is_signed)
 		throw FormNotSignedException();
