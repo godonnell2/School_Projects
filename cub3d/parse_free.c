@@ -47,10 +47,10 @@ void	free_cub_elements(t_cub_elements *cub3d, void *mlx_ptr)
 	cub3d->so_text = NULL;
 	cub3d->we_text = NULL;
 	cub3d->ea_text = NULL;
-	cub3d->map = NULL; 
+	cub3d->map = NULL;
 }
 
-	 // added this to prevent segfault??cub3d->map = NULL;
+// added this to prevent segfault??cub3d->map = NULL;
 void	free_array(char **array)
 {
 	int	i;
