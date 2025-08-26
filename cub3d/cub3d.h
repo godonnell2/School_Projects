@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/26 13:07:00 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 13:15:42 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,11 +188,13 @@ enum
 typedef struct s_cast
 {
 	bool			hitted;
-	float hit[2];   // exact X,Y hit point
-	float distance; // perp-corrected distance
-	char content;   // map cell content ('1' for wall)
+	float			hit[2];
+	float			distance;
+	char			content;
 }					t_cast;
-
+// exact X,Y hit point 	float hit[2];
+// perp-corrected distance float distance;
+// map cell content ('1' for wall) 	char content;
 typedef struct s_ray_step
 {
 	float			next_x;
@@ -209,10 +211,11 @@ typedef struct s_render_slice
 	int				texX;
 	int				start;
 	int				end;
-	int line_h;      // clamped integer height (for drawing)
-	double line_h_d; // original projected height (double) — for texture mapping
+	int				line_h;
+	double			line_h_d;
 }					t_render_slice;
-
+// clamped integer height (for drawing) 	int line_h;
+// original projected height (double) — for texture mapping   double line_h_d;
 typedef struct s_slice
 {
 	int				top_pixel;
