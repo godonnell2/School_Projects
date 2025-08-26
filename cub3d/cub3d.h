@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/26 13:27:40 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 13:30:03 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,6 @@ typedef struct s_ray
 	double			hit[2];
 	bool			vertical_hit;
 	char			wall_content;
-	int				wall_top;
-	int				wall_bottom;
 }					t_ray;
 // distance corrected for fish-eye 	float correct_dist;
 // ray angle float angle;
