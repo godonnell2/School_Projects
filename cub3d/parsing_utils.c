@@ -25,8 +25,8 @@ bool	is_map_line(char *line)
 	while (trimmed[i])
 	{
 		c = trimmed[i];
-		if (c != ' ' && c != '0' && c != '1'
-			&& c != 'N' && c != 'S' && c != 'E' && c != 'W')
+		if (c != ' ' && c != '0' && c != '1' && c != 'N' && c != 'S' && c != 'E'
+			&& c != 'W')
 			return (false);
 		i++;
 	}
@@ -40,8 +40,8 @@ char	*trim_spaces(char *str)
 	while (*str == ' ' || *str == '\t')
 		str++;
 	len = ft_strlen(str);
-	while (len > 0 && (str[len - 1] == ' ' || str[len - 1] == '\t'
-			|| str[len - 1] == '\n' || str[len - 1] == '\r'))
+	while (len > 0 && (str[len - 1] == ' ' || str[len - 1] == '\t' || str[len
+			- 1] == '\n' || str[len - 1] == '\r'))
 		str[--len] = '\0';
 	return (str);
 }

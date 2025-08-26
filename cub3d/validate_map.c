@@ -62,12 +62,9 @@ int	flood_fill(char **map_data, int x, int y, int height)
 	if (!is_valid_tile(c, 0))
 		return (0);
 	map_data[y][x] = '*';
-	return (
-		flood_fill(map_data, x + 1, y, height)
-		&& flood_fill(map_data, x - 1, y, height)
-		&& flood_fill(map_data, x, y + 1, height)
-		&& flood_fill(map_data, x, y - 1, height)
-	);
+	return (flood_fill(map_data, x + 1, y, height) && flood_fill(map_data, x
+			- 1, y, height) && flood_fill(map_data, x, y + 1, height)
+		&& flood_fill(map_data, x, y - 1, height));
 }
 
 int	flood_fill_validate(t_map *map)

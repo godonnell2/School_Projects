@@ -13,24 +13,22 @@
 #include "cub3d.h"
 
 // had to update this to avoid double free was causing segfault just put the ptr to null
-    // Corrected: Destroy texture->img_ptr, not texture->data
-void free_texture(t_texture *texture, void *mlx_ptr)
+// Corrected: Destroy texture->img_ptr, not texture->data
+void	free_texture(t_texture *texture, void *mlx_ptr)
 {
-    if (!texture)
-        return;
-
-
-    if (mlx_ptr && texture->img_ptr) {
-        mlx_destroy_image(mlx_ptr, texture->img_ptr);
-        texture->img_ptr = NULL; 
-    }
-
-    if (texture->path) {
-        free(texture->path);
-        texture->path = NULL;
-    }
-
-    free(texture);
+	if (!texture)
+		return ;
+	if (mlx_ptr && texture->img_ptr)
+	{
+		mlx_destroy_image(mlx_ptr, texture->img_ptr);
+		texture->img_ptr = NULL;
+	}
+	if (texture->path)
+	{
+		free(texture->path);
+		texture->path = NULL;
+	}
+	free(texture);
 }
 
 static t_texture	*init_text_struct(void)
@@ -44,10 +42,10 @@ static t_texture	*init_text_struct(void)
 	texture->height = 0;
 	texture->width = 0;
 	texture->path = NULL;
-	 texture->bits_per_pixel = 0;    // <-- ADD THIS: 
-    texture->line_length = 0;       // <-- ADD THIS: 
-    texture->endian = 0;            // <-- ADD THIS: 
-    texture->path = NULL;
+	texture->bits_per_pixel = 0; // <-- ADD THIS:
+	texture->line_length = 0;    // <-- ADD THIS:
+	texture->endian = 0;         // <-- ADD THIS:
+	texture->path = NULL;
 	return (texture);
 }
 
@@ -95,8 +93,8 @@ bool	cub3d_parsing(int argc, char **argv, t_cub_elements *cub3d)
 		ft_printf("Error: Failed to initialize cub3d structure\n");
 		return (false);
 	}
-	if (!scan_cub_elements(argv[1], cub3d,
-			cub3d->ceiling_color, cub3d->floor_color))
+	if (!scan_cub_elements(argv[1], cub3d, cub3d->ceiling_color,
+			cub3d->floor_color))
 	{
 		ft_printf("Error: Failed to parse cub elements\n");
 		return (false);

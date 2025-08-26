@@ -22,10 +22,7 @@ int	init_mlx(t_mlx *mlx)
 		ft_putstr_fd("Failed to initialize mlx\n", 2);
 		return (EXIT_FAILURE);
 	}
-	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr,
-			WIDTH,
-			HEIGHT,
-			"Map Display");
+	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, WIDTH, HEIGHT, "Map Display");
 	if (mlx->win_ptr == NULL)
 	{
 		ft_putstr_fd("Failed to create a new window\n", 2);
@@ -37,10 +34,8 @@ int	init_mlx(t_mlx *mlx)
 		ft_putstr_fd("Failed to create image buffer\n", 2);
 		return (EXIT_FAILURE);
 	}
-	mlx->img_data = mlx_get_data_addr(mlx->img_ptr,
-                                   &mlx->bits_per_pixel,
-                                   &mlx->line_length,
-                                   &mlx->endian);
+	mlx->img_data = mlx_get_data_addr(mlx->img_ptr, &mlx->bits_per_pixel,
+			&mlx->line_length, &mlx->endian);
 	return (EXIT_SUCCESS);
 }
 
@@ -54,7 +49,6 @@ int	data_init(int argc, char **argv, t_data *data)
 		return (1);
 	data->mlx->mlx_ptr = NULL;
 	data->mlx->win_ptr = NULL;
-	
 	if (!cub3d_parsing(argc, argv, data->elem))
 	{
 		ft_putstr_fd("Error: Parsing failed\n", 2);
@@ -70,13 +64,11 @@ int	data_init(int argc, char **argv, t_data *data)
 		ft_putstr_fd("Error: Map not initialized\n", 2);
 		return (1);
 	}
-	
 	if (xpm_to_img(data->elem, data->mlx) != 0)
 	{
 		ft_putstr_fd("Error: Texture loading failed\n", 2);
 		return (1);
 	}
-
 	return (0);
 }
 

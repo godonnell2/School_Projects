@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:25:57 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/14 14:34:14 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:56:15 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,10 @@ void	free_cub_elements(t_cub_elements *cub3d, void *mlx_ptr)
 	cub3d->so_text = NULL;
 	cub3d->we_text = NULL;
 	cub3d->ea_text = NULL;
-	  cub3d->map = NULL; //added this to prevent segfault??
+	cub3d->map = NULL; 
 }
 
+	 // added this to prevent segfault??cub3d->map = NULL;
 void	free_array(char **array)
 {
 	int	i;
@@ -84,7 +85,7 @@ void	free_map(t_map *map)
 	free(map);
 }
 
-//im not sure we need this anymore??
+// im not sure we need this anymore??
 void	free_all(t_data *data)
 {
 	if (!data)
