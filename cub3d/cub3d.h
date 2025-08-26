@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/26 11:43:55 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:47:25 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,5 +297,9 @@ void	safe_destroy_image(t_mlx *m, void **img_ptr);
 void	clear_image(t_mlx *mlx, int color);
 void	safe_destroy_window(t_mlx *m);
 void	safe_destroy_display_and_free(t_mlx *m);
+
+//draw_walls_utils.c
+double	correct_distance(t_ray *ray, t_player *player);
+int	get_line_height(double corrected_dist, double dist_proj_plane);
 
 #endif

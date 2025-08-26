@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 13:22:05 by gro-donn          #+#    #+#             */
-/*   Updated: 2025/08/12 09:19:50 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:52:23 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,28 +39,6 @@ int	get_tex_x(t_ray *ray, t_texture *tex)
 	return (tex_x);
 }
 
-static double	correct_distance(t_ray *ray, t_player *player)
-{
-	double	corrected;
-
-	corrected = ray->distance * cos(ray->angle - player->angle);
-	if (corrected <= 0.00001)
-		corrected = 0.00001;
-	return (corrected);
-}
-
-static int	get_line_height(double corrected_dist, double dist_proj_plane)
-{
-	double	raw_line_h;
-	int		draw_line_h;
-
-	raw_line_h = ((double)TILE_SIZE / corrected_dist) * dist_proj_plane;
-	draw_line_h = (int)raw_line_h;
-	if (draw_line_h < 1)
-		draw_line_h = 1;
-	return (draw_line_h);
-}
-
 t_render_slice	calculate_slice(t_mlx *mlx, t_ray *ray, int col,
 		t_cub_elements *elem)
 {
@@ -85,8 +63,39 @@ t_render_slice	calculate_slice(t_mlx *mlx, t_ray *ray, int col,
 	return (slice);
 }
 
-void	draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
-		t_cub_elements *elem)
+// void	draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
+// 		t_cub_elements *elem)
+// {
+// 	double	step;
+// 	double	tex_y;
+// 	int		y;
+// 	int		tex_y_int;
+// 	int		color;
+
+// 	step = (double)tex->height / slice->line_h_d;
+// 	tex_y = (slice->start - (mlx->height / 2) + (slice->line_h_d / 2)) * step;
+// 	y = slice->start;
+// 	if (y < 0)
+// 		y = 0;
+// 	if (slice->end > mlx->height)
+// 		slice->end = mlx->height;
+// 	fill_ceiling(mlx, elem, slice->x, y);
+// 	while (y < slice->end)
+// 	{
+// 		tex_y_int = (int)tex_y;
+// 		if (tex_y_int < 0)
+// 			tex_y_int = 0;
+// 		if (tex_y_int >= tex->height)
+// 			tex_y_int = tex->height - 1;
+// 		color = get_tex_pixel(tex, slice->texX, tex_y_int);
+// 		put_pixel(slice->x, y++, color, mlx);
+// 		tex_y += step;
+// 	}
+// 	fill_floor(mlx, elem, slice->x, slice->end);
+// }
+
+static void	draw_wall_texture(t_mlx *mlx, t_texture *tex,
+			t_render_slice *slice)
 {
 	double	step;
 	double	tex_y;
@@ -101,7 +110,6 @@ void	draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
 		y = 0;
 	if (slice->end > mlx->height)
 		slice->end = mlx->height;
-	fill_ceiling(mlx, elem, slice->x, y);
 	while (y < slice->end)
 	{
 		tex_y_int = (int)tex_y;
@@ -113,6 +121,20 @@ void	draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
 		put_pixel(slice->x, y++, color, mlx);
 		tex_y += step;
 	}
+}
+
+void	draw_wall_column(t_mlx *mlx, t_texture *tex, t_render_slice *slice,
+		t_cub_elements *elem)
+{
+	int	y;
+
+	y = slice->start;
+	if (y < 0)
+		y = 0;
+	if (slice->end > mlx->height)
+		slice->end = mlx->height;
+	fill_ceiling(mlx, elem, slice->x, y);
+	draw_wall_texture(mlx, tex, slice);
 	fill_floor(mlx, elem, slice->x, slice->end);
 }
 

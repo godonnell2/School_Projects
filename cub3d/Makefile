@@ -40,6 +40,7 @@ SRCS = main.c \
        render/render_keys.c \
        render/utils.c \
        render/movement.c \
+       render/draw_walls_utils.c \
        render/free_render.c
 
 # Object files
