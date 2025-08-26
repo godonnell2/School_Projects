@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/26 13:15:42 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 13:19:10 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ typedef struct s_ray_step
 typedef struct s_render_slice
 {
 	int				x;
-	int				texX;
+	int				texx;
 	int				start;
 	int				end;
 	int				line_h;
@@ -293,8 +293,6 @@ float				hit_distance(float x1, float y1, float x2, float y2);
 float				normalize_angle(float angle);
 t_ray_step			init_ray_step(float x_intercept, float y_intercept,
 						float x_step, float y_step);
-// t_render_slice		init_render_slice(int x, int texX, int start_end[2],
-//	int line_h, double line_h_d);
 float				get_padding(float move);
 bool				is_wall(t_map *map, float x, float y);
 
