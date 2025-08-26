@@ -39,7 +39,8 @@ SRCS = main.c \
        render/raycasting.c \
        render/render_keys.c \
        render/utils.c \
-       render/movement.c
+       render/movement.c \
+       render/free_render.c
 
 # Object files
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)

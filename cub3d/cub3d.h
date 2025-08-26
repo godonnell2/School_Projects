@@ -6,7 +6,7 @@
 /*   By: gro-donn <gro-donn@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 18:26:20 by pviegas-          #+#    #+#             */
-/*   Updated: 2025/08/16 14:47:22 by gro-donn         ###   ########.fr       */
+/*   Updated: 2025/08/26 11:43:55 by gro-donn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,4 +291,11 @@ void	move_left(t_map *map, t_player *player, float speed);
 void	rotate_left(t_player *player, float angle);
 void	rotate_right(t_player *player, float angle);
 void	move_right(t_map *map, t_player *player, float speed);
+
+//free_render.c
+void	safe_destroy_image(t_mlx *m, void **img_ptr);
+void	clear_image(t_mlx *mlx, int color);
+void	safe_destroy_window(t_mlx *m);
+void	safe_destroy_display_and_free(t_mlx *m);
+
 #endif
